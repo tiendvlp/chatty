@@ -1,0 +1,110 @@
+ext {
+    //region - project configuration
+    compileSdkVersion = 30
+    buildToolsVersion  = "30.0.2"
+    applicationId = "com.devlogs.chatty"
+    minSdkVersion = 21
+    targetSdkVersion = 30
+    versionCode = 1
+    versionName = "1.0"
+    //endregion project configuration
+
+    //region - Plugins
+    def plugins = [
+            androidApplication: 'com.android.application',
+            kotlinKapt : 'kotlin-kapt',
+            kotlinAndroid : 'kotlin-android',
+            kotlinAndroidExtensions : 'kotlin-android-extensions',
+            daggerHiltPlugin: 'dagger.hilt.android.plugin'
+    ]
+    //endregion Plugins
+
+    //region - Dependencies
+    def daggerHilt = [group: "com.google.dagger",version: "2.28-alpha"]
+    daggerHiltDependencies = [
+            hiltAndroid: [configuration: "implementation", dependency: [group: daggerHilt.group, name: "hilt-android", version: daggerHilt.version]],
+            hiltAndroidCompiler: [configuration: "kapt", dependency: [group: daggerHilt.group, name: "hilt-android-compiler", version: daggerHilt.version]]
+    ]
+
+    def kotlin = [group: "org.jetbrains.kotlin", version: "1.4.20"]
+    kotlinDependencies = [
+            kotlinStdlib : [configuration: "implementation", dependency: [group: kotlin.group, name: "kotlin-stdlib", version: kotlin.verion]],
+    ]
+
+    def androidxCore = [group: "androidx.core", version: "1.3.2"]
+    androidxCoreDependencies = [
+           coreKtx: [configuration: "implementation", dependency: [group: androidxCore.group, name: "core-ktx", version: androidxCore.version]],
+    ]
+
+    def androidXAppCompat = [group: "androidx.appcompat", version: '1.2.0']
+    androidXAppCompatDependencies = [
+           androidXAppCompat: [configuration: "implementation", dependency: [group: androidXAppCompat.group, name: "appcompat"]],
+    ]
+
+    def material = [group: "com.google.android.material", version: "1.2.1"]
+    materialDependencies = [
+           material: [configuration: "implementation", dependency:  [group: material.group, name: "material", version: material.version]],
+    ]
+
+    def constraintLayout = [group: "androidx.constraintlayout", version: "2.0.4"]
+    constraintLayoutDependencies = [
+           constraintLayout: [configuration: "implementation", dependency: [group: constraintLayout.group, name: "constraintlayout", version: constraintLayout.version]],
+    ]
+
+    def junit = [group: "junit", version: "4.+"]
+    junitDependencies = [
+            junit: [configuration: "testImplementation", dependency: [ group: junit.group, name: "junit", version: junit.version]],
+    ]
+
+    def androidXTest = [group: "androidx.test.ext" , version: "1.1.2"]
+    androidXTestDependencies = [
+            androidXTest: [configuration: "androidTestImplementation" , dependency: [ group: androidXTest.group, name: "junit", version: androidXTest.version]],
+    ]
+
+    def espresso = [group: "androidx.test.espresso", version: "3.3.0"]
+    espressoDependencies = [
+           espresso: [configuration: "androidTestImplementation", dependency: [group: espresso.group, name: "espresso-core", version: espresso.version]]
+    ]
+
+    def rxJava = [group: "io.reactivex.rxjava3", version: "3.0.0"]
+    rxJavaDependencies = [
+            rxJava: [configuration: "implementation", dependency: [group: rxJava.group, name: "rxjava", version: rxJava.version]],
+            rxAndroid: [configuration: "implementation", dependency: [group: rxJava.group, name: "rxandroid", version: rxJava.version]],
+            rxKotlin: [configuration: "implementation", dependency: [group: rxJava.group, name: "rxkotlin", version: "3.0.1"]]
+    ]
+
+    def socketIO = [group: "io.socket", version: "2.0.0"]
+    socketIODependencies = [
+            socketIoClient: [configuration: "implementation",dependency: [group: socketIO.group, name: "socket.io-client", version: socketIO.version]]
+    ]
+
+    def retrofit = [group: "com.squareup.retrofit2", version: "2.9.0"]
+    retrofitDependencies = [
+            retrofit: [configuration: "implementation", dependency: [group: retrofit.group, name: "retrofit", version: retrofit.version]],
+            converterGson: [configuration: "implementation", dependency: [group: retrofit.group, name: "converter-gson", version: retrofit.version]]
+    ]
+
+    def circleImage = [group: "de.hdodenhof", version: "3.1.0"]
+    circleImageDependencies = [
+            circleImage: [configuration: "implementation", dependency: [group: circleImage.group, name: "circleimageview", version: circleImage.version]]
+    ]
+
+    //endregion dependencies
+
+    //region - Module
+    //region +) App Module
+    appModule = [
+            dependencies:
+                daggerHiltDependencies.values() + kotlinDependencies.values() + androidxCoreDependencies.values() +
+                androidXAppCompatDependencies.values() + materialDependencies.values() + constraintLayoutDependencies.values()+
+                junitDependencies.values() + androidXTestDependencies.values() + espressoDependencies.values() +
+                rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() +
+                circleImageDependencies.values(),
+
+            plugins: [
+                    plugins.androidApplication, plugins.kotlinAndroid, plugins.kotlinAndroidExtensions, plugins.kotlinKapt, plugins.daggerHiltPlugin
+            ]
+    ]
+    //endregion App Module
+    //endregion Module
+}
