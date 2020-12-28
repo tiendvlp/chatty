@@ -28,5 +28,4 @@ class ActivityModule {
     fun provideMvcViewFactory (layoutInflater: LayoutInflater): MvcViewFactory {
         return MvcViewFactory(layoutInflater)
     }
-
 }

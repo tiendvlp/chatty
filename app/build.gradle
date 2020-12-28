@@ -3,6 +3,7 @@ rootProject.ext.appModule.plugins.each {
     apply plugin: it
 }
 
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -30,6 +31,10 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    apollo {
+        // instruct the compiler to generate Kotlin models
+        generateKotlinModels.set(true)
+    }
 }
 
 
@@ -39,3 +44,4 @@ dependencies {
             add(it.configuration, it.dependency, it.options)
     }
 }
+

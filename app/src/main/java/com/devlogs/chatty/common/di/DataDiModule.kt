@@ -1,14 +1,15 @@
 package com.devlogs.chatty.common.di
 
-import com.devlogs.chatty.mainserver.authentication.AuthMainRestApi
-import com.devlogs.chatty.mainserver.authentication.AuthMainRestApiImp
-import com.devlogs.chatty.repository.authentication.TokenRepository
-import com.devlogs.chatty.repository.authentication.TokenRepositoryImp
+import com.devlogs.chatty.datasource.errorhandler.GeneralErrorHandlerImp
+import com.devlogs.chatty.datasource.authserver.authentication.AuthServerRestApiImp
+import com.devlogs.chatty.datasource.mainserver.user.UserMainGraphqlApiImp
+import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi
+import com.devlogs.chatty.domain.datasource.mainserver.UserMainServerApi
+import com.devlogs.chatty.domain.error.ErrorHandler
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
-import retrofit2.Retrofit
 import javax.inject.Named
 
 @Module
@@ -16,12 +17,19 @@ import javax.inject.Named
 class DataDiModule {
 
     @Provides
-    fun provideAuthMainResApi (@Named ("AuthServerRetrofit") retrofit: Retrofit) : AuthMainRestApi {
-        return AuthMainRestApiImp(retrofit)
+    @Named(DaggerNamed.ErrorHandler.GeneralErrorHandler)
+    fun provideGeneralErrorHandler () : ErrorHandler {
+        return GeneralErrorHandlerImp()
     }
 
     @Provides
-    fun provideTokenRepository () : TokenRepository {
-        return TokenRepositoryImp()
+    fun provideAuthMainRestApi (authMainRestApiImp: AuthServerRestApiImp) : AuthServerApi {
+        return authMainRestApiImp
     }
+
+    @Provides
+    fun provideUserMainServerGraphqlApi (userMainGraphqlApiImp: UserMainGraphqlApiImp) : UserMainServerApi {
+        return userMainGraphqlApiImp
+    }
+
 }

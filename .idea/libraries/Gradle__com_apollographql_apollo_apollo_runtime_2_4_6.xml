@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.apollographql.apollo:apollo-runtime:2.4.6">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.apollographql.apollo/apollo-runtime/2.4.6/125983d0e1302391ab1a08007a142247cc642fde/apollo-runtime-2.4.6.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.apollographql.apollo/apollo-runtime/2.4.6/c77fe2d9f9d921ce539cd8539e0a4d8b7d950065/apollo-runtime-2.4.6-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.apollographql.apollo/apollo-runtime/2.4.6/72421ca1011bfb5468f3ebe831f9f8ff4c4da4f4/apollo-runtime-2.4.6-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -1,0 +1,11 @@
+query getUserByEmail ($email: String!) {
+    getUserByEmail(email: $email) {
+        id,
+        email,
+        name,
+        avatar {
+            type,
+            content
+        }
+    }
+}

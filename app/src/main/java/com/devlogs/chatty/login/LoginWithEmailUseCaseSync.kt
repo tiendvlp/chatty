@@ -1,34 +1,30 @@
 package com.devlogs.chatty.login
 
-import android.util.Log
-import com.devlogs.chatty.mainserver.authentication.AuthMainRestApi
-import com.devlogs.chatty.repository.authentication.TokenRepository
-import io.reactivex.rxjava3.core.Completable
-import io.reactivex.rxjava3.kotlin.subscribeBy
+import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class LoginWithEmailUseCaseSync {
-    private val mTokenRepository: TokenRepository
-    private val mAuthMainRestApi : AuthMainRestApi
+
+    sealed class Result {
+        object Success : Result()
+        object GeneralError : Result()
+    }
+
+    private val mAuthRestApi : AuthServerApi
 
     @Inject
-    constructor(tokenRepository: TokenRepository, authMainRestApi: AuthMainRestApi) {
-        mTokenRepository = tokenRepository
-        mAuthMainRestApi = authMainRestApi
+    constructor(authRestApi: AuthServerApi) {
+        mAuthRestApi = authRestApi
     }
-    // dan gminh tien
 
-    fun execute (email: String, password: String) : Completable {
-        return Completable.create { completableEmitter ->
-            mAuthMainRestApi.loginByEmail(email, password).subscribeBy(
-                onSuccess = {
-                    Log.d("LoginWithSync", it.refreshToken)
-                    completableEmitter.onComplete()
-                },
-                onError = {
-                    completableEmitter.onError(it)
-                }
-            )
+    suspend fun execute (email: String, password: String) : Result = withContext(Dispatchers.IO) {
+        val loginResponse = mAuthRestApi.loginByEmail(email, password)
+        if (loginResponse.isLeft) {
+           return@withContext  Result.GeneralError
         }
+
+        return@withContext Result.Success
     }
 }

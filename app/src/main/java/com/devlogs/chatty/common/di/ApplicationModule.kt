@@ -3,6 +3,7 @@ package com.devlogs.chatty.common.di
 import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.apollographql.apollo.ApolloClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,7 +27,7 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    @Named("AuthServerRetrofit")
+    @Named(DaggerNamed.Retrofit.AuthServerRetrofit)
     fun provideAuthServerRetrofit () : Retrofit {
         val okHttpClient = OkHttpClient.Builder().callTimeout(21, TimeUnit.SECONDS)
             .connectTimeout(21, TimeUnit.SECONDS).build()
@@ -41,7 +42,7 @@ class ApplicationModule {
 
     @Provides
     @Singleton
-    @Named("MainServerRetrofit")
+    @Named(DaggerNamed.Retrofit.MainServerRetrofit)
     fun provideMainServerRetrofit () : Retrofit {
         val okHttpClient = OkHttpClient.Builder().callTimeout(21, TimeUnit.SECONDS)
             .connectTimeout(21, TimeUnit.SECONDS).build()
@@ -52,5 +53,11 @@ class ApplicationModule {
             .addConverterFactory(GsonConverterFactory.create())
             .client(okHttpClient)
             .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApolloClient () : ApolloClient {
+        return ApolloClient.builder().serverUrl("http://10.0.2.2:3000/graphql").build()
     }
 }

@@ -1,0 +1,22 @@
+query getChannels ($count: Int!, $userEmail: String!) {
+    getChannels (count: $count, userEmail: $userEmail) {
+        id,
+        title,
+        admin,
+        status {
+            senderEmail,
+            description {
+                type,
+                content
+            }
+        },
+        members {
+            id,
+            email,
+            name
+        },
+        seen,
+        createdDate,
+        latestUpdate
+    }
+}
