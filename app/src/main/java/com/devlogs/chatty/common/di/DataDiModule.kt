@@ -1,35 +1,36 @@
 package com.devlogs.chatty.common.di
 
-import com.devlogs.chatty.datasource.errorhandler.GeneralErrorHandlerImp
 import com.devlogs.chatty.datasource.authserver.authentication.AuthServerRestApiImp
-import com.devlogs.chatty.datasource.mainserver.user.UserMainGraphqlApiImp
+import com.devlogs.chatty.datasource.mainserver.channel.ChannelMainServerApiImp
+import com.devlogs.chatty.datasource.mainserver.message.MessageMainServerApiImp
+import com.devlogs.chatty.datasource.mainserver.user.UserMainServerApiImp
+import com.devlogs.chatty.datasource.prefsdatastore.TokenSharedPreferenceApi
 import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi
+import com.devlogs.chatty.domain.datasource.mainserver.ChannelMainServerApi
+import com.devlogs.chatty.domain.datasource.mainserver.MessageMainServerApi
 import com.devlogs.chatty.domain.datasource.mainserver.UserMainServerApi
-import com.devlogs.chatty.domain.error.ErrorHandler
+import com.devlogs.chatty.domain.datasource.offlinedb.TokenOfflineApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
-import javax.inject.Named
 
 @Module
 @InstallIn(ApplicationComponent::class)
 class DataDiModule {
+    @Provides
+    fun provideAuthMainRestApi (authMainRestApiImp: AuthServerRestApiImp) : AuthServerApi = authMainRestApiImp
 
     @Provides
-    @Named(DaggerNamed.ErrorHandler.GeneralErrorHandler)
-    fun provideGeneralErrorHandler () : ErrorHandler {
-        return GeneralErrorHandlerImp()
-    }
+    fun provideUserMainServerGraphqlApi (userMainServerApiImp: UserMainServerApiImp) : UserMainServerApi = userMainServerApiImp
 
     @Provides
-    fun provideAuthMainRestApi (authMainRestApiImp: AuthServerRestApiImp) : AuthServerApi {
-        return authMainRestApiImp
-    }
+    fun provideTokenOfflineApi (tokenSharedPreferenceApi: TokenSharedPreferenceApi) : TokenOfflineApi = tokenSharedPreferenceApi
 
     @Provides
-    fun provideUserMainServerGraphqlApi (userMainGraphqlApiImp: UserMainGraphqlApiImp) : UserMainServerApi {
-        return userMainGraphqlApiImp
-    }
+    fun provideMessageMainServerApi (messageMainServerApiImp: MessageMainServerApiImp) : MessageMainServerApi = messageMainServerApiImp
+
+    @Provides
+    fun provideChannelMainServerApi (channelMainServerApi: ChannelMainServerApiImp) : ChannelMainServerApi = channelMainServerApi
 
 }

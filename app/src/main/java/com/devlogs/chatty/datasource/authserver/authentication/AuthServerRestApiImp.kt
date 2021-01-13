@@ -1,56 +1,55 @@
 package com.devlogs.chatty.datasource.authserver.authentication
 
 import android.util.Log
-import com.devlogs.chatty.common.Either
-import com.devlogs.chatty.common.None
 import com.devlogs.chatty.common.di.DaggerNamed
-import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.common.restconfig.AuthServerRestClientConfig
+import com.devlogs.chatty.datasource.common.restconfig.AuthServerRestClientConfig.LoginByEmailReqBody
 import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi
-import com.devlogs.chatty.domain.datasource.mainserver.model.LoginMainServerModel
-import com.devlogs.chatty.domain.error.ErrorEntity
-import com.devlogs.chatty.domain.error.ErrorHandler
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi.LoginByEmailResult
+import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi.LoginByEmailResult.*
+import com.devlogs.chatty.domain.error.CommonErrorEntity
+import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import javax.inject.Inject
 import javax.inject.Named
 
 class AuthServerRestApiImp : AuthServerApi {
-
     private val mAuthRetrofit: Retrofit
-    private val mErrorHandler: ErrorHandler
     private val mAuthClientConfig : AuthServerRestClientConfig
 
     @Inject
-    constructor(@Named(DaggerNamed.Retrofit.AuthServerRetrofit) authRetrofit: Retrofit, @Named(DaggerNamed.ErrorHandler.GeneralErrorHandler) errorHandler: ErrorHandler) {
+    constructor(@Named(DaggerNamed.Retrofit.AuthServerRetrofit) authRetrofit: Retrofit) {
         mAuthRetrofit = authRetrofit
-        mErrorHandler = errorHandler
         mAuthClientConfig = mAuthRetrofit.create(AuthServerRestClientConfig::class.java)
     }
 
-    override suspend fun loginByEmail(email: String, password: String): Either<ErrorEntity, LoginMainServerModel> = withContext(Dispatchers.IO) {
-        val reqBody: AuthServerRestClientConfig.LoginByEmailReqBody = AuthServerRestClientConfig.LoginByEmailReqBody(email, password)
-        val loginResponse = mAuthClientConfig.loginByEmail(reqBody)
+    override suspend fun loginByEmail(email: String, password: String): LoginByEmailResult {
+        val reqBody = LoginByEmailReqBody(email, password)
+        try {
+            Log.d("AuthMainRestApiImp", "Login in progress")
+            val loginResponse = mAuthClientConfig.loginByEmail(reqBody)
+            Log.d("AuthMainRestApiImp", "Login in progress")
 
-        if (loginResponse.code() == 200) {
-            Log.d("AuthMainRestApiImp", "Login Success")
-            return@withContext Either.Right(LoginMainServerModel(loginResponse.body()!!.accessToken, loginResponse.body()!!.refreshToken))
-        }
-        // if the request send failed
-        if (!loginResponse.isSuccessful) {
-            return@withContext Either.Left(ErrorEntity.ConnectionError)
-        }
-        if (loginResponse.code() == 400) {
-            return@withContext Either.Left(ErrorEntity.AuthError.InvalidAccountError)
+            if (loginResponse.code() == 200) {
+                Log.d("AuthMainRestApiImp", "Login Success")
 
+                val resBody = loginResponse.body() ?:  throw GeneralErrorEntity("The loginByEmail ReqBody is missing")
+
+                val accessTokenRes = Token(resBody.accessToken.token, resBody.accessToken.expiredAt)
+                val refreshTokenRes = Token(resBody.refreshToken.token, resBody.refreshToken.expiredAt)
+                return LoginByEmailResult(accessTokenRes, refreshTokenRes)
+            }
+            if (loginResponse.code() == 400) {
+                throw NotFoundErrorEntity("Your account with id: $email doesn't exist")
+            }
+            throw GeneralErrorEntity("")
+        } catch (e: HttpException) {
+            throw NetworkErrorEntity(e.message())
         }
-        return@withContext Either.Left(ErrorEntity.UnknownError)
     }
 
-
-    override suspend fun register(email: String, password: String): Either<ErrorEntity, None> = withContext(Dispatchers.IO) {
+    override suspend fun register(email: String, password: String) {
         val reqBody: AuthServerRestClientConfig.RegisterReqBody = AuthServerRestClientConfig.RegisterReqBody(email, password)
 
         try {
@@ -59,28 +58,18 @@ class AuthServerRestApiImp : AuthServerApi {
             * */
             val registerResponse = mAuthClientConfig.register(reqBody)
 
-            if (registerResponse.code() == 200) {
-                return@withContext Either.Right(None)
-            }
-            return@withContext Either.Left(mErrorHandler.getError(HttpException(registerResponse)))
 
+            if (!registerResponse.isSuccessful) {
+
+                if (registerResponse.code() == 409) {
+                    throw DuplicateErrorEntity("Your account with id: $email already exist")
+                }
+
+                throw GeneralErrorEntity("register error code: " + registerResponse.code())
+            }
         }
-        catch (e : Exception) {
-            normalLog("Send login request failed" + e.message)
-            return@withContext Either.Left(mErrorHandler.getError(e))
+        catch (e : HttpException) {
+            throw NetworkErrorEntity(e.message())
         }
     }
-
-    override suspend fun generateNewAccessToken(refreshToken: String): String = withContext(Dispatchers.IO) {
-        try {
-            val generateAccessTokenResponse = mAuthClientConfig.generateNewAccessToken(AuthServerRestClientConfig.GenerateNewAccessTokenReq.ReqBody(refreshToken))
-            if (generateAccessTokenResponse.code() == 200) {
-                return@withContext generateAccessTokenResponse.body()!!.accessToken
-            }
-            throw ErrorEntity.UnknownError
-        } catch (e: HttpException) {
-            throw mErrorHandler.getError(e)
-        }
-    }
-
 }

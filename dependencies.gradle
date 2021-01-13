@@ -21,7 +21,10 @@ ext {
     //endregion Plugins
 
     //region - Dependencies
-
+    def eventBus = [group: "org.greenrobot", version: "3.2.0"]
+    eventBusDependencies = [
+            roomRuntime: [configuration: "implementation", dependency: [group: eventBus.group, name: "eventbus", version: eventBus.version]],
+    ]
     def room = [group: "androidx.room", version: "2.2.6"]
     roomDependencies = [
             roomRuntime: [configuration: "implementation", dependency: [group: room.group, name: "room-runtime", version: room.version]],
@@ -88,6 +91,7 @@ ext {
 
     def retrofit = [group: "com.squareup.retrofit2", version: "2.9.0"]
     retrofitDependencies = [
+            scarlarConvertor: [configuration: "implementation", dependency: [group: retrofit.group, name: "converter-scalars", version: retrofit.version]],
             retrofit: [configuration: "implementation", dependency: [group: retrofit.group, name: "retrofit", version: retrofit.version]],
             converterGson: [configuration: "implementation", dependency: [group: retrofit.group, name: "converter-gson", version: retrofit.version]]
     ]
@@ -116,6 +120,11 @@ ext {
             dataStorePreferences: [configuration: "implementation", dependency: [group: dataStore.group, name: "datastore-preferences", version: dataStore.version]],
             dataStoreCore: [configuration: "implementation", dependency: [group: dataStore.group, name: "datastore-core", version: dataStore.version]],
     ]
+
+    def fragNav = [group: "com.ncapdevi", version: "3.2.0"]
+    fragNavDependencies = [
+            fragNav: [configuration: "implementation", dependency: [group: fragNav.group, name: "frag-nav", version: fragNav.version]]
+    ]
     //endregion dependencies
 
     //region - Module
@@ -126,7 +135,8 @@ ext {
                 androidXAppCompatDependencies.values() + materialDependencies.values() + constraintLayoutDependencies.values()+
                 junitDependencies.values() + androidXTestDependencies.values() + espressoDependencies.values() +
                 rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() + dataStoreDependencies.values() +
-                circleImageDependencies.values() + roomDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values(),
+                circleImageDependencies.values() + roomDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values()
+                + eventBusDependencies.values() + fragNavDependencies.values(),
 
             plugins: [
                     plugins.androidApplication, plugins.apollographql, plugins.kotlinAndroid, plugins.kotlinAndroidExtensions, plugins.kotlinKapt, plugins.daggerHiltPlugin

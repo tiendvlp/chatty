@@ -19,13 +19,16 @@ interface AuthServerRestClientConfig {
         val email : String,
         val password : String)
     data class LoginByEmailResBody (
-        val accessToken : String,
-        val refreshToken: String)
+        val accessToken : TokenRes,
+        val refreshToken: TokenRes) {
+    }
+    data class TokenRes (val token: String, val expiredAt: Long)
 
-    @GET("auth/token/generateaccesstoken")
+    @POST("auth/token/generateaccesstoken")
     suspend fun generateNewAccessToken (@Body body: GenerateNewAccessTokenReq.ReqBody) : Response<GenerateNewAccessTokenReq.ResBody>
     class GenerateNewAccessTokenReq {
         data class ReqBody (val refreshToken: String)
-        data class ResBody (val accessToken: String)
+        data class ResBody (
+                val accessToken : TokenRes)
     }
 }

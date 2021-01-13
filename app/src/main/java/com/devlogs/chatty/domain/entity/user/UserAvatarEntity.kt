@@ -1,7 +1,7 @@
 package com.devlogs.chatty.domain.entity.user
 
 sealed class UserAvatarEntity {
-    protected val type : String
+    val type : String
 
     constructor(type : String) {
         this.type = type

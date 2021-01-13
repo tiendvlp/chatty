@@ -1,5 +1,5 @@
-query getChannels ($count: Int!, $userEmail: String!) {
-    getChannels (count: $count, userEmail: $userEmail) {
+query getChannels ($count: Int!) {
+    getChannels (count: $count) {
         id,
         title,
         admin,
@@ -13,7 +13,11 @@ query getChannels ($count: Int!, $userEmail: String!) {
         members {
             id,
             email,
-            name
+            name,
+            avatar {
+                type,
+                content
+            }
         },
         seen,
         createdDate,
