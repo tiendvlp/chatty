@@ -3,7 +3,7 @@ ext {
     compileSdkVersion = 30
     buildToolsVersion  = "30.0.2"
     applicationId = "com.devlogs.chatty"
-    minSdkVersion = 21
+    minSdkVersion = 24
     targetSdkVersion = 30
     versionCode = 1
     versionName = "1.0"

@@ -1,3 +1,5 @@
 package com.devlogs.chatty.config
 
-const val LOCALHOST = "192.168.1.11"
+//                10.0.2.2: emulator
+//192.168.1.11
+const val LOCALHOST = "10.0.2.2"

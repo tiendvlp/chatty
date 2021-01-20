@@ -10,4 +10,7 @@ interface LoginMvcView : ObservableMvcView <LoginMvcView.Listener> {
         fun onBtnForgotPasswordClicked ()
     }
 
+    fun loading ()
+    fun loginFailed (errorMessage: String)
+    fun loginSuccess ()
 }

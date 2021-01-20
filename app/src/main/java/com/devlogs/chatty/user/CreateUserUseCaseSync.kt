@@ -1,5 +1,6 @@
 package com.devlogs.chatty.user
 
+import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.domain.datasource.mainserver.UserMainServerApi
 import com.devlogs.chatty.domain.datasource.mainserver.UserMainServerApi.CreateUserError.UserAlreadyExist
 import com.devlogs.chatty.domain.datasource.mainserver.model.UserAvatarMainServerModel
@@ -25,7 +26,7 @@ class CreateUserUseCaseSync {
         this.mUserMainServerApi = userMainServerApi
     }
 
-    suspend fun execute (name: String, userAvatar: UserAvatarEntity) : Result = withContext(Dispatchers.IO) {
+    suspend fun execute (name: String, userAvatar: UserAvatarEntity) : Result = withContext(BackgroundDispatcher) {
         try {
             val avatar = convertAvatarEntityToAvatarServerModel(userAvatar) ?: return@withContext GeneralError
             mUserMainServerApi.createUser(name, avatar)

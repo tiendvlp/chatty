@@ -2,18 +2,16 @@ package com.devlogs.chatty.common.helper
 
 fun String.isEmail () : Boolean {
 
-    if (!contains('@') && !contains('.')) {
+    if (!contains('@') || !contains('.')) {
         return false
     }
 
     val emailName = substring(0, indexOf('@'))
-    val emailDomain = substring(indexOf('@'), indexOf('.'))
-    val domainType = substring(indexOf('.'), length)
-
-    val validEmailName = !(emailName.contains('@') || emailName.contains('.') || emailName.isBlank())
-    val validEmailDomain = !(emailDomain.contains('@') || emailDomain.contains('.') || emailDomain.isBlank())
-    val validDomainType = !domainType.isBlank()
-
+    val emailDomain = substring(indexOf('@')+1, indexOf('.'))
+    val domainType = substring(indexOf('.')+1, length)
+    val validEmailName = !emailName.contains('.') && emailName.isNotBlank()
+    val validEmailDomain = !emailDomain.contains('@') && emailDomain.isNotBlank()
+    val validDomainType = !domainType.contains("..") && domainType.isNotBlank()
 
     return validEmailDomain && validDomainType && validEmailName
 }

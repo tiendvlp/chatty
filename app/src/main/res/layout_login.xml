@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/purple"
+    android:paddingBottom="15dp">
+
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/blue"
+        android:layout_width="350dp"
+        android:layout_height="350dp"
+        android:src="@drawable/redcircle"
+        app:layout_constraintBottom_toBottomOf="@id/yello"
+        app:layout_constraintLeft_toRightOf="@id/yello"
+        android:translationX="-170dp"
+        android:translationY="-15dp"
+        />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/yello"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:src="@drawable/yellocircle"
+        app:layout_constraintBottom_toTopOf="@id/childConstraint"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:translationX="-90dp"
+        />
+
+
+    <TextView
+        android:id="@+id/hi"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Hi !"
+        android:textColor="@color/dark3"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginLeft="35dp"
+        android:layout_marginTop="120dp"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/childConstraint"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/hi"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:paddingBottom="20dp"
+        >
+
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Welcome to"
+        android:textColor="#FFFFFF"
+        android:textSize="25sp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/chatty"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Chatty"
+        android:textColor="#FFFFFF"
+        android:textSize="42sp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/welcome" />
+
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="43dp"
+        android:background="@drawable/circularviewbg"
+        android:hint="Email"
+        android:paddingLeft="22dp"
+        android:inputType="textEmailAddress"
+        android:maxLines="1"
+        android:textColor="@color/dark4"
+        android:textColorHint="@color/dark4"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chatty" />
+
+
+
+    <EditText
+        android:id="@+id/edtPassword"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="13dp"
+        android:background="@drawable/circularviewbg"
+        android:hint="Password"
+        android:paddingLeft="22dp"
+        android:inputType="textEmailAddress"
+        android:maxLines="1"
+        android:textColor="@color/dark4"
+        android:textColorHint="@color/dark4"
+        android:textSize="14sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
+
+
+    <com.devlogs.chatty.screen.common.customview.Button
+        android:id="@+id/btnLogin"
+        android:layout_width="0dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="22dp"
+        android:background="@drawable/circularviewbg"
+        android:backgroundTint="@color/main_color"
+        android:text="Login"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/edtPassword"
+
+        />
+
+
+    <com.devlogs.chatty.screen.common.customview.Button
+        android:id="@+id/btnSignUp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:letterSpacing="0.09"
+        android:text="Sign Up"
+        android:textAlignment="textStart"
+        android:textAllCaps="false"
+        android:textColor="@color/dark2"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="0dp"
+        app:layout_constraintLeft_toLeftOf="parent" />
+
+    <com.devlogs.chatty.screen.common.customview.Button
+        android:id="@+id/btnForgotPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:letterSpacing="0.09"
+        android:text="Forgot password"
+        android:textAlignment="textEnd"
+        android:textAllCaps="false"
+        android:textColor="@color/dark2"
+        android:textSize="13sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginBottom="0dp"
+        />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

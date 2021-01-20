@@ -11,6 +11,7 @@ import com.devlogs.chatty.domain.error.CommonErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import retrofit2.HttpException
 import retrofit2.Retrofit
+import java.lang.Exception
 import javax.inject.Inject
 import javax.inject.Named
 

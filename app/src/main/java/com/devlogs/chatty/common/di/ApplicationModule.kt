@@ -49,7 +49,6 @@ class ApplicationModule {
                 .connectTimeout(21, TimeUnit.SECONDS).build()
 
         return Retrofit.Builder()
-                //http://10.0.2.2:8080/api/v1/
                 // 172.20.10.4
 
                 .baseUrl("http://$LOCALHOST:4000")

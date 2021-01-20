@@ -15,7 +15,7 @@ abstract class BaseObservable<LISTENER> : Observable<LISTENER> {
             mListeners.add(listener)
 
             if (hadNoListener && mListeners.size == 1) {
-
+                onFirstListenerRegistered()
             }
         }
     }
@@ -36,11 +36,11 @@ abstract class BaseObservable<LISTENER> : Observable<LISTENER> {
         }
     }
 
-    protected fun onFirstListenerRegistered () {
+    open protected fun onFirstListenerRegistered () {
 
     }
 
-    protected fun onLastListenerUnregistered () {
+    open protected fun onLastListenerUnregistered () {
 
     }
 }

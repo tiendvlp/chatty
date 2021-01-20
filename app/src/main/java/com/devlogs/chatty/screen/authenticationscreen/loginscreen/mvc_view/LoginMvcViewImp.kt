@@ -4,37 +4,48 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
+import android.widget.FrameLayout
+import androidx.core.widget.doOnTextChanged
 import com.devlogs.chatty.R
+import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.isEmail
-import com.devlogs.chatty.common.helper.isValidPassword
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import com.devlogs.chatty.screen.common.mvcview.ProgressButtonMvcView
+import kotlinx.coroutines.*
 
 class LoginMvcViewImp : BaseMvcView<LoginMvcView.Listener>, LoginMvcView {
     private val mainScope = CoroutineScope(Dispatchers.Main.immediate)
-    private val btnLogin : ImageButton
-    private val btnRegister : Button
-    private val btnForgotPassword : Button
-    private val edtEmail : EditText
-    private val edtPassword : EditText
+    private val elementBtnLogin: FrameLayout
+    private val btnLoginMvcView: ProgressButtonMvcView
+    private val btnRegister: Button
+    private val btnForgotPassword: Button
+    private val edtEmail: EditText
+    private val edtPassword: EditText
 
     constructor(layoutInflater: LayoutInflater, container: ViewGroup?) {
         val rootView = layoutInflater.inflate(R.layout.layout_login, container, false)
         setRootView(rootView)
-
-        btnLogin = findViewById(R.id.btnLogin)
-        btnRegister = findViewById(R.id.btnRegister)
+        elementBtnLogin = findViewById(R.id.elementBtnLogin)
+        btnRegister = findViewById(R.id.btnSignUp)
         btnForgotPassword = findViewById(R.id.btnForgotPassword)
         edtEmail = findViewById(R.id.edtEmail)
         edtPassword = findViewById(R.id.edtPassword)
+        btnLoginMvcView = ProgressButtonMvcView(layoutInflater, elementBtnLogin, "Login")
+        elementBtnLogin.addView(btnLoginMvcView.getRootView())
+        btnLoginMvcView.deactivate()
         addEvents()
     }
 
     private fun addEvents() {
+        edtEmail.doOnTextChanged { text, start, before, count ->
+            makeSureInputValid()
+        }
+
+        edtPassword.doOnTextChanged { text, start, before, count ->
+            makeSureInputValid()
+        }
+
         btnForgotPassword.setOnClickListener {
             getListener().forEach {
                 it.onBtnForgotPasswordClicked()
@@ -47,27 +58,52 @@ class LoginMvcViewImp : BaseMvcView<LoginMvcView.Listener>, LoginMvcView {
             }
         }
 
-        btnLogin.setOnClickListener{
-            mainScope.launch {
-                if (!checkEmail(edtEmail.text.toString())) {
-                    // show warning to user
-                    return@launch
-                }
-
-                if (!checkPassword(edtPassword.text.toString())) {
-                    // show warning to user
-                    return@launch
-                }
-
-                getListener().forEach {
-                    it.onBtnLoginClicked(edtEmail.text.toString(), edtPassword.text.toString())
-                }
+        btnLoginMvcView.register(object : ProgressButtonMvcView.Listener {
+            override fun onBtnClicked() {
+               getListener().forEach {
+                   it.onBtnLoginClicked(edtEmail.text.toString(), edtPassword.text.toString())
+               }
             }
+        })
+    }
+
+    private fun makeSureInputValid () {
+        mainScope.launch {
+            if (checkInput()) {
+                btnLoginMvcView.activate()
+            } else {
+                btnLoginMvcView.deactivate()
+            }
+            normalLog("check input")
         }
     }
 
-    // to make sure the UI is not handle too much
-    private suspend fun checkEmail (target: String) : Boolean = withContext(Dispatchers.Default) { target.isEmail() }
-    private suspend fun checkPassword (target: String) : Boolean = withContext(Dispatchers.Default) { target.isValidPassword() }
+    private suspend fun checkInput () : Boolean = withContext(BackgroundDispatcher) {
+        edtEmail.text.toString().isEmail() && edtPassword.text.isNotBlank()
+    }
 
+    override fun loading() {
+        btnLoginMvcView.startProgress("Please wait...")
+        setEnableForAll(false)
+    }
+
+    override fun loginFailed(errorMessage: String) {
+        setEnableForAll(true)
+        makeSureInputValid()
+        btnLoginMvcView.stopProgress()
+    }
+
+    override fun loginSuccess() {
+        normalLog("Finish")
+        btnLoginMvcView.finishProgress("WELCOME")
+        setEnableForAll(false)
+    }
+
+    private fun setEnableForAll (isEnable : Boolean) {
+        btnLoginMvcView.isEnable = isEnable
+        btnRegister.isEnabled = isEnable
+        btnForgotPassword.isEnabled = isEnable
+        edtPassword.isEnabled = isEnable
+        edtEmail.isEnabled = isEnable
+    }
 }

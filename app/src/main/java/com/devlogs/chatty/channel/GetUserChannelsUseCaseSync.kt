@@ -1,6 +1,7 @@
 package com.devlogs.chatty.channel
 
 import com.devlogs.chatty.channel.GetUserChannelsUseCaseSync.Result.*
+import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.domain.datasource.mainserver.ChannelMainServerApi
 import com.devlogs.chatty.domain.datasource.mainserver.ChannelMainServerApi.ChannelModel
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
@@ -32,26 +33,13 @@ class GetUserChannelsUseCaseSync {
     /**
      * @throws UnSupportedDataType when get an avatar that this client do not support
      * */
-    suspend fun execute (count: Int) : Result = withContext(Dispatchers.IO){
+    suspend fun execute (count: Int) : Result = withContext(BackgroundDispatcher){
         try {
 
             val response = mChannelMainSerApi.getUserLatestChannels(count)
             val channels : List<ChannelEntity> = response.map {channelModel ->
-                val channelMembers : List<ChannelMemberEntity> = channelModel.members.map { memberModel ->
-                    ChannelMemberEntity(memberModel.id, memberModel.email, memberModel.name, getAvatar(memberModel.avatar))
-                }
-
-                val channelStatus = ChannelStatusEntity(
-                    channelModel.status.senderEmail,
-                    ChannelStatusEntity.ChannelStatusDescription(
-                        channelModel.status.description.type,
-                        channelModel.status.description.content
-                    )
-                )
-
-                ChannelEntity(channelModel.id, channelModel.title, channelModel.admin, channelStatus, channelMembers, channelModel.seen, channelModel.createdDate, channelModel.latestUpdate)
+                convertToEntity(channelModel)
             }
-
             Success(channels)
         } catch (e: NetworkErrorEntity) {
             NetworkError
@@ -63,6 +51,22 @@ class GetUserChannelsUseCaseSync {
         } catch (e: AuthenticationErrorEntity) {
             InvalidRefreshToken
         }
+    }
+
+    private fun convertToEntity (channelModel: ChannelModel) : ChannelEntity {
+        val channelMembers : List<ChannelMemberEntity> = channelModel.members.map { memberModel ->
+            ChannelMemberEntity(memberModel.id, memberModel.email, memberModel.name, getAvatar(memberModel.avatar))
+        }
+
+        val channelStatus = ChannelStatusEntity(
+                channelModel.status.senderEmail,
+                ChannelStatusEntity.ChannelStatusDescription(
+                        channelModel.status.description.type,
+                        channelModel.status.description.content
+                )
+        )
+
+        return ChannelEntity(channelModel.id, channelModel.title, channelModel.admin, channelStatus, channelMembers, channelModel.seen, channelModel.createdDate, channelModel.latestUpdate)
     }
 
     private fun getAvatar (avatarModel: ChannelModel.MemberAvatar) : UserAvatarEntity {

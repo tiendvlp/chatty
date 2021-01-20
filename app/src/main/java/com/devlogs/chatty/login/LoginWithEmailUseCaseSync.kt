@@ -1,5 +1,6 @@
 package com.devlogs.chatty.login
 
+import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi
 import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi.*
 import com.devlogs.chatty.domain.datasource.offlinedb.TokenOfflineApi
@@ -7,6 +8,8 @@ import com.devlogs.chatty.domain.error.CommonErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync.Result.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -28,10 +31,11 @@ class LoginWithEmailUseCaseSync {
         mTokenOfflineApi = tokenOfflineApi
     }
 
-    suspend fun execute (email: String, password: String) : Result = withContext(Dispatchers.IO) {
+    suspend fun execute (email: String, password: String) : Result = withContext(BackgroundDispatcher) {
         try {
             val loginResult = mAuthRestApi.loginByEmail(email, password)
             mTokenOfflineApi.setRefreshToken(loginResult.refreshToken.token, loginResult.refreshToken.expiredAt)
+            if (!isActive) {mTokenOfflineApi.clear(); GeneralError}
             mTokenOfflineApi.setAccessToken(loginResult.accessToken.token, loginResult.accessToken.expiredAt)
             Success
         } catch (e : NetworkErrorEntity) {

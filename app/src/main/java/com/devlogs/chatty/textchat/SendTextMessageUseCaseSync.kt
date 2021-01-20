@@ -1,5 +1,6 @@
 package com.devlogs.chatty.textchat
 
+import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.domain.datasource.mainserver.MessageMainServerApi
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.InvalidRefreshTokenErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
@@ -24,7 +25,7 @@ class SendTextMessageUseCaseSync {
         mMessageMainServerApi = messageMainServerApi
     }
 
-    suspend fun execute (message: String, channelId: String) : Result = withContext(Dispatchers.IO) {
+    suspend fun execute (message: String, channelId: String) : Result = withContext(BackgroundDispatcher) {
         try {
             mMessageMainServerApi.sendTextMessage(message, channelId)
             Success
