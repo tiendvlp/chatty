@@ -16,7 +16,7 @@ sealed class LoginPresentationState : PresentationState {
                 is LoginAction ->  return LoadingState(inputEmail, inputPassword)
                 is LoginSuccessAction ->  return LoginSuccessState
             }
-            throw InvalidActionException("${getTag()}.NotLoggedInState", action.toString())
+               throw InvalidActionException("${getTag()}.NotLoggedInState", action.toString())
         }
     }
 

@@ -9,6 +9,7 @@ import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi.LoginByEmai
 import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi.LoginByEmailResult.*
 import com.devlogs.chatty.domain.error.CommonErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
+import kotlinx.coroutines.delay
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import java.lang.Exception

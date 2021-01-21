@@ -4,7 +4,7 @@ import android.os.Bundle
 import com.devlogs.chatty.common.base.BaseObservable
 
 class PresentationStateManager : BaseObservable<PresentationStateChangedListener>() {
-    private lateinit var currentState: PresentationState
+    lateinit var currentState: PresentationState private set
     private lateinit var currentAction : PresentationAction
     private lateinit var previousState : PresentationState
 

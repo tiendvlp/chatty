@@ -1,6 +1,8 @@
 package com.devlogs.chatty.login
 
 import com.devlogs.chatty.domain.datasource.offlinedb.TokenOfflineApi
+import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
+import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.*
 import com.devlogs.chatty.login.SilentLoginUseCase.Result.*
 import java.lang.Exception
 import javax.inject.Inject
@@ -22,7 +24,9 @@ class SilentLoginUseCase {
         return try {
             mTokenApi.getRefreshToken()
             Allow
-        } catch (e: Exception) {
+        } catch (e: CannotGetRefreshTokenErrorEntity) {
+            NotAllow
+        } catch (e: InvalidRefreshTokenErrorEntity) {
             NotAllow
         }
     }

@@ -126,7 +126,7 @@
             android:layout_height="48dp"
             android:layout_marginTop="15dp"
             android:background="@drawable/circularviewbg"
-            android:hint="Password"
+            android:hint="Confirm password"
             android:paddingLeft="22dp"
             android:inputType="textEmailAddress"
             android:maxLines="1"
