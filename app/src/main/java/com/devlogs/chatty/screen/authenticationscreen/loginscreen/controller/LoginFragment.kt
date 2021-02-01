@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.devlogs.chatty.R
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.LoginMvcView
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationAction
@@ -45,8 +44,10 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationStateManager.init(savedInstanceState, NotLoggedInState("", ""))
-        silentlyController.silentLogin()
+        presentationStateManager.init(savedInstanceState, NotLoggedInState)
+        if (presentationStateManager.currentState is NotLoggedInState) {
+            presentationStateManager.consumeAction(LoginSilentlyAction)
+        }
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -86,13 +87,19 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
                 mMvcView.loginSuccess()
             }
             is LoadingState -> {
+                if (action is LoginAction) {
+                    loginController.login(action.email, action.password)
+                }
+                else if (action is LoginSilentlyAction) {
+                    silentlyController.silentLogin()
+                }
                 mMvcView.loading()
             }
         }
     }
 
     override fun onBtnLoginClicked(email: String, password: String) {
-        loginController.login(email, password)
+        presentationStateManager.consumeAction(LoginAction(email, password))
     }
 
     override fun onBtnRegisterClicked() {

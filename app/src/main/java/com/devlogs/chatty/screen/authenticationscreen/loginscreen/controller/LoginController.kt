@@ -4,9 +4,6 @@ import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync.Result
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationAction.*
-import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState
-import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState.LoadingState
-import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState.LoginSuccessState
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -27,8 +24,6 @@ class LoginController {
     }
 
     fun login(email: String, password: String) {
-        mPresentationStateManager.consumeAction(LoginAction(email, password))
-
         scope.launch {
             try {
                 val result = mLoginWithEmailUseCase.execute(email, password)

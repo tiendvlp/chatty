@@ -24,7 +24,6 @@ class LoginSilentlyController {
     }
 
     fun silentLogin () {
-        mPresentationStateManager.consumeAction(LoginPresentationAction.LoginAction("", ""))
         scope.launch {
             val result = mSilentLoginUseCase.execute()
             delay(1500)

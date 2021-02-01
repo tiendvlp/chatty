@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -8,62 +7,57 @@
     android:background="@color/purple">
 
 
-
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/blue"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:src="@drawable/redcircle"
-        app:layout_constraintBottom_toBottomOf="@id/yello"
-        app:layout_constraintLeft_toRightOf="@id/yello"
         android:translationX="-150dp"
         android:translationY="-15dp"
-        />
+        app:layout_constraintBottom_toBottomOf="@id/yello"
+        app:layout_constraintLeft_toRightOf="@id/yello" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/yello"
         android:layout_width="350dp"
         android:layout_height="350dp"
         android:src="@drawable/yellocircle"
-        app:layout_constraintBottom_toTopOf="@id/childConstraint"
-        app:layout_constraintLeft_toLeftOf="parent"
         android:translationX="-90dp"
-        />
+        app:layout_constraintBottom_toTopOf="@id/childConstraint"
+        app:layout_constraintLeft_toLeftOf="parent" />
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/childConstraint"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
         android:layout_marginLeft="35dp"
+        android:layout_marginTop="110dp"
         android:layout_marginRight="35dp"
-        android:layout_marginTop="120dp"
-        app:layout_constraintTop_toTopOf="parent"
         android:paddingBottom="25dp"
-        >
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <TextView
             android:id="@+id/welcome"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:text="Create"
             android:textColor="#FFFFFF"
             android:textSize="35sp"
             android:textStyle="bold"
-            android:layout_marginTop="10dp"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/chatty"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Account"
             android:layout_marginLeft="10dp"
+            android:text="Account"
             android:textColor="#FFFFFF"
             android:textSize="35sp"
             android:textStyle="bold"
@@ -89,12 +83,11 @@
             app:layout_constraintTop_toBottomOf="@+id/chatty" />
 
 
-
         <EditText
             android:id="@+id/edtEmail"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/circularviewbg"
             android:hint="Email"
             android:paddingLeft="22dp"
@@ -107,11 +100,23 @@
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/edtName" />
 
+        <FrameLayout
+            android:id="@+id/viewCheckingEmail"
+            android:orientation="horizontal"
+            android:layout_marginTop="1dp"
+            android:layout_width="0dp"
+            android:layout_height="15dp"
+            android:layout_marginLeft="23dp"
+            app:layout_constraintTop_toBottomOf="@id/edtEmail"
+            app:layout_constraintLeft_toLeftOf="@id/edtEmail"
+            app:layout_constraintRight_toRightOf="@id/edtEmail">
+        </FrameLayout>
+
         <EditText
             android:id="@+id/edtPassword"
             android:layout_width="0dp"
+            android:layout_marginTop="4dp"
             android:layout_height="48dp"
-            android:layout_marginTop="15dp"
             android:background="@drawable/circularviewbg"
             android:hint="Password"
             android:paddingLeft="22dp"
@@ -122,16 +127,26 @@
             android:textSize="14sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtEmail" />
-
+            app:layout_constraintTop_toBottomOf="@+id/viewCheckingEmail" />
+        <FrameLayout
+            android:id="@+id/viewCheckingPassword"
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="15dp"
+            android:layout_marginTop="1dp"
+            android:layout_marginLeft="22dp"
+            app:layout_constraintTop_toBottomOf="@id/edtPassword"
+            app:layout_constraintLeft_toLeftOf="@id/edtPassword"
+            app:layout_constraintRight_toRightOf="@id/edtPassword">
+        </FrameLayout>
         <EditText
             android:id="@+id/edtRetypePassword"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="4dp"
             android:background="@drawable/circularviewbg"
-            android:hint="Password"
-            android:paddingLeft="22dp"
+            android:hint="Confirm password"
+            android:paddingLeft="23dp"
             android:inputType="textEmailAddress"
             android:maxLines="1"
             android:textColor="@color/dark4"
@@ -139,25 +154,16 @@
             android:textSize="14sp"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edtPassword" />
+            app:layout_constraintTop_toBottomOf="@+id/viewCheckingPassword" />
 
-        <com.devlogs.chatty.screen.common.customview.Button
-            android:id="@+id/btnNext"
+        <FrameLayout
+            android:id="@+id/btnRegister"
             android:layout_width="0dp"
             android:layout_height="48dp"
-            android:layout_marginTop="22dp"
-            android:background="@drawable/circularviewbg"
-            android:backgroundTint="@color/main_color"
-            android:text="Next"
-            android:textAllCaps="false"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
+            android:layout_marginTop="25dp"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/edtRetypePassword"
-
-            />
-
+            app:layout_constraintTop_toBottomOf="@id/edtRetypePassword" />
 
         <com.devlogs.chatty.screen.common.customview.Button
             android:id="@+id/btnSignIn"
@@ -169,12 +175,11 @@
             android:gravity="center"
             android:textAllCaps="false"
             android:textColor="@color/dark2"
-            android:textSize="15sp"
-            app:layout_constraintTop_toBottomOf="@id/btnNext"
-            app:layout_constraintRight_toRightOf="@id/btnNext"
+            android:textSize="13sp"
+            app:layout_constraintTop_toBottomOf="@id/btnRegister"
+            app:layout_constraintRight_toRightOf="@id/btnRegister"
             android:layout_marginBottom="0dp"
-            app:layout_constraintLeft_toLeftOf="@id/btnNext" />
+            app:layout_constraintLeft_toLeftOf="@id/btnRegister" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

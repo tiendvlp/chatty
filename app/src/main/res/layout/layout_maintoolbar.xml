@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginLeft="@dimen/global_margin"
+    android:layout_marginRight="@dimen/global_margin"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgAvatar"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@color/dark2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/chatty"
+        />
+
+    <TextView
+        android:id="@+id/chatty"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="Chatty"
+        android:textColor="@color/dark4"
+        android:textSize="23dp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/btnNewChat"
+        app:layout_constraintLeft_toRightOf="@id/imgAvatar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.devlogs.chatty.screen.common.customview.ImageButton
+        android:id="@+id/btnNewChat"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/icon_newchat"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/chatty"
+        android:background="@null"
+        />
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

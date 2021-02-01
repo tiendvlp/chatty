@@ -10,11 +10,11 @@ sealed class LoginPresentationState : PresentationState {
         return "LoginPresentationState"
     }
 
-    data class NotLoggedInState (val inputEmail : String, val inputPassword: String) : LoginPresentationState() {
+    object NotLoggedInState : LoginPresentationState() {
         override fun consumeAction(action: PresentationAction): PresentationState {
             when (action) {
-                is LoginAction ->  return LoadingState(inputEmail, inputPassword)
-                is LoginSuccessAction ->  return LoginSuccessState
+                is LoginAction ->  return LoadingState(action.email, action.password)
+                is LoginSilentlyAction -> return LoadingState("", "")
             }
                throw InvalidActionException("${getTag()}.NotLoggedInState", action.toString())
         }
@@ -23,7 +23,7 @@ sealed class LoginPresentationState : PresentationState {
     data class LoadingState (val inputEmail: String, val inputPassword: String) : LoginPresentationState() {
         override fun consumeAction(action: PresentationAction): PresentationState {
             when (action) {
-                is LoginFailedAction ->  return NotLoggedInState(inputEmail, inputPassword)
+                is LoginFailedAction ->  return NotLoggedInState
                 is LoginSuccessAction ->  return LoginSuccessState
             }
             throw InvalidActionException("${getTag()}.LoadingState", action.toString())

@@ -5,18 +5,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.devlogs.chatty.R
-import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.authenticationscreen.registerscreen.mvc_view.RegisterMvcView
+import com.devlogs.chatty.screen.authenticationscreen.registerscreen.state.RegisterPresentationAction.RegisterAction
+import com.devlogs.chatty.screen.authenticationscreen.registerscreen.state.RegisterPresentationState.NotRegisterState
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
+import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
+import com.devlogs.chatty.screen.common.presentationstate.PresentationState
+import com.devlogs.chatty.screen.common.presentationstate.PresentationStateChangedListener
+import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RegisterFragment : Fragment(), RegisterMvcView.Listener {
+class RegisterFragment : Fragment(), RegisterMvcView.Listener, PresentationStateChangedListener {
 
     companion object {
         fun getInstance () : RegisterFragment {
@@ -24,6 +26,8 @@ class RegisterFragment : Fragment(), RegisterMvcView.Listener {
         }
     }
 
+    @Inject
+    lateinit var presentationStateManager : PresentationStateManager
     @Inject
     lateinit var navigator: AuthenticationScreenNavigator
     @Inject
@@ -33,28 +37,45 @@ class RegisterFragment : Fragment(), RegisterMvcView.Listener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        presentationStateManager.init(savedInstanceState, NotRegisterState)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         mMvcView = mvcViewFactory.getRegisterMvcView(container)
         return mMvcView.getRootView()
     }
 
     override fun onStart() {
         mMvcView.register(this)
+        presentationStateManager.register(this)
         super.onStart()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        presentationStateManager.onSavedInstanceState(outState)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onStop() {
         mMvcView.unRegister(this)
+        presentationStateManager.unRegister(this)
         super.onStop()
     }
 
-    override fun onBtnRegisterClicked() {
+    override fun onStateChanged(
+        previousState: PresentationState,
+        currentState: PresentationState,
+        action: PresentationAction
+    ) {
+
+    }
+
+    override fun onBtnRegisterClicked(email: String, password: String) {
+        presentationStateManager.consumeAction(RegisterAction(email, password))
     }
 
     override fun onBtnSignInClicked() {
-        // go back to login screen
         navigator.navigateBack()
     }
+
 }

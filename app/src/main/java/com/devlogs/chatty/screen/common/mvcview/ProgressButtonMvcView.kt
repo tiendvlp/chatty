@@ -27,7 +27,7 @@ class ProgressButtonMvcView : BaseMvcView<ProgressButtonMvcView.Listener> {
     private val layout: LinearLayout
     private val progressbar: ProgressBar
     private val buttonText: TextView
-    var isEnable: Boolean
+    private var isEnable: Boolean
         get() {
             return layout.isEnabled
         }
@@ -82,19 +82,22 @@ class ProgressButtonMvcView : BaseMvcView<ProgressButtonMvcView.Listener> {
         layout.setBackgroundColor(cardView.resources.getColor(R.color.main_color))
     }
 
-    fun startProgress (loadingText: String = text, loadingColor: Int = cardView.resources.getColor(R.color.dark2)) {
+    fun startProgress (loadingText: String = text, loadingColor: Int = cardView.resources.getColor(R.color.dark2), canClick: Boolean) {
+        isEnable = canClick
         progressbar.visibility = VISIBLE
         layout.setBackgroundColor(loadingColor)
         buttonText.text = loadingText
     }
 
-    fun stopProgress (normalColor: Int = cardView.resources.getColor(R.color.main_color)) {
+    fun stopProgress (normalColor: Int = cardView.resources.getColor(R.color.main_color), canClick:Boolean) {
+        isEnable = canClick
         progressbar.visibility = GONE
         layout.setBackgroundColor(normalColor)
         buttonText.text = text
     }
 
-    fun finishProgress (finishText: String = text, finishColor: Int = cardView.resources.getColor(R.color.green)) {
+    fun finishProgress (finishText: String = text, finishColor: Int = cardView.resources.getColor(R.color.green), canClick: Boolean) {
+        isEnable = canClick
         progressbar.visibility = GONE
         layout.setBackgroundColor(finishColor)
         buttonText.text = finishText

@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import com.devlogs.chatty.R
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
@@ -83,24 +84,24 @@ class LoginMvcViewImp : BaseMvcView<LoginMvcView.Listener>, LoginMvcView {
     }
 
     override fun loading() {
-        btnLoginMvcView.startProgress("Please wait...")
+        btnLoginMvcView.startProgress("Please wait...", canClick = false)
         setEnableForAll(false)
     }
 
     override fun loginFailed(errorMessage: String) {
         setEnableForAll(true)
         makeSureInputValid()
-        btnLoginMvcView.stopProgress()
+        btnLoginMvcView.stopProgress(canClick = true)
+        Toast.makeText(getContext(), errorMessage, Toast.LENGTH_SHORT).show()
     }
 
     override fun loginSuccess() {
         normalLog("Finish")
-        btnLoginMvcView.finishProgress("WELCOME")
+        btnLoginMvcView.finishProgress("WELCOME", canClick = false)
         setEnableForAll(false)
     }
 
     private fun setEnableForAll (isEnable : Boolean) {
-        btnLoginMvcView.isEnable = isEnable
         btnRegister.isEnabled = isEnable
         btnForgotPassword.isEnabled = isEnable
         edtPassword.isEnabled = isEnable

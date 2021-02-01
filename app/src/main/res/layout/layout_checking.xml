@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <TextView
+        android:id="@+id/txtContent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="Checking email"
+        android:textColor="#FFFFFF"
+        android:textSize="10sp"
+        android:textStyle="bold" />
+    <ProgressBar
+        android:id="@+id/prg"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="10dp" />
+    <ImageView
+        android:id="@+id/imgWarning"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="3dp"
+        android:src="@drawable/icon_warning"/>
+    <ImageView
+        android:id="@+id/imgChecked"
+        android:layout_width="10.5dp"
+        android:layout_height="10.5dp"
+        android:layout_marginLeft="3dp"
+        android:layout_gravity="center"
+        android:src="@drawable/icon_checked"
+        />
+</LinearLayout>
