@@ -5,7 +5,6 @@ import com.devlogs.chatty.domain.datasource.mainserver.MessageMainServerApi
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.InvalidRefreshTokenErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import com.devlogs.chatty.textchat.SendTextMessageUseCaseSync.Result.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

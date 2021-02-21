@@ -22,9 +22,9 @@ class ChannelMainServerApiImp : ChannelMainServerApi {
         this.mApolloClient = apolloClient
     }
 
-    override suspend fun getUserLatestChannels(count: Int): List<ChannelModel> {
+    override suspend fun getChannels(lastUpdate: Long, count: Int): List<ChannelModel> {
         try {
-            val response = mApolloClient.query(GetChannelsQuery(count)).await()
+            val response = mApolloClient.query(GetChannelsQuery(lastUpdate,count)).await()
 
             if (response.hasErrors()) {
                 val currentError = response.errors!![0].simple()
@@ -48,7 +48,7 @@ class ChannelMainServerApiImp : ChannelMainServerApi {
                 val channelStatusDescription = ChannelModel.Status.Description(channelResult.status.__typename, channelResult.status.senderEmail)
                 val channelStatus = ChannelModel.Status(channelResult.status.senderEmail, channelStatusDescription)
                 val channelMembers = channelResult.members.map { memberResult ->
-                    ChannelModel.Member(memberResult!!.id, memberResult.email, memberResult.name, ChannelModel.MemberAvatar(memberResult.avatar.type, memberResult.avatar.content.toString()))
+                    ChannelModel.Member(memberResult!!.id, memberResult.email, memberResult.name)
                 }
                 val seenPeople : List<String> = channelResult.seen.map { it!! }
 

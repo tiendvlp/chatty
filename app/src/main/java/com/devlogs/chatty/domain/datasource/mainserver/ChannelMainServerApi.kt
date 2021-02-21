@@ -9,7 +9,7 @@ interface ChannelMainServerApi {
      * @throws CommonErrorEntity.NetworkErrorEntity
      * @throws CommonErrorEntity.UnAuthorizedErrorEntity
      * */
-    suspend fun getUserLatestChannels (count: Int) : List<ChannelModel>
+    suspend fun getChannels (lastUpdate: Long, count: Int) : List<ChannelModel>
     data class ChannelModel(
             val id: String,
             val title: String,
@@ -22,7 +22,6 @@ interface ChannelMainServerApi {
         data class Status (val senderEmail: String, val description: Description) {
             data class Description (val type: String, val content: String)
         }
-        data class Member (val id: String, val email: String, val name: String, val avatar: MemberAvatar)
-        data class MemberAvatar (val type: String, val content: String)
+        data class Member (val id: String, val email: String, val name: String)
     }
 }

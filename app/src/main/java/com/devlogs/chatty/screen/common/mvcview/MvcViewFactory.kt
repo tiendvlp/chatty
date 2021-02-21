@@ -6,20 +6,23 @@ import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.Login
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.LoginMvcViewImp
 import com.devlogs.chatty.screen.authenticationscreen.registerscreen.mvc_view.RegisterMvcView
 import com.devlogs.chatty.screen.authenticationscreen.registerscreen.mvc_view.RegisterMvcViewImp
+import com.devlogs.chatty.screen.mainscreen.account_screen.mvc_view.AccountMvcView
+import com.devlogs.chatty.screen.mainscreen.account_screen.mvc_view.AccountMvcViewImp
 
+
+/**
+ * all factory_code is extension-method, they were splited into XXXMvcView File
+ * */
 
 class MvcViewFactory {
-    private val mLayoutInflater: LayoutInflater
+      val mLayoutInflater: LayoutInflater
 
     constructor(layoutInflater: LayoutInflater) {
         mLayoutInflater = layoutInflater
     }
 
-    fun getLoginMvcView (container: ViewGroup?) : LoginMvcView {
-        return LoginMvcViewImp(mLayoutInflater, container)
+    fun getLayoutInflater () : LayoutInflater {
+        return mLayoutInflater
     }
 
-    fun getRegisterMvcView (container: ViewGroup?) : RegisterMvcView {
-        return RegisterMvcViewImp(mLayoutInflater, container)
-    }
 }

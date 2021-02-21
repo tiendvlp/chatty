@@ -4,7 +4,6 @@ import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.domain.datasource.mainserver.UserMainServerApi
 import com.devlogs.chatty.domain.datasource.mainserver.UserMainServerApi.CreateUserError.UserAlreadyExist
 import com.devlogs.chatty.domain.datasource.mainserver.model.UserAvatarMainServerModel
-import com.devlogs.chatty.domain.entity.user.UserAvatarEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import com.devlogs.chatty.user.CreateUserUseCaseSync.Result.GeneralError
 import com.devlogs.chatty.user.CreateUserUseCaseSync.Result.Success

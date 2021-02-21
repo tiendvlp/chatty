@@ -1,5 +1,5 @@
-query getChannels ($count: Int!) {
-    getChannels (count: $count) {
+query getChannels ($lastUpdate: BigInt!, $count: Int!) {
+    getChannels (lastUpdate: $lastUpdate, count: $count) {
         id,
         title,
         admin,

@@ -11,7 +11,6 @@ import javax.inject.Inject
 class LoginController {
     private var mLoginWithEmailUseCase: LoginWithEmailUseCaseSync
     private var mPresentationStateManager: PresentationStateManager
-
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate)
 
     @Inject
@@ -25,6 +24,7 @@ class LoginController {
 
     fun login(email: String, password: String) {
         scope.launch {
+            LoginController::class
             try {
                 val result = mLoginWithEmailUseCase.execute(email, password)
                 if (result is Result.NetworkError) mPresentationStateManager.consumeAction(
@@ -37,7 +37,6 @@ class LoginController {
                     LoginFailedAction("Your account doesn't exist")
                 )
                 if (result is Result.Success) mPresentationStateManager.consumeAction(LoginSuccessAction)
-
             } catch (e: CancellationException) {
                 normalLog("Login Canceled ")
                 mPresentationStateManager.consumeAction(LoginFailedAction("Canceled"))

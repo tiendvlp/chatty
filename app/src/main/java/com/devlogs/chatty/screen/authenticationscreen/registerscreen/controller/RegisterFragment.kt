@@ -7,8 +7,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.authenticationscreen.registerscreen.mvc_view.RegisterMvcView
+import com.devlogs.chatty.screen.authenticationscreen.registerscreen.mvc_view.getRegisterMvcView
 import com.devlogs.chatty.screen.authenticationscreen.registerscreen.state.RegisterPresentationAction.RegisterAction
-import com.devlogs.chatty.screen.authenticationscreen.registerscreen.state.RegisterPresentationState.NotRegisterState
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.PresentationState
@@ -37,7 +37,7 @@ class RegisterFragment : Fragment(), RegisterMvcView.Listener, PresentationState
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationStateManager.init(savedInstanceState, NotRegisterState)
+//        presentationStateManager.init(savedInstanceState, )
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

@@ -40,7 +40,7 @@ class LaunchActivity : AppCompatActivity() {
         coroutineScope.launch(Dispatchers.IO) {
 //            loginUseCase.execute("mingting15@mintin.com", "tiendvlp")
 //            userMainServerApiImp.getUser("mingting15@mintin.com")
-            (getUserChannelUSeCase.execute(10) as GetUserChannelsUseCaseSync.Result.Success)
+            (getUserChannelUSeCase.execute(10, 10) as GetUserChannelsUseCaseSync.Result.Success)
                 .channels.forEach {
                     normalLog("RESULT: " + it.admin)
                     normalLog("RESULT: " + it.members[0].avatar.type)

@@ -8,6 +8,7 @@ import com.devlogs.chatty.R
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
+import com.devlogs.chatty.screen.mainscreen.MainScreenNavigator
 import com.ncapdevi.fragnav.FragNavController
 import dagger.Module
 import dagger.Provides
@@ -36,7 +37,12 @@ class ActivityModule {
 
     @Provides
     @ActivityScoped
-    fun provideAuthenticationScreenNavigator (fragmentManager: FragmentManager) : AuthenticationScreenNavigator = AuthenticationScreenNavigator(getMainFragNavController(fragmentManager))
+    fun provideAuthenticationScreenNavigator (fragmentManager: FragmentManager) : AuthenticationScreenNavigator = AuthenticationScreenNavigator(getAuthenticationFragNavController(fragmentManager))
+
+    @Provides
+    @ActivityScoped
+    fun provideMainScreenNavigator (fragmentManager: FragmentManager) : MainScreenNavigator = MainScreenNavigator(getMainFragNavController(fragmentManager))
+
 
     @Provides
     @ActivityScoped
@@ -44,7 +50,11 @@ class ActivityModule {
         return PresentationStateManager()
     }
 
-    private fun getMainFragNavController (fragmentManager: FragmentManager) : FragNavController {
+    private fun getAuthenticationFragNavController (fragmentManager: FragmentManager) : FragNavController {
         return FragNavController(fragmentManager, R.id.frameAuthenticationContent)
+    }
+
+    private fun getMainFragNavController (fragmentManager: FragmentManager) : FragNavController {
+        return FragNavController(fragmentManager, R.id.mainLayoutContainer)
     }
 }

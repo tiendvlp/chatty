@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <com.devlogs.chatty.screen.common.customview.Button
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/btnSearch"
+        android:layout_width="match_parent"
+        android:layout_height="28dp"
+        android:background="@drawable/circularviewbg_a"
+        android:backgroundTint="@color/dark1"
+        android:textAlignment="textStart"
+        android:textColor="@color/dark2"
+        android:paddingLeft="20dp"
+        style="?android:attr/borderlessButtonStyle"
+        android:text="Search"
+        android:textSize="12sp" />

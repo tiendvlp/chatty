@@ -1,5 +1,7 @@
 package com.devlogs.chatty.screen.authenticationscreen.registerscreen.mvc_view
 
+import android.view.ViewGroup
+import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.mvcview.ObservableMvcView
 
 interface RegisterMvcView : ObservableMvcView<RegisterMvcView.Listener> {
@@ -13,3 +15,5 @@ interface RegisterMvcView : ObservableMvcView<RegisterMvcView.Listener> {
     fun registerSuccess ()
 
 }
+
+fun MvcViewFactory.getRegisterMvcView (container: ViewGroup?) : RegisterMvcView = RegisterMvcViewImp(mLayoutInflater, container)

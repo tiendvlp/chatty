@@ -8,11 +8,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.LoginMvcView
-import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationAction
+import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.getLoginMvcView
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationAction.*
-import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState.*
-import com.devlogs.chatty.screen.common.mvcview.MvcView
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.PresentationState

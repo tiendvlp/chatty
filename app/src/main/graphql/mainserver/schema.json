@@ -14,6 +14,19 @@
               "name": "getChannels",
               "args": [
                 {
+                  "name": "lastUpdate",
+                  "type": {
+                    "kind": "NON_NULL",
+                    "name": null,
+                    "ofType": {
+                      "kind": "SCALAR",
+                      "name": "BigInt",
+                      "ofType": null
+                    }
+                  },
+                  "defaultValue": null
+                },
+                {
                   "name": "count",
                   "type": {
                     "kind": "NON_NULL",
