@@ -24,6 +24,7 @@ object BackgroundDispatcher: CoroutineDispatcher() {
         override fun newThread(runnable: java.lang.Runnable): Thread {
             return Thread(runnable, nextThreadName)
         }
+        // dang minh tien 912001
     }
 
     private val threadPool = ThreadPoolExecutor(
