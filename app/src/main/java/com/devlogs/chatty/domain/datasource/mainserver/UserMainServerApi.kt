@@ -19,7 +19,7 @@ interface UserMainServerApi {
      * @throws CreateUserError.UserAlreadyExist
      * @throws AuthenticationErrorEntity
      * */
-    suspend fun createUser (name: String, userAvatarMainServerModel: UserAvatarMainServerModel)
+    suspend fun createUser (name: String)
     sealed class CreateUserError(message: String) : ErrorEntity(message) {
         object UserAlreadyExist: CreateUserError("Your user email is already exist")
     }

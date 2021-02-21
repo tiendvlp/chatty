@@ -27,7 +27,7 @@ class GetUserByEmailUseCaseSync {
     suspend fun execute (userEmail: String) : Result = withContext(BackgroundDispatcher) {
         try {
             val getUserResult = mUserMainServerApi.getUser(userEmail)
-            Success(UserEntity(getUserResult.id, getUserResult.name, getUserResult.email, getUserAvatarEntity(getUserResult.avatar)))
+            Success(UserEntity(getUserResult.id, getUserResult.name, getUserResult.email, getUserResult.avatar))
         } catch (e: GeneralErrorEntity) {
             GeneralError
         } catch (e: NotFoundErrorEntity) {
@@ -37,10 +37,4 @@ class GetUserByEmailUseCaseSync {
         }
     }
 
-    private fun getUserAvatarEntity (from: UserAvatarMainServerModel) : UserAvatarEntity {
-        if (from is UserAvatarMainServerModel.LocalAvatar) {
-            return UserAvatarEntity.LocalAvatar(from.type, from.avatarName, from.avatarColor)
-        }
-        throw GeneralErrorEntity("UnSupported Avatar type")
-    }
 }

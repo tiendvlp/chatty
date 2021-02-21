@@ -43,7 +43,6 @@ class LaunchActivity : AppCompatActivity() {
             (getUserChannelUSeCase.execute(10, 10) as GetUserChannelsUseCaseSync.Result.Success)
                 .channels.forEach {
                     normalLog("RESULT: " + it.admin)
-                    normalLog("RESULT: " + it.members[0].avatar.type)
                     normalLog("RESULT: " + it.admin)
                 }
 //            messageApiImp.getChannelMessage("5fb8bdf0614d57292085e59d", 10)

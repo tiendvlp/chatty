@@ -40,14 +40,14 @@ class ChannelFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        CoroutineScope(Dispatchers.Main.immediate).launch {
-            val result = getChannelUseCaseSync.execute(Date().time, 10)
-            if (result is GetUserChannelsUseCaseSync.Result.Success) {
-                result.channels.forEach {
-                    normalLog(it.title)
-                }
-            }
-        }
+//        CoroutineScope(Dispatchers.Main.immediate).launch {
+//            val result = getChannelUseCaseSync.execute(Date().time, 10)
+//            if (result is GetUserChannelsUseCaseSync.Result.Success) {
+//                result.channels.forEach {
+//                    normalLog(it.title)
+//                }
+//            }
+//        }
         mChannelMvcView = mvcViewFactory.getMainMvcView(container)
         return mChannelMvcView.getRootView()
     }

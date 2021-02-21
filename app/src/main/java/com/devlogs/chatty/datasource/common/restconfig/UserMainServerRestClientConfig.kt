@@ -8,6 +8,6 @@ interface UserMainServerRestClientConfig {
     @POST("/newuser")
     suspend fun createNewUser (@Body reqBody: CreateNewUser.ReqBody) : Response<Any>
     class CreateNewUser {
-        data class ReqBody(val name:String, val avatar: Any)
+        data class ReqBody(val name:String)
     }
 }

@@ -4,5 +4,5 @@ data class UserMainServerModel (
         val id: String,
         val email: String,
         val name: String,
-        val avatar: UserAvatarMainServerModel
+        val avatar: String
 )

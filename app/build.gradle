@@ -2,8 +2,8 @@
 rootProject.ext.appModule.plugins.each {
     apply plugin: it
 }
-
-
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -43,5 +43,8 @@ dependencies {
     rootProject.ext.appModule.dependencies.each {
             add(it.configuration, it.dependency, it.options)
     }
+    implementation platform('com.google.firebase:firebase-bom:26.5.0')
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
 }
 

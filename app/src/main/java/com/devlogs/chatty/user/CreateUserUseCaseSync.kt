@@ -25,10 +25,9 @@ class CreateUserUseCaseSync {
         this.mUserMainServerApi = userMainServerApi
     }
 
-    suspend fun execute (name: String, userAvatar: UserAvatarEntity) : Result = withContext(BackgroundDispatcher) {
+    suspend fun execute (name: String) : Result = withContext(BackgroundDispatcher) {
         try {
-            val avatar = convertAvatarEntityToAvatarServerModel(userAvatar) ?: return@withContext GeneralError
-            mUserMainServerApi.createUser(name, avatar)
+            mUserMainServerApi.createUser(name)
             Success
         } catch (e: GeneralErrorEntity) {
             GeneralError
@@ -39,13 +38,6 @@ class CreateUserUseCaseSync {
         } catch (e: TokenExpiredErrorEntity) {
             Result.UnAuthorize
         }
-    }
-
-    private suspend fun convertAvatarEntityToAvatarServerModel (avatarEntity: UserAvatarEntity) : UserAvatarMainServerModel? = withContext(Dispatchers.Default) {
-        if (avatarEntity is UserAvatarEntity.LocalAvatar) {
-            UserAvatarMainServerModel.LocalAvatar("LOCAL", avatarEntity.avatarName, avatarEntity.avatarColor)
-        }
-        null
     }
 
 }

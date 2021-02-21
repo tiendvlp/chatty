@@ -46,22 +46,16 @@ class UserMainServerApiImp : UserMainServerApi {
 
             val result: GetUserByEmailQuery.GetUserByEmail = response.data?.getUserByEmail
                     ?: throw NotFoundErrorEntity("Can not find your user")
-            if (result.avatar == null) {
-                throw GeneralErrorEntity("Your user avatar is missing")
-            }
-            val avatar = createUserAvatar(result.avatar)
-
-            normalLog("GetUserSuccess: Avatar: " + avatar.type)
-            return UserMainServerModel(result.id, result.email, result.name, avatar)
+            return UserMainServerModel(result.id, result.email, result.name, result.avatar.toString())
 
         } catch (e: ApolloException) {
             throw NetworkErrorEntity(e.message ?: "")
         }
     }
 
-    override suspend fun createUser(name: String, userAvatarMainServerModel: UserAvatarMainServerModel) {
+    override suspend fun createUser(name: String) {
         try {
-            val reqBody: CreateNewUser.ReqBody = CreateNewUser.ReqBody(name, userAvatarMainServerModel)
+            val reqBody: CreateNewUser.ReqBody = CreateNewUser.ReqBody(name)
             val client = mMainServerClinet.create(UserMainServerRestClientConfig::class.java)
             val response = client.createNewUser(reqBody)
 
