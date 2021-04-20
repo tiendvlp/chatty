@@ -1,0 +1,11 @@
+query getPreviousStoryWithCount ($since: BigInt!, $count: Int!){
+    getPreviousStoryWithCount(since: $since, count: $count) {
+        id,
+        channelId,
+        content,
+        type,
+        owner,
+        uploadedDate
+        outdatedDate
+    }
+}

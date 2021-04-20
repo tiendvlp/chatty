@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.devlogs.chatty.channel.GetUserChannelsUseCaseSync
+import com.devlogs.chatty.channel.GetUserChannelsOverPeriodOfTimeUseCaseSync
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
@@ -30,7 +30,7 @@ class ChannelFragment : Fragment() {
     @Inject
     lateinit var loginWithEmailUseCaseSync: LoginWithEmailUseCaseSync
     @Inject
-    lateinit var getChannelUseCaseSync: GetUserChannelsUseCaseSync
+    lateinit var getChannelOverPeriodOfTimeUseCaseSync: GetUserChannelsOverPeriodOfTimeUseCaseSync
     @Inject
     lateinit var mvcViewFactory: MvcViewFactory
     private lateinit var mChannelMvcView : ChannelMvcView
@@ -40,14 +40,24 @@ class ChannelFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-//        CoroutineScope(Dispatchers.Main.immediate).launch {
-//            val result = getChannelUseCaseSync.execute(Date().time, 10)
-//            if (result is GetUserChannelsUseCaseSync.Result.Success) {
-//                result.channels.forEach {
-//                    normalLog(it.title)
-//                }
-//            }
-//        }
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            loginWithEmailUseCaseSync.execute("mingting17@mintin.com", "tiendvlp")
+            val result = getChannelOverPeriodOfTimeUseCaseSync.execute(10, Date().time)
+            if (result is GetUserChannelsOverPeriodOfTimeUseCaseSync.Result.Success) {
+                result.channels.forEach {
+                    normalLog("channelTitle: " + it.title)
+                    normalLog("channelStatusContent: " + it.status.content)
+                    normalLog("channelAdmin: " + it.admin)
+                    normalLog("channelCreatedDate: " + it.createdDate)
+                    normalLog("channelLatestUpdate: " + it.latestUpdate)
+                    normalLog("channelId: " + it.id)
+                    normalLog("channelAvatar: " + it.members[1].avatar.size)
+
+                }
+            } else {
+                normalLog("Failure");
+            }
+        }
         mChannelMvcView = mvcViewFactory.getMainMvcView(container)
         return mChannelMvcView.getRootView()
     }

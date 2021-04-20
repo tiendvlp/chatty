@@ -14,6 +14,8 @@ ext {
             androidApplication: 'com.android.application',
             kotlinKapt : 'kotlin-kapt',
             apollographql: "com.apollographql.apollo",
+            realm: 'realm-android',
+            google_service: 'com.google.gms.google-services',
             kotlinAndroid : 'kotlin-android',
             kotlinAndroidExtensions : 'kotlin-android-extensions',
             daggerHiltPlugin: 'dagger.hilt.android.plugin'
@@ -84,7 +86,7 @@ ext {
             rxKotlin: [configuration: "implementation", dependency: [group: rxJava.group, name: "rxkotlin", version: "3.0.1"]]
     ]
 
-    def socketIO = [group: "io.socket", version: "2.0.0"]
+    def socketIO = [group: "io.socket", version: "1.0.0"]
     socketIODependencies = [
             socketIoClient: [configuration: "implementation",dependency: [group: socketIO.group, name: "socket.io-client", version: socketIO.version]]
     ]
@@ -125,6 +127,16 @@ ext {
     fragNavDependencies = [
             fragNav: [configuration: "implementation", dependency: [group: fragNav.group, name: "frag-nav", version: fragNav.version]]
     ]
+
+    def realm = [group: "io.realm", version: "10.3.1"]
+    realmDependencies = [
+            realmdb: [configuration: "implementation", dependency: [group: realm.group, name: "realm-gradle-plugin", version: realm.version]]
+    ]
+
+    def picasso = [group: "com.squareup.picasso", version: "2.71828"]
+    picassoDependencies = [
+            picasso: [configuration: "implementation", dependency: [group: picasso.group, name: "picasso", version: picasso.version]]
+    ]
     //endregion dependencies
 
     //region - Module
@@ -135,11 +147,18 @@ ext {
                 androidXAppCompatDependencies.values() + materialDependencies.values() + constraintLayoutDependencies.values()+
                 junitDependencies.values() + androidXTestDependencies.values() + espressoDependencies.values() +
                 rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() + dataStoreDependencies.values() +
-                circleImageDependencies.values() + roomDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values()
-                + eventBusDependencies.values() + fragNavDependencies.values(),
+                circleImageDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values()
+                + eventBusDependencies.values() + fragNavDependencies.values() + picassoDependencies.values(),
 
             plugins: [
-                    plugins.androidApplication, plugins.apollographql, plugins.kotlinAndroid, plugins.kotlinAndroidExtensions, plugins.kotlinKapt, plugins.daggerHiltPlugin
+                    plugins.androidApplication,
+                    plugins.kotlinAndroid,
+                    plugins.kotlinAndroidExtensions,
+                    plugins.kotlinKapt,
+                    plugins.google_service,
+                    plugins.daggerHiltPlugin,
+                    plugins.apollographql,
+                    plugins.realm
             ]
     ]
     //endregion App Module

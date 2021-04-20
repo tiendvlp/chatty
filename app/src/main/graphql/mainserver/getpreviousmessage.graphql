@@ -1,0 +1,10 @@
+query getPreviousMessageWithCount  ($channelId: String!, $since: BigInt!, $count: Int!){
+    getPreviousMessageWithCount(channelId: $channelId, since:$since, count: $count) {
+        id,
+        content,
+        type,
+        senderEmail,
+        channelId,
+        createdDate
+    }
+}

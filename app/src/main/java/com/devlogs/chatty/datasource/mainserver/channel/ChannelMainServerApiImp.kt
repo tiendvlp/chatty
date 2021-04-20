@@ -1,17 +1,15 @@
 package com.devlogs.chatty.datasource.mainserver.channel
 
 import com.apollographql.apollo.ApolloClient
-import com.apollographql.apollo.api.toJson
 import com.apollographql.apollo.coroutines.await
 import com.apollographql.apollo.exception.ApolloException
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.common.helper.simple
 import com.devlogs.chatty.domain.datasource.mainserver.ChannelMainServerApi
-import com.devlogs.chatty.domain.datasource.mainserver.ChannelMainServerApi.ChannelModel
+import com.devlogs.chatty.domain.datasource.mainserver.model.ChannelMainServerModel
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import mainserver.GetChannelsQuery
+import mainserver.GetChannelsOverPeriodOfTimeQuery
+import mainserver.GetPreviousChannelsQuery
 import javax.inject.Inject
 
 class ChannelMainServerApiImp : ChannelMainServerApi {
@@ -22,9 +20,9 @@ class ChannelMainServerApiImp : ChannelMainServerApi {
         this.mApolloClient = apolloClient
     }
 
-    override suspend fun getChannels(lastUpdate: Long, count: Int): List<ChannelModel> {
+    override suspend fun getPreviousChannels(lastUpdate: Long, count: Int): List<ChannelMainServerModel> {
         try {
-            val response = mApolloClient.query(GetChannelsQuery(lastUpdate,count)).await()
+            val response = mApolloClient.query(GetPreviousChannelsQuery(lastUpdate,count)).await()
 
             if (response.hasErrors()) {
                 val currentError = response.errors!![0].simple()
@@ -37,7 +35,7 @@ class ChannelMainServerApiImp : ChannelMainServerApi {
                 throw GeneralErrorEntity("Internal server error")
             }
 
-            val result: List<GetChannelsQuery.GetChannel?> = response.data?.getChannels?: throw NotFoundErrorEntity("Can not find channel")
+            val result: List<GetPreviousChannelsQuery.GetPreviousChannel?> = response.data?.getPreviousChannels?: throw NotFoundErrorEntity("Can not find channel")
 
             return result.map { channelResult ->
 
@@ -45,19 +43,59 @@ class ChannelMainServerApiImp : ChannelMainServerApi {
                     throw NotFoundErrorEntity("Channel is missing")
                 }
 
-                val channelStatusDescription = ChannelModel.Status.Description(channelResult.status.__typename, channelResult.status.senderEmail)
-                val channelStatus = ChannelModel.Status(channelResult.status.senderEmail, channelStatusDescription)
+                val channelStatus = ChannelMainServerModel.Status(channelResult.status.senderEmail, channelResult.status.type, channelResult.status.content)
                 val channelMembers = channelResult.members.map { memberResult ->
-                    ChannelModel.Member(memberResult!!.id, memberResult.email, memberResult.name)
+                    ChannelMainServerModel.Member(memberResult!!.id, memberResult.email)
                 }
                 val seenPeople : List<String> = channelResult.seen.map { it!! }
 
-                ChannelModel(
+                ChannelMainServerModel(
                         channelResult.id, channelResult.title,
                         channelResult.admin,channelStatus,
                         channelMembers, seenPeople,
                         channelResult.createdDate.toString().toLong(),
                         channelResult.latestUpdate.toString().toLong())
+            }
+        } catch (e: ApolloException) {
+            throw NetworkErrorEntity(e.message?: "")
+        }
+    }
+
+    override suspend fun getChannelsOverPeriodOfTime(from: Long, to: Long): List<ChannelMainServerModel> {
+        try {
+            val response = mApolloClient.query(GetChannelsOverPeriodOfTimeQuery(from,to)).await()
+
+            if (response.hasErrors()) {
+                val currentError = response.errors!![0].simple()
+                currentError.code.let {
+                    if (currentError.code == 404) {
+                        throw NotFoundErrorEntity("Can not find channel")
+                    }
+                }
+                normalLog("Error happened: " + currentError.message)
+                throw GeneralErrorEntity("Internal server error")
+            }
+
+            val result: List<GetChannelsOverPeriodOfTimeQuery.GetChannelsOverPeriodOfTime?> = response.data?.getChannelsOverPeriodOfTime?: throw NotFoundErrorEntity("Can not find channel")
+
+            return result.map { channelResult ->
+
+                if (channelResult == null) {
+                    throw NotFoundErrorEntity("Channel is missing")
+                }
+
+                val channelStatus = ChannelMainServerModel.Status(channelResult.status.senderEmail, channelResult.status.type, channelResult.status.content)
+                val channelMembers = channelResult.members.map { memberResult ->
+                    ChannelMainServerModel.Member(memberResult!!.id, memberResult.email)
+                }
+                val seenPeople : List<String> = channelResult.seen.map { it!! }
+
+                ChannelMainServerModel(
+                    channelResult.id, channelResult.title,
+                    channelResult.admin,channelStatus,
+                    channelMembers, seenPeople,
+                    channelResult.createdDate.toString().toLong(),
+                    channelResult.latestUpdate.toString().toLong())
             }
         } catch (e: ApolloException) {
             throw NetworkErrorEntity(e.message?: "")

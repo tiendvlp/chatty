@@ -3,11 +3,10 @@ package com.devlogs.chatty.screen.launch
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.devlogs.chatty.R
-import com.devlogs.chatty.channel.GetUserChannelsUseCaseSync
+import com.devlogs.chatty.channel.GetUserChannelsOverPeriodOfTimeUseCaseSync
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.mainserver.channel.ChannelMainServerApiImp
 import com.devlogs.chatty.datasource.mainserver.user.UserMainServerApiImp
-import com.devlogs.chatty.domain.datasource.mainserver.ChannelMainServerApi
 import com.devlogs.chatty.domain.datasource.mainserver.MessageMainServerApi
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync
 import dagger.hilt.android.AndroidEntryPoint
@@ -29,7 +28,7 @@ class LaunchActivity : AppCompatActivity() {
     @Inject
     lateinit var channelMainServerApi: ChannelMainServerApiImp
     @Inject
-    lateinit var getUserChannelUSeCase : GetUserChannelsUseCaseSync
+    lateinit var getUserChannelUSeCaseOverPeriodOfTime : GetUserChannelsOverPeriodOfTimeUseCaseSync
     private val scopeJob = Job()
     private val coroutineScope = CoroutineScope(scopeJob + Dispatchers.Main.immediate)
 
@@ -40,7 +39,7 @@ class LaunchActivity : AppCompatActivity() {
         coroutineScope.launch(Dispatchers.IO) {
 //            loginUseCase.execute("mingting15@mintin.com", "tiendvlp")
 //            userMainServerApiImp.getUser("mingting15@mintin.com")
-            (getUserChannelUSeCase.execute(10, 10) as GetUserChannelsUseCaseSync.Result.Success)
+            (getUserChannelUSeCaseOverPeriodOfTime.execute(10, 10) as GetUserChannelsOverPeriodOfTimeUseCaseSync.Result.Success)
                 .channels.forEach {
                     normalLog("RESULT: " + it.admin)
                     normalLog("RESULT: " + it.admin)

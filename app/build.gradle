@@ -2,8 +2,6 @@
 rootProject.ext.appModule.plugins.each {
     apply plugin: it
 }
-apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion

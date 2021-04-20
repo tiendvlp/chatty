@@ -1,0 +1,20 @@
+query getPreviousChannels ($lastUpdate: BigInt!, $count: Int!) {
+    getPreviousChannels(lastUpdate: 1615602155203, count: 30) {
+        title,
+        id,
+        status {
+            content,
+            type
+            senderEmail
+        }
+        members {
+            id,
+            email
+        }
+        admin,
+        seen,
+        createdDate,
+        latestUpdate
+    }
+}
+

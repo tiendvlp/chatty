@@ -1,7 +1,5 @@
 package com.devlogs.chatty.common.di
 
-import com.devlogs.chatty.datasource.interceptor.AuthInterceptor
-
 class DaggerNamed {
     object Retrofit {
         const val AuthServerRetrofit = "AuthServerRetrofit"

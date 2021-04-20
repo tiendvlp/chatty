@@ -1,0 +1,11 @@
+query getStoryOverPeriodOfTime ($from: BigInt!, $to: BigInt!){
+    getStoryOverPeriodOfTime(from: $from, to: $to) {
+        id,
+        channelId,
+        content,
+        type,
+        owner,
+        uploadedDate,
+        outdatedDate
+    }
+}

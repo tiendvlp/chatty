@@ -1,0 +1,20 @@
+query getChannelsOverPeriodOfTime ($from: BigInt!, $to: BigInt!) {
+    getChannelsOverPeriodOfTime(from: $from, to: $to) {
+        title,
+        id,
+        status {
+            content,
+            type
+            senderEmail
+        }
+        members {
+            id,
+            email
+        }
+        admin,
+        seen,
+        createdDate,
+        latestUpdate
+
+    }
+}

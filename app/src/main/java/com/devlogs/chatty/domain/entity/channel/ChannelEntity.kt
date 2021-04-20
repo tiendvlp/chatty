@@ -8,6 +8,7 @@ data class ChannelEntity (
     val members : List<ChannelMemberEntity>,
     val seen : List<String>,
     val createdDate : Long,
-    val latestUpdate : Long) {
+    val latestUpdate : Long
+    )
 
-}
+

@@ -25,7 +25,7 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
         }
 
         fun bind (channelPresentationModel: ChannelPresentationModel) {
-            imgAvatar.setImageBitmap(channelPresentationModel.avatar)
+            imgAvatar.setImageBitmap(channelPresentationModel.avatar[0])
             txtMessage.text = channelPresentationModel.message
             txtSender.text = channelPresentationModel.sender
             txtTitle.text = channelPresentationModel.title

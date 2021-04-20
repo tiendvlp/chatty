@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Firebase.messaging.subscribeToTopic("6020e869b84648076303b8a6")
+        Firebase.messaging.subscribeToTopic("603236349deb10090ebd3a78")
             .addOnCompleteListener {
                 Log.d("Register Room", "State: " + it.isSuccessful)
             }

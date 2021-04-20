@@ -12,6 +12,7 @@ import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 class LoginWithEmailUseCaseSync {
 
@@ -29,6 +30,7 @@ class LoginWithEmailUseCaseSync {
     constructor(authRestApi: AuthServerApi, tokenOfflineApi: TokenOfflineApi) {
         mAuthRestApi = authRestApi
         mTokenOfflineApi = tokenOfflineApi
+        Dispatchers.Main.immediate
     }
 
     suspend fun execute (email: String, password: String) : Result = withContext(BackgroundDispatcher) {

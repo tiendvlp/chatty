@@ -16,5 +16,7 @@ interface MessageMainServerApi {
      * @throws CommonErrorEntity.GeneralErrorEntity
      * @throws CommonErrorEntity.NetworkErrorEntity
      * */
-    suspend fun getChannelMessage (channelId: String, count: Int) : List<MessageMainServerModel>;
+    suspend fun getPreviousChannelMessages (channelId: String,since: Long, count: Int) : List<MessageMainServerModel>;
+
+    suspend fun getChannelMessagesOverPeriodOfTime (channelId: String, from: Long, to: Long): List<MessageMainServerModel>
 }

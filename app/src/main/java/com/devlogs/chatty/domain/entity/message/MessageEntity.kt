@@ -1,49 +1,27 @@
 package com.devlogs.chatty.domain.entity.message
 
-sealed class MessageEntity {
+class MessageEntity {
     val id: String
     val channelId: String
     val type: String
+    val content: String
     val senderEmail: String
     val createdDate: Long
-
 
     constructor(
         id: String,
         channelId: String,
         type: String,
+        content: String,
         senderEmail: String,
         createdDate: Long
     ) {
+        this.content = content
         this.id = id
         this.channelId = channelId
         this.type = type
         this.senderEmail = senderEmail
         this.createdDate = createdDate
-    }
-
-    class TextMessageEntity : MessageEntity {
-        val messageBody: String
-
-        constructor(id : String, channelId: String, type: String, senderEmail: String, createdDate : Long, messageBody: String) : super(id,
-            channelId,
-            type,
-            senderEmail,
-            createdDate) {
-            this.messageBody = messageBody
-        }
-    }
-
-    class VideoMessageEntity : MessageEntity {
-        val videoUrl: String
-
-        constructor(id : String, channelId: String, type: String, senderEmail: String, createdDate : Long, videoUrl: String) : super(id,
-            channelId,
-            type,
-            senderEmail,
-            createdDate) {
-            this.videoUrl = videoUrl
-        }
     }
 }
 

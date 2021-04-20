@@ -1,0 +1,10 @@
+query getMessageOverPeriodOfTime ( $channelId: String!, $from: BigInt!, $to: BigInt!) {
+    getMessageOverPeriodOfTime (channelId: $channelId, from: $from, to: $to) {
+        id,
+        content,
+        type,
+        senderEmail,
+        channelId,
+        createdDate
+    }
+}

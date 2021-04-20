@@ -4,13 +4,19 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.apollographql.apollo.ApolloClient
+import com.devlogs.chatty.common.AUTH_SERVER_START_PATH
+import com.devlogs.chatty.common.MAIN_SERVER_START_PATH
 import com.devlogs.chatty.config.LOCALHOST
-import com.devlogs.chatty.datasource.interceptor.AuthInterceptor
-import com.devlogs.chatty.datasource.interceptor.LogcatInterceptor
+import com.devlogs.chatty.datasource.common.http_interceptor.AuthInterceptor
+import com.devlogs.chatty.datasource.common.http_interceptor.LogcatInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import io.realm.Realm
+import io.realm.RealmConfiguration
+import io.socket.client.IO
+import io.socket.client.Socket
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -49,14 +55,11 @@ class ApplicationModule {
                 .connectTimeout(21, TimeUnit.SECONDS).build()
 
         return Retrofit.Builder()
-                // 172.20.10.4
-
-                .baseUrl("http://$LOCALHOST:4000")
+                .baseUrl(AUTH_SERVER_START_PATH)
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(okHttpClient).build()
     }
-
 
     @Provides
     @Singleton
@@ -64,12 +67,29 @@ class ApplicationModule {
     fun provideMainServerRetrofit(client: OkHttpClient): Retrofit {
 
         return Retrofit.Builder()
-                //http://10.0.2.2:8080/api/v1/
-                // 172.20.10.4
-                .baseUrl("http://$LOCALHOST:3000/api/v1/")
+                .baseUrl(MAIN_SERVER_START_PATH)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideRealmInstance () : RealmConfiguration {
+        return RealmConfiguration.Builder()
+            .name("CHATTY_LOCAL_DB")
+            .schemaVersion(1)
+            .allowQueriesOnUiThread(false)
+            .allowWritesOnUiThread(false)
+            .deleteRealmIfMigrationNeeded()
+            .build()
+
+    }
+
+    @Provides
+    @Singleton
+    fun provideSocketInstance () : Socket  {
+        return IO.socket("http://$LOCALHOST:3000")
     }
 
     @Provides

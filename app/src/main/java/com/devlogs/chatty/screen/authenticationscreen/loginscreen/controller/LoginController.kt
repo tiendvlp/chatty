@@ -7,6 +7,7 @@ import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPre
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import kotlinx.coroutines.*
 import javax.inject.Inject
+import kotlin.coroutines.EmptyCoroutineContext
 
 class LoginController {
     private var mLoginWithEmailUseCase: LoginWithEmailUseCaseSync
@@ -23,8 +24,10 @@ class LoginController {
     }
 
     fun login(email: String, password: String) {
-        scope.launch {
+        var j : Job  = scope.launch {
             LoginController::class
+            async { mLoginWithEmailUseCase.execute("", "") }
+
             try {
                 val result = mLoginWithEmailUseCase.execute(email, password)
                 if (result is Result.NetworkError) mPresentationStateManager.consumeAction(
@@ -42,6 +45,8 @@ class LoginController {
                 mPresentationStateManager.consumeAction(LoginFailedAction("Canceled"))
             }
         }
+        j.cancelChildren()
+        scope.coroutineContext.cancelChildren()
     }
 
     fun cancel() {

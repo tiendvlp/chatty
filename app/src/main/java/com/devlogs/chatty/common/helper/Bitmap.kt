@@ -1,11 +1,17 @@
 package com.devlogs.chatty.common.helper
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 
 import android.graphics.drawable.BitmapDrawable
 
 import android.graphics.drawable.Drawable
+import com.devlogs.chatty.common.getFullDownloadAvatarUrl
+import com.devlogs.chatty.config.LOCALHOST
+import java.io.ByteArrayOutputStream
+import java.io.IOException
+import java.net.URL
 
 
 fun drawableToBitmap(drawable: Drawable): Bitmap? {
@@ -33,4 +39,37 @@ fun drawableToBitmap(drawable: Drawable): Bitmap? {
     drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight())
     drawable.draw(canvas)
     return bitmap
+}
+
+fun URL.toBitmap(): Bitmap?{
+    return try {
+        BitmapFactory.decodeStream(openStream())
+    }catch (e: IOException){
+        null
+    }
+}
+
+@Throws(IOException::class)
+ fun getImageBytes(imageUrl: String): ByteArray {
+    val url = URL(imageUrl)
+    val output = ByteArrayOutputStream()
+    url.openStream().use { stream ->
+        val buffer = ByteArray(4096)
+        while (true) {
+            val bytesRead = stream.read(buffer)
+            if (bytesRead < 0) {
+                break
+            }
+            output.write(buffer, 0, bytesRead)
+        }
+    }
+    return output.toByteArray()
+}
+
+fun getUserAvatar ( email : String) : ByteArray {
+    return getImageBytes(getFullDownloadAvatarUrl(email))
+}
+
+fun ByteArray.toBitmap () : Bitmap {
+    return BitmapFactory.decodeByteArray(this, 0, size, BitmapFactory.Options())
 }
