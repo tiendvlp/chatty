@@ -1,5 +1,5 @@
 query getPreviousChannels ($lastUpdate: BigInt!, $count: Int!) {
-    getPreviousChannels(lastUpdate: 1615602155203, count: 30) {
+    getPreviousChannels(lastUpdate: $lastUpdate, count: $count) {
         title,
         id,
         status {

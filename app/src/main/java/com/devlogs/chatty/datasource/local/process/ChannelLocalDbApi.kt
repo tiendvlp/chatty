@@ -6,6 +6,7 @@ import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import kotlinx.coroutines.withContext
+import java.util.*
 import javax.inject.Inject
 
 class ChannelLocalDbApi {
@@ -21,17 +22,13 @@ class ChannelLocalDbApi {
         realmInstance.executeTransaction {
             it.insert(channelRO)
         }
-        realmInstance.close()
     }
 
-    suspend fun removeChannel (id: String) : ChannelRealmObject? = withContext(BackgroundDispatcher){
+    suspend fun addChannel (channelROs: List<ChannelRealmObject>) = withContext(BackgroundDispatcher) {
         val realmInstance = Realm.getInstance(currentRealmConfiguration)
-        val result = realmInstance
-            .where(ChannelRealmObject::class.java)
-            .equalTo("id", id)
-            .findFirst()
-        realmInstance.close()
-        result
+        realmInstance.executeTransaction {
+            it.insert(channelROs)
+        }
     }
 
     suspend fun getAllChannel () : List<ChannelRealmObject> = withContext(BackgroundDispatcher) {
@@ -50,8 +47,15 @@ class ChannelLocalDbApi {
             .lessThan("latestUpdate", since)
             .limit(CHANNEL_LIMIT)
             .findAll().toList()
-        realmInstance.close()
         result
+    }
+
+    suspend fun getLatestUpdateTime () : Long {
+        val result =  getPreviousChannels(Date().time, 1);
+        if (result.isNotEmpty()) {
+            return result[0].latestUpdate!!
+        }
+        return 0
     }
 
     suspend fun getChannelsInPeriodOfTime (from: Long, to: Long) : List<ChannelRealmObject> = withContext(BackgroundDispatcher){

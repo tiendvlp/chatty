@@ -24,7 +24,7 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
 
     fun consumeAction (action: PresentationAction) {
         previousState = currentState
-        currentState = currentState.consumeAction(action)
+        currentState = currentState.consumeAction(currentState,action)
         currentAction = action
 
         getListener().forEach {

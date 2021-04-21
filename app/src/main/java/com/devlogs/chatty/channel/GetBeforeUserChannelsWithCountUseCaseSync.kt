@@ -41,7 +41,7 @@ class GetBeforeUserChannelsWithCountUseCaseSync {
             val response = mChannelMainSerApi.getPreviousChannels(since, count)
             val channelMemberLocalModels = RealmList<ChannelMemberRealmObject>();
             val channelMemberEntities = ArrayList<ChannelMemberEntity>();
-            var avatarByteArray : ByteArray?;
+            var avatarByteArray : ByteArray?
             val channels : List<ChannelEntity> = response.map {channelModel ->
                 for (member in channelModel.members) {
                     avatarByteArray = getUserAvatar(member.email)

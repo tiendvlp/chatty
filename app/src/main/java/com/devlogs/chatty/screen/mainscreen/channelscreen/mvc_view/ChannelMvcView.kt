@@ -13,7 +13,7 @@ interface ChannelMvcView: ObservableMvcView <Listener>{
 
     fun loading ()
     fun loadingFailed ()
-    fun channelLoaded (channels: ArrayList<ChannelPresentationModel>)
+    fun channelLoaded (channels: List<ChannelPresentationModel>)
 }
 
 fun MvcViewFactory.getMainMvcView (container: ViewGroup?) : ChannelMvcView = ChannelMvcViewImp(getLayoutInflater(), container)

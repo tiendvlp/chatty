@@ -14,13 +14,13 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Chatty">
-        <activity android:name=".screen.mainscreen.MainActivity" android:screenOrientation="portrait">
+        <activity android:name=".screen.authenticationscreen.AuthenticationActivity" android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".screen.authenticationscreen.AuthenticationActivity"/>
+        <activity android:name=".screen.mainscreen.MainActivity"/>
         <service
             android:name=".androidservice.FcmNotificationServer"
             android:exported="false">

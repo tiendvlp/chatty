@@ -16,6 +16,7 @@ import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.PresentationState
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateChangedListener
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
+import com.devlogs.chatty.screen.mainscreen.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -83,6 +84,7 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
             }
             is LoginSuccessState -> {
                 mMvcView.loginSuccess()
+                MainActivity.start(requireContext())
             }
             is LoadingState -> {
                 if (action is LoginAction) {

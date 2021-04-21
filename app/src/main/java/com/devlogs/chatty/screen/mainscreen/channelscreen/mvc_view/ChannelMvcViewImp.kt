@@ -2,6 +2,7 @@ package com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import android.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -47,14 +48,14 @@ class ChannelMvcViewImp : BaseMvcView<ChannelMvcView.Listener>, ChannelMvcView,
     }
 
     override fun loading() {
-        TODO("Not yet implemented")
+        Toast.makeText(getContext(), "Loading", Toast.LENGTH_LONG).show()
     }
 
     override fun loadingFailed() {
-        TODO("Not yet implemented")
+        Toast.makeText(getContext(), "Load Failed", Toast.LENGTH_LONG).show()
     }
 
-    override fun channelLoaded(channels: ArrayList<ChannelPresentationModel>) {
+    override fun channelLoaded(channels: List<ChannelPresentationModel>) {
         val startedChangedPos = loadedChannels.size
         loadedChannels.addAll(channels)
         mChannelAdapter.notifyItemRangeInserted(startedChangedPos, loadedChannels.size)

@@ -44,7 +44,9 @@ class GetUserChannelsOverPeriodOfTimeUseCaseSync {
                 channelMemberLocals.clear()
                 channelSeen.clear()
                 channelSeen.addAll(channelModel.seen)
-                channelMemberLocals.addAll(channelModel.members.map { ChannelMemberRealmObject(it.email, it.id, getUserAvatar(it.email)) })
+                channelMemberLocals.addAll(channelModel.members.map {
+                    ChannelMemberRealmObject(it.email, it.id, getUserAvatar(it.email))
+                })
 
                 channelLocalDbApi.addChannel(ChannelRealmObject(
                     channelModel.latestUpdate,

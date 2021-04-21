@@ -39,13 +39,14 @@ class LaunchActivity : AppCompatActivity() {
         coroutineScope.launch(Dispatchers.IO) {
 //            loginUseCase.execute("mingting15@mintin.com", "tiendvlp")
 //            userMainServerApiImp.getUser("mingting15@mintin.com")
-            (getUserChannelUSeCaseOverPeriodOfTime.execute(10, 10) as GetUserChannelsOverPeriodOfTimeUseCaseSync.Result.Success)
-                .channels.forEach {
-                    normalLog("RESULT: " + it.admin)
-                    normalLog("RESULT: " + it.admin)
-                }
+//            (getUserChannelUSeCaseOverPeriodOfTime.execute(10, 10) as GetUserChannelsOverPeriodOfTimeUseCaseSync.Result.Success)
+//                .channels.forEach {
+//                    normalLog("RESULT: " + it.admin)
+//                    normalLog("RESULT: " + it.admin)
+//                }
 //            messageApiImp.getChannelMessage("5fb8bdf0614d57292085e59d", 10)
 //            messageApiImp.sendTextMessage("Hi hi tui ne", "5fb8bdf0614d57292085e59d")
+
         }
     }
 }

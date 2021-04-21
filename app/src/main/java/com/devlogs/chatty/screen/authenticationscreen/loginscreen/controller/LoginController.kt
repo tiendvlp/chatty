@@ -24,10 +24,7 @@ class LoginController {
     }
 
     fun login(email: String, password: String) {
-        var j : Job  = scope.launch {
-            LoginController::class
-            async { mLoginWithEmailUseCase.execute("", "") }
-
+         scope.launch {
             try {
                 val result = mLoginWithEmailUseCase.execute(email, password)
                 if (result is Result.NetworkError) mPresentationStateManager.consumeAction(
@@ -45,8 +42,6 @@ class LoginController {
                 mPresentationStateManager.consumeAction(LoginFailedAction("Canceled"))
             }
         }
-        j.cancelChildren()
-        scope.coroutineContext.cancelChildren()
     }
 
     fun cancel() {

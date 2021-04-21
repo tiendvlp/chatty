@@ -1,5 +1,7 @@
 package com.devlogs.chatty.screen.mainscreen
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.FrameLayout
@@ -16,6 +18,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity(), BackPressDispatcher {
+
+    companion object {
+        fun start (currentContext: Context) {
+            currentContext.startActivity(Intent(currentContext, MainActivity::class.java))
+        }
+    }
+
     private var mBackPressListeners : HashSet<BackPressListener> = HashSet()
 
     @Inject
@@ -81,4 +90,5 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
             super.onBackPressed()
         }
     }
+
 }

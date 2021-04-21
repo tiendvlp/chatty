@@ -1,6 +1,7 @@
 package com.devlogs.chatty.domain.datasource.mapper
 
 import com.devlogs.chatty.common.helper.getImageBytes
+import com.devlogs.chatty.common.helper.getUserAvatar
 import com.devlogs.chatty.config.LOCALHOST
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
 import com.devlogs.chatty.domain.datasource.mainserver.model.ChannelMainServerModel
@@ -29,7 +30,7 @@ fun ChannelRealmObject.toChannelEntity () : ChannelEntity {
 
 fun ChannelMainServerModel.toChannelEntity () : ChannelEntity {
    val channelMembers : List<ChannelMemberEntity> = this.members.map { memberModel ->
-            ChannelMemberEntity(memberModel.id, memberModel.email, getImageBytes("http://$LOCALHOST:3000/api/v1/user/avatar/download/${memberModel.email}"))
+            ChannelMemberEntity(memberModel.id, memberModel.email, getUserAvatar(memberModel.email))
         }
 
         val channelStatus = ChannelStatusEntity(
