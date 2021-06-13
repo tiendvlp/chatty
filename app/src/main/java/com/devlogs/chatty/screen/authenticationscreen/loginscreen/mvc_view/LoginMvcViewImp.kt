@@ -2,10 +2,12 @@ package com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.WindowInsets
 import android.widget.Button
 import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.Toast
+import androidx.core.view.ViewCompat
 import androidx.core.widget.doOnTextChanged
 import com.devlogs.chatty.R
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher

@@ -42,6 +42,8 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
     }
 
     fun onSavedInstanceState (outState: Bundle) {
-        outState.putSerializable(currentState.getTag(), currentState)
+        if (currentState.allowSave) {
+            outState.putSerializable(currentState.getTag(), currentState)
+        }
     }
 }

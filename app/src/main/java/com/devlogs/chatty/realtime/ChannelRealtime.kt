@@ -2,13 +2,17 @@ package com.devlogs.chatty.realtime
 
 import com.devlogs.chatty.common.base.BaseObservable
 import com.devlogs.chatty.common.helper.getImageBytes
+import com.devlogs.chatty.common.helper.getUserAvatar
+import com.devlogs.chatty.common.mapper.Mapper
 import com.devlogs.chatty.config.LOCALHOST
+import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.entity.channel.ChannelMemberEntity
 import com.devlogs.chatty.domain.entity.channel.ChannelStatusEntity
 import com.devlogs.chatty.realtime.ChannelRealtime.Listener
 import io.socket.client.Socket
 import org.json.JSONObject
+import javax.inject.Inject
 
 class ChannelRealtime : BaseObservable<Listener> {
     interface Listener {
@@ -16,9 +20,12 @@ class ChannelRealtime : BaseObservable<Listener> {
     }
 
     private val socketInstance: Socket
+    @Inject
+    lateinit var channelLocalDbApi: ChannelLocalDbApi
 
     constructor(socketInstance: Socket) {
         this.socketInstance = socketInstance
+        startListen()
     }
 
     private fun startListen () {
@@ -33,7 +40,6 @@ class ChannelRealtime : BaseObservable<Listener> {
                 ChannelMemberEntity(
                     id = currentMember!!.getString("id"),
                     email = email,
-                    avatar = getImageBytes("http://$LOCALHOST:3000/api/v1/avatar/download/$email")
                 )
             }
 

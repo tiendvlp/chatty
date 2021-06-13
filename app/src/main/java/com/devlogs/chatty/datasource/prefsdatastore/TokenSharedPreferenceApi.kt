@@ -1,7 +1,7 @@
 package com.devlogs.chatty.datasource.prefsdatastore
 
 import android.content.SharedPreferences
-import com.devlogs.chatty.domain.datasource.offlinedb.TokenOfflineApi
+import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.*
 import java.util.*
 import javax.inject.Inject

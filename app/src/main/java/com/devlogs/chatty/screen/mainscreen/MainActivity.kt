@@ -20,15 +20,14 @@ import javax.inject.Inject
 class MainActivity : AppCompatActivity(), BackPressDispatcher {
 
     companion object {
-        fun start (currentContext: Context) {
+        fun start(currentContext: Context) {
             currentContext.startActivity(Intent(currentContext, MainActivity::class.java))
         }
     }
 
-    private var mBackPressListeners : HashSet<BackPressListener> = HashSet()
+    private var mBackPressListeners: HashSet<BackPressListener> = HashSet()
 
-    @Inject
-    lateinit var mNavigator: MainScreenNavigator
+    @Inject lateinit var mNavigator: MainScreenNavigator
 
     private lateinit var mFrameContainer: FrameLayout
     private lateinit var rdgrMain: RadioGroup
@@ -37,10 +36,6 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Firebase.messaging.subscribeToTopic("603236349deb10090ebd3a78")
-            .addOnCompleteListener {
-                Log.d("Register Room", "State: " + it.isSuccessful)
-            }
         setContentView(R.layout.layout_main)
         mNavigator.init(savedInstanceState)
         rdgrMain = findViewById(R.id.rdgrMain)
@@ -64,7 +59,7 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
         mBackPressListeners.remove(backPressListener)
     }
 
-    private fun addEvents () {
+    private fun addEvents() {
         rdgrMain.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 rbtnAccountScreen.id -> mNavigator.switchToAccountTab()
@@ -74,7 +69,7 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
     }
 
     override fun onBackPressed() {
-        var isBackPressConsumed : Boolean = false
+        var isBackPressConsumed: Boolean = false
 
         mBackPressListeners.forEach { listener ->
             if (listener.onBackPress()) {
@@ -90,5 +85,4 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
             super.onBackPressed()
         }
     }
-
 }

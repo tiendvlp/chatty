@@ -1,8 +1,8 @@
 package com.devlogs.chatty.channel
 
-import android.provider.Telephony.Carriers.PORT
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
-import com.devlogs.chatty.common.helper.getUserAvatar
+import com.devlogs.chatty.common.helper.normalLog
+import com.devlogs.chatty.common.helper.warningLog
 import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.ChannelMemberRealmObject
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
@@ -14,10 +14,7 @@ import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity
 import io.realm.RealmList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.net.URL
-import java.util.*
+import kotlinx.coroutines.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
 
@@ -33,10 +30,11 @@ import kotlin.collections.ArrayList
 class LoadMoreUseCaseSync {
 
     sealed class Result {
-        data class Success (val channels: List<ChannelEntity>): Result()
-        object GeneralError: Result ()
-        object NetworkError: Result ()
-        object UnAuthorized: Result ()
+        data class Success(val channels: List<ChannelEntity>) : Result()
+        object  Empty : Result()
+        object GeneralError : Result()
+        object NetworkError : Result()
+        object UnAuthorized : Result()
     }
 
     private val localDbApi: ChannelLocalDbApi
@@ -50,28 +48,21 @@ class LoadMoreUseCaseSync {
         this.loadMorePolicy = LoadMoreChannelPolicyImp()
     }
 
-    suspend fun execute(since: Long) : Result = withContext(BackgroundDispatcher) {
+    suspend fun execute(): Result = withContext(BackgroundDispatcher) {
         try {
-            val channelCount = loadMorePolicy.getMaxNumberOfChannel()
             val result = ArrayList<ChannelEntity>()
-            result.addAll(localDbApi.getPreviousChannels(since, channelCount).map {
-                it.toChannelEntity()
-            })
-
-            if ( result.size < loadMorePolicy.getMaxNumberOfChannel()) {
-                var lastUpdateTime = Date().time
-                if (result.size > 0) {
-                    lastUpdateTime = result[result.size - 1].latestUpdate
-                }
-                val channelsLoadMoreFromServer = mainServerApi.getPreviousChannels(
+            val lastUpdateTime = localDbApi.getLatestLastUpdateTime()
+            normalLog("lastUpdateTime: $lastUpdateTime")
+            val channelsLoadMoreFromServer =
+                mainServerApi.getPreviousChannels(
                     lastUpdateTime,
-                    channelCount - result.size
-                )
-                result.addAll(channelsLoadMoreFromServer.map {
-                    it.toChannelEntity()
-                })
-                saveChannelsToDb(channelsLoadMoreFromServer)
+                    loadMorePolicy.getMaxNumberOfChannel())
+            if (channelsLoadMoreFromServer.isEmpty()) {
+                warningLog("No more channels")
+                return@withContext Result.Empty
             }
+                result.addAll(channelsLoadMoreFromServer.map { it.toChannelEntity() })
+                saveChannelsToDb(channelsLoadMoreFromServer)
             Result.Success(result)
         } catch (e: CommonErrorEntity.NetworkErrorEntity) {
             Result.NetworkError
@@ -85,30 +76,32 @@ class LoadMoreUseCaseSync {
         }
     }
 
-    private suspend fun saveChannelsToDb (serverRespond : List<ChannelMainServerModel>) = withContext(BackgroundDispatcher) {
-        launch (BackgroundDispatcher) {
-            val channelMemberLocals : RealmList<ChannelMemberRealmObject> = RealmList()
-            val channelSeen = RealmList<String>()
-            localDbApi.addChannel(serverRespond.map {
-                    channelModel ->
-                channelMemberLocals.clear()
-                channelSeen.clear()
-                channelSeen.addAll(channelModel.seen)
-                channelMemberLocals.addAll(channelModel.members.map {
-                    ChannelMemberRealmObject(it.email, it.id, getUserAvatar(it.email))
-                })
+    private suspend fun saveChannelsToDb(serverRespond: List<ChannelMainServerModel>) =
+            CoroutineScope(BackgroundDispatcher).launch  {
+                val channelMemberLocals: RealmList<ChannelMemberRealmObject> = RealmList()
+                val channelSeen = RealmList<String>()
+                localDbApi.addChannel(serverRespond.map { channelModel ->
+                    channelMemberLocals.clear()
+                    channelSeen.clear()
+                    channelSeen.addAll(channelModel.seen)
+                    channelMemberLocals.addAll(channelModel.members.map {
+                        ChannelMemberRealmObject(it.email, it.id)
+                    })
 
-                ChannelRealmObject(
-                    channelModel.latestUpdate,
-                    channelModel.createdDate,
-                    channelSeen,
-                    channelMemberLocals,
-                    ChannelStatusRealmObject(channelModel.status.senderEmail, channelModel.status.content, channelModel.status.type),
-                    channelModel.admin,
-                    channelModel.title,
-                    channelModel.id
-                )
-            })
+                    ChannelRealmObject(
+                        channelModel.latestUpdate,
+                        channelModel.createdDate,
+                        channelSeen,
+                        channelMemberLocals,
+                        ChannelStatusRealmObject(
+                            channelModel.status.senderEmail,
+                            channelModel.status.content,
+                            channelModel.status.type
+                        ),
+                        channelModel.admin,
+                        channelModel.title,
+                        channelModel.id
+                    )
+                })
         }
-    }
 }

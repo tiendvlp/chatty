@@ -6,6 +6,7 @@ import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.PresentationState
 
 sealed class LoginPresentationState : PresentationState {
+    override val allowSave: Boolean = true
     override fun getTag(): String {
         return "LoginPresentationState"
     }

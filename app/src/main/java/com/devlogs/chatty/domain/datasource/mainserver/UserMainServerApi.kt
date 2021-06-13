@@ -23,4 +23,6 @@ interface UserMainServerApi {
     sealed class CreateUserError(message: String) : ErrorEntity(message) {
         object UserAlreadyExist: CreateUserError("Your user email is already exist")
     }
+
+    suspend fun getMyAccount () : UserMainServerModel
 }

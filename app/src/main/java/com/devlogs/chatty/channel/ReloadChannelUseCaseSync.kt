@@ -1,7 +1,7 @@
 package com.devlogs.chatty.channel
 
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
-import com.devlogs.chatty.common.helper.getUserAvatar
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.ChannelMemberRealmObject
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
@@ -13,8 +13,6 @@ import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity
 import io.realm.RealmList
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -59,7 +57,7 @@ class ReloadChannelUseCaseSync {
         try {
             val lastUpdate = localDbApi.getLatestUpdateTime()
             val result: ArrayList<ChannelEntity> = ArrayList();
-            val channelsFromServer = mainServerApi.getChannelsOverPeriodOfTime(Date().time, lastUpdate)
+            val channelsFromServer = mainServerApi.getChannelsOverPeriodOfTime(lastUpdate, Date().time)
             result.addAll(channelsFromServer.map {
                 it.toChannelEntity()
             })
@@ -78,16 +76,16 @@ class ReloadChannelUseCaseSync {
     }
 
     private suspend fun saveChannelsToDb (serverRespond : List<ChannelMainServerModel>) = withContext(BackgroundDispatcher) {
-        launch (BackgroundDispatcher) {
+        withContext (BackgroundDispatcher) {
             val channelMemberLocals : RealmList<ChannelMemberRealmObject> = RealmList()
             val channelSeen = RealmList<String>()
-            localDbApi.addChannel(serverRespond.map {
+            localDbApi.overrideChannel(serverRespond.map {
                     channelModel ->
                 channelMemberLocals.clear()
                 channelSeen.clear()
                 channelSeen.addAll(channelModel.seen)
                 channelMemberLocals.addAll(channelModel.members.map {
-                    ChannelMemberRealmObject(it.email, it.id, getUserAvatar(it.email))
+                    ChannelMemberRealmObject(it.email, it.id)
                 })
 
                 ChannelRealmObject(

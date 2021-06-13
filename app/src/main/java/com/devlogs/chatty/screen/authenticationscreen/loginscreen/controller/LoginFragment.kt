@@ -18,28 +18,24 @@ import com.devlogs.chatty.screen.common.presentationstate.PresentationStateChang
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import com.devlogs.chatty.screen.mainscreen.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChangedListener {
 
     companion object {
-        fun getInstance () : LoginFragment {
+        fun getInstance(): LoginFragment {
             return LoginFragment()
         }
     }
 
-    private lateinit var mMvcView : LoginMvcView
-    @Inject
-    lateinit var presentationStateManager: PresentationStateManager
-    @Inject
-    lateinit var mMvcViewFactory : MvcViewFactory
-    @Inject
-    lateinit var navigator: AuthenticationScreenNavigator
-    @Inject
-    lateinit var loginController: LoginController
-    @Inject
-    lateinit var silentlyController: LoginSilentlyController
+    private lateinit var mMvcView: LoginMvcView
+    @Inject lateinit var presentationStateManager: PresentationStateManager
+    @Inject lateinit var mMvcViewFactory: MvcViewFactory
+    @Inject lateinit var navigator: AuthenticationScreenNavigator
+    @Inject lateinit var loginController: LoginController
+    @Inject lateinit var silentlyController: LoginSilentlyController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,8 +45,13 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View {
         mMvcView = mMvcViewFactory.getLoginMvcView(container)
+        Toast.makeText(requireContext(), "Success nhe 6", Toast.LENGTH_LONG).show()
         return mMvcView.getRootView()
     }
 
@@ -65,7 +66,6 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
         presentationStateManager.register(this)
     }
 
-
     override fun onStop() {
         super.onStop()
         mMvcView.unRegister(this)
@@ -74,9 +74,9 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
     }
 
     override fun onStateChanged(
-        previousState: PresentationState,
-        currentState: PresentationState,
-        action: PresentationAction
+            previousState: PresentationState,
+            currentState: PresentationState,
+            action: PresentationAction
     ) {
         when (currentState) {
             is NotLoggedInState -> {
@@ -84,13 +84,13 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
             }
             is LoginSuccessState -> {
                 mMvcView.loginSuccess()
+
                 MainActivity.start(requireContext())
             }
             is LoadingState -> {
                 if (action is LoginAction) {
                     loginController.login(action.email, action.password)
-                }
-                else if (action is LoginSilentlyAction) {
+                } else if (action is LoginSilentlyAction) {
                     silentlyController.silentLogin()
                 }
                 mMvcView.loading()
@@ -109,6 +109,4 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
     override fun onBtnForgotPasswordClicked() {
         Toast.makeText(requireContext(), "NOT SUPPORTED YET", Toast.LENGTH_SHORT).show()
     }
-
-
 }

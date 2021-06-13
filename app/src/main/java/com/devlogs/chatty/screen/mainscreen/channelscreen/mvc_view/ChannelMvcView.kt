@@ -3,17 +3,39 @@ package com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view
 import android.view.ViewGroup
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.mvcview.ObservableMvcView
+import com.devlogs.chatty.screen.common.presentationmodel.UserPresentationModel
+import com.devlogs.chatty.screen.mainscreen.channelscreen.controller.ChannelRcvAdapter
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
 import com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view.ChannelMvcView.Listener
+import java.util.*
+
 
 interface ChannelMvcView: ObservableMvcView <Listener>{
-    interface Listener {
-        fun loadMore()
+    enum class ErrorType {
+        Network,
+        LoadUserError
     }
 
-    fun loading ()
-    fun loadingFailed ()
-    fun channelLoaded (channels: List<ChannelPresentationModel>)
+    interface Listener {
+        fun onLoadMoreChannel()
+        fun onRefreshChannel ()
+    }
+
+
+    fun showLoading ()
+    fun showError (errorType: ErrorType)
+    fun display (channels: TreeSet<ChannelPresentationModel>)
+    fun showMoreChannel (channels: TreeSet<ChannelPresentationModel>)
+    fun showLoadMoreError (errorType: ErrorType)
+    fun showTopError (errorType: ErrorType)
+    fun hideTopError ()
+    fun showRefresh ()
+    fun hideRefresh ()
+    fun showLoadUserError ()
+    fun hideError ()
+    fun showUserInfo (user: UserPresentationModel)
+    fun showNewChannel (newChannel : ChannelPresentationModel)
+    fun showReloadedChannel (channels: TreeSet<ChannelPresentationModel>)
 }
 
-fun MvcViewFactory.getMainMvcView (container: ViewGroup?) : ChannelMvcView = ChannelMvcViewImp(getLayoutInflater(), container)
+fun MvcViewFactory.getMainMvcView (container: ViewGroup?, channelRcvAdapter: ChannelRcvAdapter) : ChannelMvcView = ChannelMvcViewImp(getLayoutInflater(), container, channelRcvAdapter)

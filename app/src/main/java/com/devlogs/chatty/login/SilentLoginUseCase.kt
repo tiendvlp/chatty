@@ -1,10 +1,8 @@
 package com.devlogs.chatty.login
 
-import com.devlogs.chatty.domain.datasource.offlinedb.TokenOfflineApi
-import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
+import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.*
 import com.devlogs.chatty.login.SilentLoginUseCase.Result.*
-import java.lang.Exception
 import javax.inject.Inject
 
 class SilentLoginUseCase {

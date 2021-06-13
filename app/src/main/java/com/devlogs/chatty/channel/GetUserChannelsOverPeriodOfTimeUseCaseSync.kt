@@ -2,7 +2,6 @@ package com.devlogs.chatty.channel
 
 import com.devlogs.chatty.channel.GetUserChannelsOverPeriodOfTimeUseCaseSync.Result.*
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
-import com.devlogs.chatty.common.helper.getUserAvatar
 import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.ChannelMemberRealmObject
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
@@ -45,7 +44,7 @@ class GetUserChannelsOverPeriodOfTimeUseCaseSync {
                 channelSeen.clear()
                 channelSeen.addAll(channelModel.seen)
                 channelMemberLocals.addAll(channelModel.members.map {
-                    ChannelMemberRealmObject(it.email, it.id, getUserAvatar(it.email))
+                    ChannelMemberRealmObject(it.email, it.id)
                 })
 
                 channelLocalDbApi.addChannel(ChannelRealmObject(
@@ -76,7 +75,7 @@ class GetUserChannelsOverPeriodOfTimeUseCaseSync {
 
     private fun convertToEntity (channelModel: ChannelMainServerModel) : ChannelEntity {
         val channelMembers : List<ChannelMemberEntity> = channelModel.members.map { memberModel ->
-            ChannelMemberEntity(memberModel.id, memberModel.email, getUserAvatar(memberModel.email))
+            ChannelMemberEntity(memberModel.id, memberModel.email)
         }
 
         val channelStatus = ChannelStatusEntity(

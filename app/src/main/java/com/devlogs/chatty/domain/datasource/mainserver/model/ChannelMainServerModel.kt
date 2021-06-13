@@ -1,5 +1,9 @@
 package com.devlogs.chatty.domain.datasource.mainserver.model
 
+import com.devlogs.chatty.common.mapper.Mapper
+import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
+import com.devlogs.chatty.datasource.local.relam_object.ChannelStatusRealmObject
+
 data class ChannelMainServerModel(
     val id: String,
     val title: String,

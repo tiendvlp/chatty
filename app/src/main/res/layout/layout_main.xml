@@ -36,6 +36,7 @@
             android:drawableTop="@drawable/rbtnchat_background"
             android:gravity="center"
             android:text="chat"
+            android:checked="true"
             android:textColor="@drawable/rbtn_text_color_black"
             android:textSize="10sp"
             android:layout_weight="1"

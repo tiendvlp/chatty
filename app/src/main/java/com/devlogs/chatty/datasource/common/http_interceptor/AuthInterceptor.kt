@@ -2,7 +2,7 @@ package com.devlogs.chatty.datasource.common.http_interceptor
 
 import com.devlogs.chatty.config.LOCALHOST
 import com.devlogs.chatty.datasource.common.restconfig.AuthServerRestClientConfig
-import com.devlogs.chatty.domain.datasource.offlinedb.TokenOfflineApi
+import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.*
 import com.google.gson.Gson
 import kotlinx.coroutines.*

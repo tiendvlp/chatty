@@ -2,9 +2,6 @@ package com.devlogs.chatty.channel
 
 import com.devlogs.chatty.channel.GetBeforeUserChannelsWithCountUseCaseSync.Result.*
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
-import com.devlogs.chatty.common.helper.getImageBytes
-import com.devlogs.chatty.common.helper.getUserAvatar
-import com.devlogs.chatty.config.LOCALHOST
 import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.ChannelMemberRealmObject
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
@@ -41,12 +38,10 @@ class GetBeforeUserChannelsWithCountUseCaseSync {
             val response = mChannelMainSerApi.getPreviousChannels(since, count)
             val channelMemberLocalModels = RealmList<ChannelMemberRealmObject>();
             val channelMemberEntities = ArrayList<ChannelMemberEntity>();
-            var avatarByteArray : ByteArray?
-            val channels : List<ChannelEntity> = response.map {channelModel ->
+            val channels : List<ChannelEntity> = response.map { channelModel ->
                 for (member in channelModel.members) {
-                    avatarByteArray = getUserAvatar(member.email)
-                    channelMemberEntities.add(ChannelMemberEntity(member.id, member.email, avatarByteArray!!))
-                    channelMemberLocalModels.add(ChannelMemberRealmObject(member.id, member.email, avatarByteArray!!))
+                    channelMemberEntities.add(ChannelMemberEntity(member.id, member.email))
+                    channelMemberLocalModels.add(ChannelMemberRealmObject(member.id, member.email))
                 }
                 val seenLocal = RealmList<String>()
                 seenLocal.addAll(channelModel.seen)

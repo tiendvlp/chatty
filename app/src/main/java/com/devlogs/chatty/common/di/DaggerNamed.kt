@@ -9,5 +9,7 @@ class DaggerNamed {
         const val AuthInterceptor = "AuthInterceptor"
         const val LoggingInterceptor = "LoggingInterceptor"
     }
-
+    object File {
+        const val ExternalFileDir = "ExternalFileDir"
+    }
 }

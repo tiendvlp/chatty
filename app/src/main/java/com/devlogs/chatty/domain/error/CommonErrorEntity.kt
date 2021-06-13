@@ -12,4 +12,6 @@ open class CommonErrorEntity(message: String) : ErrorEntity (message) {
     class TokenExpiredErrorEntity (message: String) : CommonErrorEntity(message)
     class DuplicateErrorEntity (message: String) : CommonErrorEntity(message)
     class UnSupportedDataType (message: String) : CommonErrorEntity(message)
+    class ResourceNotFoundErrorEntity (message: String) : CommonErrorEntity (message)
+    class IOException (message: String) : CommonErrorEntity (message)
 }

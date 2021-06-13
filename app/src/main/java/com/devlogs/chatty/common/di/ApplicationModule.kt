@@ -5,15 +5,15 @@ import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.apollographql.apollo.ApolloClient
 import com.devlogs.chatty.common.AUTH_SERVER_START_PATH
+import com.devlogs.chatty.common.HOST
 import com.devlogs.chatty.common.MAIN_SERVER_START_PATH
-import com.devlogs.chatty.config.LOCALHOST
+import com.devlogs.chatty.common.application.ApplicationEventObservable
 import com.devlogs.chatty.datasource.common.http_interceptor.AuthInterceptor
 import com.devlogs.chatty.datasource.common.http_interceptor.LogcatInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
-import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -65,12 +65,17 @@ class ApplicationModule {
     @Singleton
     @Named(DaggerNamed.Retrofit.MainServerRetrofit)
     fun provideMainServerRetrofit(client: OkHttpClient): Retrofit {
-
         return Retrofit.Builder()
                 .baseUrl(MAIN_SERVER_START_PATH)
                 .addConverterFactory(GsonConverterFactory.create())
                 .client(client)
                 .build()
+    }
+
+    @Provides
+    @Singleton
+    fun provideApplicationEventObservable () : ApplicationEventObservable {
+        return ApplicationEventObservable()
     }
 
     @Provides
@@ -81,7 +86,6 @@ class ApplicationModule {
             .schemaVersion(1)
             .allowQueriesOnUiThread(false)
             .allowWritesOnUiThread(false)
-            .deleteRealmIfMigrationNeeded()
             .build()
 
     }
@@ -89,17 +93,23 @@ class ApplicationModule {
     @Provides
     @Singleton
     fun provideSocketInstance () : Socket  {
-        return IO.socket("http://$LOCALHOST:3000")
+        val socketOption = IO.Options()
+        socketOption.reconnection = true
+        socketOption.reconnectionDelay = 5000
+        socketOption.forceNew = true
+        return IO.socket("http://$HOST:3000", socketOption)
     }
 
     @Provides
     @Singleton
     fun provideApolloClient(client: OkHttpClient): ApolloClient {
+
         return ApolloClient.builder()
-                .serverUrl("http://$LOCALHOST:3000/graphql")
+                .serverUrl("http://$HOST:3000/graphql")
                 .okHttpClient(client)
                 .build()
 
     }
+
 
 }

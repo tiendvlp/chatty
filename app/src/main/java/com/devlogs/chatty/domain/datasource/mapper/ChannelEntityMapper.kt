@@ -21,7 +21,6 @@ fun ChannelRealmObject.toChannelEntity () : ChannelEntity {
             ChannelMemberEntity(
                 it.id!!,
                 it.email!!,
-                it.avatar!!
             )
         },
         seen = this.seen!!
@@ -30,13 +29,13 @@ fun ChannelRealmObject.toChannelEntity () : ChannelEntity {
 
 fun ChannelMainServerModel.toChannelEntity () : ChannelEntity {
    val channelMembers : List<ChannelMemberEntity> = this.members.map { memberModel ->
-            ChannelMemberEntity(memberModel.id, memberModel.email, getUserAvatar(memberModel.email))
+            ChannelMemberEntity(memberModel.id, memberModel.email)
         }
 
         val channelStatus = ChannelStatusEntity(
             this.status.senderEmail,
+            this.status.content,
             this.status.type,
-            this.status.content
         )
 
         return ChannelEntity(this.id, this.title, this.admin, channelStatus, channelMembers, this.seen, this.createdDate, this.latestUpdate)

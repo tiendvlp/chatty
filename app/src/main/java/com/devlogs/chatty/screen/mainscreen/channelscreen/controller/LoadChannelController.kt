@@ -1,18 +1,23 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.controller
 
-import com.devlogs.chatty.channel.GetBeforeUserChannelsWithCountUseCaseSync
-import com.devlogs.chatty.channel.GetUserChannelsOverPeriodOfTimeUseCaseSync
-import com.devlogs.chatty.channel.LoadMoreUseCaseSync
-import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
+import com.devlogs.chatty.channel.*
+import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.common.helper.normalLog
-import com.devlogs.chatty.common.helper.toBitmap
+import com.devlogs.chatty.common.helper.warningLog
+import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
+import com.devlogs.chatty.resource.GetAvatarUseCaseSync
+import com.devlogs.chatty.screen.common.presentationmodel.UserPresentationModel
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
-import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationAction
-import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationAction.LoadChannelSuccessAction
+import com.devlogs.chatty.screen.mainscreen.channelscreen.model.to
+import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationAction.*
+import com.devlogs.chatty.user.GetAccountUseCase
+import io.socket.client.Socket
+import com.devlogs.chatty.common.helper.*
+import com.devlogs.chatty.domain.entity.AccountEntity
 import kotlinx.coroutines.*
+import java.util.*
 import javax.inject.Inject
-import kotlin.coroutines.EmptyCoroutineContext
 
 class LoadChannelController {
     private val mPresentationStateManager: PresentationStateManager
@@ -20,43 +25,93 @@ class LoadChannelController {
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate)
     private val getBeforeChannelWithCountUseCase: GetBeforeUserChannelsWithCountUseCaseSync
     private val loadMoreChannel: LoadMoreUseCaseSync
-
+    private val reloadChannelUseCaseSync : ReloadChannelUseCaseSync
+    private val getLoadedChannel: GetLoadedChannelUseCaseSync
+    private val getAccountUseCase: GetAccountUseCase
+    private val socketIOInstance: Socket
+    private val tokenApi: TokenOfflineApi
+    private val getUserAvatarUseCase: GetAvatarUseCaseSync
     @Inject
     constructor(
-        getChannelOverPeriodOfTimeUseCaseSync: GetUserChannelsOverPeriodOfTimeUseCaseSync,
-        presentationStateManager: PresentationStateManager,
-        getBeforeChannelWithCountUseCase: GetBeforeUserChannelsWithCountUseCaseSync,
-        loadMoreChannel: LoadMoreUseCaseSync
+            getLoadedChannelUseCaseSync: GetLoadedChannelUseCaseSync,
+            getChannelOverPeriodOfTimeUseCaseSync: GetUserChannelsOverPeriodOfTimeUseCaseSync,
+            presentationStateManager: PresentationStateManager,
+            getBeforeChannelWithCountUseCase: GetBeforeUserChannelsWithCountUseCaseSync,
+            loadMoreChannel: LoadMoreUseCaseSync,
+            reloadChannelUseCaseSync: ReloadChannelUseCaseSync,
+            getAccountUseCase: GetAccountUseCase,
+            socketIOInstance: Socket,
+            tokenApi: TokenOfflineApi,
+            getUserAvatarUseCase: GetAvatarUseCaseSync
     ) {
+        this.getLoadedChannel = getLoadedChannelUseCaseSync
+        this.reloadChannelUseCaseSync = reloadChannelUseCaseSync
         mGetChannelOverPeriodOfTimeUseCaseSync = getChannelOverPeriodOfTimeUseCaseSync
         mPresentationStateManager = presentationStateManager
         this.getBeforeChannelWithCountUseCase = getBeforeChannelWithCountUseCase
         this.loadMoreChannel = loadMoreChannel
+        this.getAccountUseCase = getAccountUseCase
+        this.socketIOInstance = socketIOInstance
+        this.tokenApi = tokenApi
+        socketIOInstance.emit("joinRoom", tokenApi.getAccessToken())
+        this.getUserAvatarUseCase = getUserAvatarUseCase
     }
 
-    fun getChannels(since: Long) {
-        scope.launch(Dispatchers.Main.immediate) {
-            val result = loadMoreChannel.execute(since);
-            if (result is LoadMoreUseCaseSync.Result.Success) {
-                normalLog("LoadChannelSuccess with count: ${result.channels.size}")
-                mPresentationStateManager.consumeAction(LoadChannelSuccessAction(result.channels.map { channelEntity ->
-                    ChannelPresentationModel(
-                        avatar = channelEntity.members.map {
-                            async(BackgroundDispatcher) {
-                                it.avatar.toBitmap()
-                            }.await()
-                        },
-                        title = channelEntity.title,
-                        sender = channelEntity.status.senderEmail,
-                        message = channelEntity.status.content
-                    )
-                }))
+    fun reloadChannels () {
+        scope.launch (Dispatchers.Main.immediate) {
+                val result = reloadChannelUseCaseSync.execute()
+            normalLog("ReloadChannelResult: ${result}")
+            if (result is ReloadChannelUseCaseSync.Result.NetworkError) {
+                normalLog("ReLoad channel failed due to network error")
+                mPresentationStateManager.consumeAction(
+                    ReloadChannelFailedAction
+                )
                 return@launch
+            }
+            else if (result is ReloadChannelUseCaseSync.Result.GeneralError) {
+                normalLog("ReLoad channel failed due to general error")
+                mPresentationStateManager.consumeAction(
+                    ReloadChannelFailedAction
+                )
+            }
+
+            else if (result is ReloadChannelUseCaseSync.Result.UnAuthorized) {
+                normalLog("Reload channel failed invalid refreshtoken")
+                mPresentationStateManager.consumeAction(
+                    ReloadChannelFailedAction
+                )
+            }
+
+            else if (result is ReloadChannelUseCaseSync.Result.Success) {
+                if (result.channels.size > 0) {
+                    normalLog("Reload channel success: " + result.channels[0].status.content)
+                } else {
+                    normalLog("No channels update")
+                }
+                val channelPMS = TreeSet<ChannelPresentationModel>()
+                channelPMS.addAll(result.channels.to())
+                mPresentationStateManager.consumeAction(ReLoadChannelSuccessAction(channelPMS))
+            }
+        }
+    }
+
+    fun loadMoreChannels() {
+        scope.launch(Dispatchers.Main.immediate) {
+            warningLog("LoadMoreChannels execute")
+            val result = loadMoreChannel.execute();
+            if (result is LoadMoreUseCaseSync.Result.Success) {
+                val channelPMS = TreeSet<ChannelPresentationModel>()
+                    channelPMS.addAll(result.channels.to())
+                mPresentationStateManager.consumeAction(LoadMoreChannelSuccessAction(channelPMS))
+                return@launch
+            }
+            if (result is LoadMoreUseCaseSync.Result.Empty) {
+                mPresentationStateManager.consumeAction(LoadMoreChannelSuccessAction(TreeSet<ChannelPresentationModel>()))
             }
             if (result is LoadMoreUseCaseSync.Result.NetworkError) {
                 normalLog("Load channel failed due to network error")
                 mPresentationStateManager.consumeAction(
-                    ChannelScreenPresentationAction.LoadChannelFailedAction(
+                    LoadMoreChannelFailedAction(
                         "Network Error"
                     )
                 )
@@ -65,7 +120,7 @@ class LoadChannelController {
             if (result is LoadMoreUseCaseSync.Result.GeneralError) {
                 normalLog("Load channel failed due to general error")
                 mPresentationStateManager.consumeAction(
-                    ChannelScreenPresentationAction.LoadChannelFailedAction(
+                    LoadMoreChannelFailedAction(
                         "General Error"
                     )
                 )
@@ -74,7 +129,7 @@ class LoadChannelController {
             if (result is LoadMoreUseCaseSync.Result.UnAuthorized) {
                 normalLog("Load channel failed invalid refreshtoken")
                 mPresentationStateManager.consumeAction(
-                    ChannelScreenPresentationAction.LoadChannelFailedAction(
+                    LoadMoreChannelFailedAction(
                         "UnAuthorized"
                     )
                 )
@@ -83,4 +138,50 @@ class LoadChannelController {
 
         }
     }
+
+    fun getLoadedChannel () {
+        scope.launch(Dispatchers.Main.immediate) {
+            val result = getLoadedChannel.execute()
+            val channelPMS = TreeSet<ChannelPresentationModel>()
+            channelPMS.addAll(result.to())
+            normalLog("Load channel success: " + channelPMS.size)
+            mPresentationStateManager.consumeAction(LoadChannelSuccessAction(channelPMS))
+        }
+    }
+
+    fun getMyUser () {
+        scope.launch {
+            val result = getAccountUseCase.execute()
+            when (result) {
+                is GetAccountUseCase.Result.NetworkError -> {
+                    mPresentationStateManager.consumeAction(LoadUserFailedAction)
+                }
+                is GetAccountUseCase.Result.GeneralError -> {
+                    mPresentationStateManager.consumeAction(LoadUserFailedAction)
+                }
+                is GetAccountUseCase.Result.Success -> {
+                    SharedMemory.let {
+                        it.email = result.accountEntity.email
+                        it.name = result.accountEntity.name
+                    }
+                }
+            }
+        }
+    }
+
+    suspend fun  convertToUserPresentationModel (account: AccountEntity) {
+        val getAvatarResult = getUserAvatarUseCase.execute(account.email)
+
+        if (getAvatarResult is GetAvatarUseCaseSync.Result.Success) {
+            mPresentationStateManager.consumeAction(LoadUserSuccessAction(
+                    UserPresentationModel(getAvatarResult.bytes.toBitmap(), account.name, account.email)
+            ))
+            return
+        }
+        if (getAvatarResult is GetAvatarUseCaseSync.Result.GeneralError) {
+            mPresentationStateManager.consumeAction(LoadUserFailedAction)
+            return
+        }
+    }
+
 }

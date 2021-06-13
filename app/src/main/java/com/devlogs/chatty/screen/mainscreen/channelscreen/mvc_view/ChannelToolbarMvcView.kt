@@ -1,5 +1,6 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view
 
+import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Button
@@ -21,6 +22,14 @@ class ChannelToolbarMvcView : BaseMvcView <ChannelToolbarMvcView.Listener> {
         setRootView(inflater.inflate(R.layout.layout_maintoolbar, container, false))
         addControls()
         addEvents()
+    }
+
+    fun changeImage (image: Bitmap) {
+        imgAvatar.setImageBitmap(image)
+    }
+
+    fun error () {
+        imgAvatar.setImageResource(R.drawable.icon_error)
     }
 
     private fun addControls() {

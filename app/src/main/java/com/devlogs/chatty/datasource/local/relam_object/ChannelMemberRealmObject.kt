@@ -1,7 +1,6 @@
 package com.devlogs.chatty.datasource.local.relam_object
 
 import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
 import io.realm.annotations.Required
 
 open class ChannelMemberRealmObject : RealmObject {
@@ -9,13 +8,11 @@ open class ChannelMemberRealmObject : RealmObject {
     var id: String? = null
     @Required
     var email: String? = null
-    var avatar: ByteArray? = null
 
     constructor()
 
-    constructor(email: String, id: String, avatar:ByteArray) {
+    constructor(email: String, id: String) {
         this.email = email
         this.id = id
-        this.avatar = avatar
     }
 }

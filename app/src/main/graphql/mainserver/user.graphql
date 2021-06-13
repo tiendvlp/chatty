@@ -3,9 +3,6 @@ query getUserByEmail ($email: String!) {
         id,
         email,
         name,
-        avatar {
-            type,
-            content
-        }
+        avatar
     }
 }

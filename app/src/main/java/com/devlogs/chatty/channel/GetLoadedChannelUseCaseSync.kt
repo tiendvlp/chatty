@@ -19,17 +19,8 @@ class GetLoadedChannelUseCaseSync {
     }
 
     suspend fun execute () : List<ChannelEntity> = withContext(BackgroundDispatcher) {
-        if (policy.numberOfChannelAllowed() == ALLOW_ALL) {
-            return@withContext channelLocalDbApi.getAllChannel().map {
-                it.toChannelEntity()
-            }
+        channelLocalDbApi.getAllChannel().map {
+            it.toChannelEntity()
         }
-
-        emptyList()
-    }
-
-
-    fun setPolicy (policy: LocalChannelPolicy) {
-        this.policy = policy
     }
 }

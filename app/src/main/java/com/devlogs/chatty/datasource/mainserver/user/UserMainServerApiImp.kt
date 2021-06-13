@@ -15,6 +15,7 @@ import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import mainserver.GetMyUserQuery
 import mainserver.GetUserByEmailQuery
 import retrofit2.HttpException
 import retrofit2.Retrofit
@@ -68,15 +69,37 @@ class UserMainServerApiImp : UserMainServerApi {
         }
     }
 
-    private fun createUserAvatar(avatarRaw: GetUserByEmailQuery.Avatar): UserAvatarMainServerModel {
-        val contentJson = Gson().toJsonTree(avatarRaw.content)
-        if (avatarRaw.type == "LOCAL") {
-            val localAvatarContentJson = contentJson.asJsonObject
-            return UserAvatarMainServerModel.LocalAvatar(
-                    avatarRaw.type,
-                    localAvatarContentJson.get("avatarName").asString,
-                    localAvatarContentJson.getAsJsonArray("avatarColor").map { jsonElement -> jsonElement.asFloat })
+    override suspend fun getMyAccount(): UserMainServerModel {
+        try {
+            val response = mApolloClient.query(GetMyUserQuery()).await()
+
+            if (response.hasErrors()) {
+                val currentError = response.errors!!.get(0).simple()
+                if (currentError.code == 404) {
+                    throw NotFoundErrorEntity("Can not find your user info")
+                }
+
+                throw GeneralErrorEntity("Internal Server error")
+            }
+
+            val result: GetMyUserQuery.GetMyUser = response.data?.getMyUser
+                ?: throw NotFoundErrorEntity("Can not find your user")
+            return UserMainServerModel(result.id, result.email, result.name, result.avatar.toString())
+
+        } catch (e: ApolloException) {
+            throw NetworkErrorEntity(e.message ?: "")
         }
-        throw GeneralErrorEntity("Your avatar is not supported")
     }
+
+//    private fun createUserAvatar(avatarRaw: GetUserByEmailQuery): UserAvatarMainServerModel {
+//        val contentJson = Gson().toJsonTree(avatarRaw.content)
+//        if (avatarRaw.type == "LOCAL") {
+//            val localAvatarContentJson = contentJson.asJsonObject
+//            return UserAvatarMainServerModel.LocalAvatar(
+//                    avatarRaw.type,
+//                    localAvatarContentJson.get("avatarName").asString,
+//                    localAvatarContentJson.getAsJsonArray("avatarColor").map { jsonElement -> jsonElement.asFloat })
+//        }
+//        throw GeneralErrorEntity("Your avatar is not supported")
+//    }
 }

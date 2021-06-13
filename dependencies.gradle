@@ -23,6 +23,10 @@ ext {
     //endregion Plugins
 
     //region - Dependencies
+    def leakCanary = [group: "com.squareup.leakcanary", version: "2.7"]
+    leakCanaryDependencies = [
+            leakCanary: [configuration: "debugImplementation", dependency: [group: leakCanary.group, name:"leakcanary-android", version: leakCanary.version]]
+    ]
     def eventBus = [group: "org.greenrobot", version: "3.2.0"]
     eventBusDependencies = [
             roomRuntime: [configuration: "implementation", dependency: [group: eventBus.group, name: "eventbus", version: eventBus.version]],
@@ -51,7 +55,13 @@ ext {
 
     def androidXAppCompat = [group: "androidx.appcompat", version: '1.2.0']
     androidXAppCompatDependencies = [
-           androidXAppCompat: [configuration: "implementation", dependency: [group: androidXAppCompat.group, name: "appcompat"]],
+           androidXAppCompat: [configuration: "implementation", dependency: [group: androidXAppCompat.group, name: "appcompat", version: androidXAppCompat.version]],
+    ]
+
+//       implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+    def swipeToRefresh = [group: "androidx.swiperefreshlayout", version: "1.1.0"]
+    swipeToRefreshDependencies = [
+            swipeToRefresh : [configuration: "implementation", dependency: [group: swipeToRefresh.group,name: "swiperefreshlayout", version: swipeToRefresh.version]]
     ]
 
     def material = [group: "com.google.android.material", version: "1.2.1"]
@@ -148,7 +158,9 @@ ext {
                 junitDependencies.values() + androidXTestDependencies.values() + espressoDependencies.values() +
                 rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() + dataStoreDependencies.values() +
                 circleImageDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values()
-                + eventBusDependencies.values() + fragNavDependencies.values() + picassoDependencies.values(),
+                + eventBusDependencies.values() + fragNavDependencies.values() + picassoDependencies.values() + swipeToRefreshDependencies.values()
+                + leakCanaryDependencies.values()
+            ,
 
             plugins: [
                     plugins.androidApplication,
