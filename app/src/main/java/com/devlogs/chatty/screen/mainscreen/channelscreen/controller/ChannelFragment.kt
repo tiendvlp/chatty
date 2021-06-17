@@ -1,17 +1,18 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.controller
 
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.devlogs.chatty.androidservice.bindSocketEventService
 import com.devlogs.chatty.channel.GetUserChannelsOverPeriodOfTimeUseCaseSync
 import com.devlogs.chatty.common.application.ApplicationEventObservable
-import com.devlogs.chatty.common.application.ApplicationListener
 import com.devlogs.chatty.common.application.ServerConnectionEvent
-import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
-import com.devlogs.chatty.common.helper.warningLog
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync
 import com.devlogs.chatty.realtime.ChannelRealtime
@@ -34,7 +35,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateChangedListener,
-    ChannelRealtime.Listener, ServerConnectionEvent {
+    ServerConnectionEvent, ServiceConnection {
 
     companion object {
         fun getInstance(): ChannelFragment {
@@ -62,17 +63,14 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     lateinit var loadChannelController: LoadChannelController
 
     @Inject
-    lateinit var channelRealtime:ChannelRealtime
-
-    @Inject
     lateinit var applicationEventObservable: ApplicationEventObservable
-
+    @Inject
+    lateinit var channelSocketController: ChannelSocketEventListener
 
     private lateinit var mvcView: ChannelMvcView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        normalLog("onCreate")
         presentationStateManager.init(savedInstanceState, LoadingState);
     }
 
@@ -95,7 +93,6 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         super.onStart()
         normalLog("onStart")
         mvcView.register(this)
-        channelRealtime.register(this)
         applicationEventObservable.register(this)
         presentationStateManager.register(this)
     }
@@ -103,7 +100,6 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     override fun onStop() {
         super.onStop()
         mvcView.unRegister(this)
-        channelRealtime.unRegister(this)
         applicationEventObservable.unRegister(this)
         presentationStateManager.unRegister(this)
     }
@@ -126,10 +122,12 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
                 displayStateProcess(currentState, previousState, action)
             }
             is LoadingState -> {
+                channelSocketController.onStop()
                 loadChannelController.getLoadedChannel()
                 mvcView.showLoading()
             }
             is ErrorState -> {
+                channelSocketController.onStop()
                 mvcView.showError(ChannelMvcView.ErrorType.Network)
             }
             else -> throw Exception("Invalid state error: ChannelFragment")
@@ -143,6 +141,7 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     ) {
         when (action) {
             is LoadChannelSuccessAction -> {
+                channelSocketController.onStart()
                 loadChannelController.getMyUser()
                 mvcView.display(action.data)
             }
@@ -170,18 +169,15 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
                 normalLog("Reload channel success")
                 mvcView.showReloadedChannel(action.data)
             }
+
+            is NewChannelAction -> {
+                mvcView.showNewChannel(action.data)
+            }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        normalLog("OnDestroyView")
-    }
-
-    override fun onNewChannelCreated(newChannel: ChannelEntity) {
-        CoroutineScope(Dispatchers.Main.immediate).launch {
-            mvcView.showNewChannel(newChannel.to())
-        }
     }
 
     override fun onServerDisconnected() {
@@ -190,5 +186,13 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
 
     override fun onServerConnected() {
         mvcView.hideTopError()
+    }
+
+    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+
     }
 }

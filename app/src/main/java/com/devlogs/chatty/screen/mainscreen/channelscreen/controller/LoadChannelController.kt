@@ -15,6 +15,7 @@ import com.devlogs.chatty.user.GetAccountUseCase
 import io.socket.client.Socket
 import com.devlogs.chatty.common.helper.*
 import com.devlogs.chatty.domain.entity.AccountEntity
+import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
 import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
@@ -53,8 +54,12 @@ class LoadChannelController {
         this.getAccountUseCase = getAccountUseCase
         this.socketIOInstance = socketIOInstance
         this.tokenApi = tokenApi
-        socketIOInstance.emit("joinRoom", tokenApi.getAccessToken())
         this.getUserAvatarUseCase = getUserAvatarUseCase
+         try {
+            socketIOInstance.emit("joinRoom", tokenApi.getAccessToken())
+        } catch (e: AuthenticationErrorEntity.InvalidAccessTokenErrorEntity) {
+            errorLog("Access token expired")
+        }
     }
 
     fun reloadChannels () {

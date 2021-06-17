@@ -1,5 +1,6 @@
 package com.devlogs.chatty.realtime
 
+import com.devlogs.chatty.androidservice.SocketEventObservable
 import com.devlogs.chatty.common.base.BaseObservable
 import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.realtime.MessageRealtime.Listener

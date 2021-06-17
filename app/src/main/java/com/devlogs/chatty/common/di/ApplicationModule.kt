@@ -4,6 +4,7 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import com.apollographql.apollo.ApolloClient
+import com.devlogs.chatty.androidservice.SocketEventObservable
 import com.devlogs.chatty.common.AUTH_SERVER_START_PATH
 import com.devlogs.chatty.common.HOST
 import com.devlogs.chatty.common.MAIN_SERVER_START_PATH
@@ -14,6 +15,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import io.realm.RealmConfiguration
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -88,6 +90,12 @@ class ApplicationModule {
             .allowWritesOnUiThread(false)
             .build()
 
+    }
+
+    @Provides
+    @Singleton
+    fun provideSocketEventObservable () : SocketEventObservable {
+        return SocketEventObservable()
     }
 
     @Provides

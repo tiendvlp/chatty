@@ -23,6 +23,9 @@ ext {
     //endregion Plugins
 
     //region - Dependencies
+    def workmanager = [group: 'androidx.work', version: "2.5.0"]
+    workManagerDependences = [workmanager: [configuration: "implementation", dependency: [group: workmanager.group, name: "work-runtime-ktx", version: workmanager.version]]]    
+
     def leakCanary = [group: "com.squareup.leakcanary", version: "2.7"]
     leakCanaryDependencies = [
             leakCanary: [configuration: "debugImplementation", dependency: [group: leakCanary.group, name:"leakcanary-android", version: leakCanary.version]]
@@ -159,7 +162,7 @@ ext {
                 rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() + dataStoreDependencies.values() +
                 circleImageDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values()
                 + eventBusDependencies.values() + fragNavDependencies.values() + picassoDependencies.values() + swipeToRefreshDependencies.values()
-                + leakCanaryDependencies.values()
+                + leakCanaryDependencies.values() + workManagerDependences.values()
             ,
 
             plugins: [

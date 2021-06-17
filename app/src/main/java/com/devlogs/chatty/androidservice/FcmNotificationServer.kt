@@ -8,7 +8,6 @@ const val TAG = "FcmNotificationServer"
 class FcmNotificationServer : FirebaseMessagingService() {
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         // ...
-
         // TODO(developer): Handle FCM messages here.
         Log.d(TAG, "From: ${remoteMessage.from}")
 

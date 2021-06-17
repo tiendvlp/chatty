@@ -127,11 +127,11 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
             var isUpdateProcess: Boolean
             channels.forEach { newChannel ->
                 isUpdateProcess = false
-                for (i in 0..loadedChannels.size) {
+                for (i in 0 until  loadedChannels.size) {
                     if (newChannel.compareTo(loadedChannels.elementAt(i)) == 0) {
                         isUpdateProcess = true
                         loadedChannels.remove(newChannel)
-                        loadedChannels.add(newChannel)
+                        insertedChannel.add(newChannel)
                         withContext(Dispatchers.Main.immediate) {
                             if (i != 0) {
                                 mChannelAdapter.notifyItemMoved(i + 1, 1)

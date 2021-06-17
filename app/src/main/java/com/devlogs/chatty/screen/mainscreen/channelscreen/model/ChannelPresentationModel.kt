@@ -28,6 +28,7 @@ data class ChannelPresentationModel(
     }
 }
 
+// it's too heavy to run on MainThread
 suspend fun ChannelEntity.to () : ChannelPresentationModel = withContext(BackgroundDispatcher) {
     var title = title
     var senderName = status.senderEmail.split('@')[0]

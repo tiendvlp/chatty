@@ -56,6 +56,7 @@ sealed class ChannelScreenPresentationState : PresentationState {
             action: PresentationAction
         ): PresentationState {
             when (action) {
+                is NewChannelAction -> return copy(channels = appendChannels(action.data))
                 is LoadMoreChannelAction -> return copy()
                 is LoadMoreChannelSuccessAction -> {
                     return copy(channels = appendChannels(action.data))
@@ -81,6 +82,13 @@ sealed class ChannelScreenPresentationState : PresentationState {
             val newChannels = TreeSet<ChannelPresentationModel>()
             newChannels.addAll(channels)
             newChannels.addAll(addedChannels)
+            return newChannels
+        }
+
+        private fun appendChannels(addedChannel: ChannelPresentationModel): TreeSet<ChannelPresentationModel> {
+            val newChannels = TreeSet<ChannelPresentationModel>()
+            newChannels.addAll(channels)
+            newChannels.add(addedChannel)
             return newChannels
         }
     }
