@@ -63,7 +63,7 @@ class RegisterFragment : Fragment(), RegisterMvcView.Listener, PresentationState
     }
 
     override fun onStateChanged(
-        previousState: PresentationState,
+        previousState: PresentationState?,
         currentState: PresentationState,
         action: PresentationAction
     ) {

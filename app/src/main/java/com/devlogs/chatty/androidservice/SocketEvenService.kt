@@ -6,8 +6,12 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Binder
 import android.os.IBinder
+import com.devlogs.chatty.channel.UpdateChannelStatusUseCaseSync
 import com.devlogs.chatty.common.application.ApplicationEventObservable
+import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
+import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
+import com.devlogs.chatty.datasource.local.relam_object.to
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.entity.channel.ChannelMemberEntity
 import com.devlogs.chatty.domain.entity.channel.ChannelStatusEntity
@@ -17,6 +21,7 @@ import io.socket.client.Socket
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import javax.inject.Inject
 
@@ -27,18 +32,21 @@ fun Context.bindSocketEventService (connection: ServiceConnection, flag: Int = C
 
 @AndroidEntryPoint
 class SocketEvenService : Service() {
-
-
     inner class LocalBinder : Binder() {
         val service = this@SocketEvenService
     }
 
     @Inject
-    lateinit var socketInstance: Socket
+    protected lateinit var socketInstance: Socket
     @Inject
-    lateinit var applicationEventObservable: ApplicationEventObservable
+    protected lateinit var applicationEventObservable: ApplicationEventObservable
     @Inject
-    lateinit var socketEventObservable: SocketEventObservable
+    protected lateinit var socketEventObservable: SocketEventObservable
+    @Inject
+    protected lateinit var updateChannelStatusUseCase: UpdateChannelStatusUseCaseSync
+    @Inject
+    protected lateinit var channelLocalDbApi: ChannelLocalDbApi
+
     private lateinit var binder: LocalBinder
     private val coroutine = CoroutineScope(Dispatchers.Main.immediate)
     override fun onCreate() {
@@ -86,13 +94,33 @@ class SocketEvenService : Service() {
                     jsonData.getString("senderEmail"),
                     jsonData.getLong("createdDate")
                 )
+                updateChannelStatusWhenMessageCome(newMessageEntity)
                 socketEventObservable.getListeners().forEach { listener ->
                     if (listener is SocketMessageListener) {
                         listener.onNewMessage(newMessageEntity)
+                        listener
                     }
                 }
         }
     }
+
+    private  fun updateChannelStatusWhenMessageCome (messageEntity: MessageEntity) {
+        coroutine.launch {
+           val result =  updateChannelStatusUseCase.execute(messageEntity.channelId, ChannelStatusEntity(
+                messageEntity.senderEmail,
+                messageEntity.content,
+                messageEntity.type), messageEntity.createdDate)
+
+        if (result is UpdateChannelStatusUseCaseSync.Result.Success) {
+            socketEventObservable.getListeners().forEach { listener ->
+                if (listener is SocketChannelListener) {
+                    listener.onChannelUpdate(result.channel)
+                }
+            }
+        }
+        }
+    }
+
 
     private fun registerSocketChannelEvent () {
         socketInstance.on(SocketEventType.NEW_CHANNEL) { payload ->
@@ -100,7 +128,6 @@ class SocketEvenService : Service() {
             val jsonStatus = jsonData.getJSONObject("status")
             val jsonMems = jsonData.getJSONArray("members")
             val jsonSeen = jsonData.getJSONArray("seen")
-            normalLog("NewChannelComing: ${jsonStatus.getString("content")}")
             val members = ArrayList<ChannelMemberEntity> ()
             val seenPeoples = ArrayList<String> ()
             var jsonMem: JSONObject
@@ -131,6 +158,13 @@ class SocketEvenService : Service() {
                 createdDate = jsonData.getLong("createdDate"),
                 latestUpdate = jsonData.getLong("latestUpdate")
             )
+
+            coroutine.launch {
+                withContext(BackgroundDispatcher) {
+                    channelLocalDbApi.addChannel(newChannelEntity.to())
+                }
+            }
+
             socketEventObservable.getListeners().forEach { listener ->
                 if (listener is SocketChannelListener) {
                     listener.onNewChannel(newChannelEntity)

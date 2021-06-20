@@ -1,5 +1,6 @@
 package com.devlogs.chatty.datasource.local.relam_object
 
+import com.devlogs.chatty.domain.entity.channel.ChannelMemberEntity
 import io.realm.RealmObject
 import io.realm.annotations.Required
 
@@ -15,4 +16,8 @@ open class ChannelMemberRealmObject : RealmObject {
         this.email = email
         this.id = id
     }
+}
+
+fun ChannelMemberEntity.to() : ChannelMemberRealmObject {
+    return ChannelMemberRealmObject(email, id)
 }

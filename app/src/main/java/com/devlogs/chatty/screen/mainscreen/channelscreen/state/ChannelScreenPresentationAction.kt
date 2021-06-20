@@ -21,4 +21,5 @@ sealed class ChannelScreenPresentationAction : PresentationAction {
     data class ReLoadChannelSuccessAction (val data: TreeSet<ChannelPresentationModel>): ChannelScreenPresentationAction()
     object ReloadChannelFailedAction : ChannelScreenPresentationAction()
     data class NewChannelAction (val data: ChannelPresentationModel) : ChannelScreenPresentationAction()
+    data class ChannelUpdatedAction (val data: ChannelPresentationModel) : ChannelScreenPresentationAction()
 }

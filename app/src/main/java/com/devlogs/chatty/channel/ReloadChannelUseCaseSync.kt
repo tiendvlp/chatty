@@ -3,6 +3,7 @@ package com.devlogs.chatty.channel
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
+import com.devlogs.chatty.datasource.local.process.ConfigurationLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.ChannelMemberRealmObject
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
 import com.devlogs.chatty.datasource.local.relam_object.ChannelStatusRealmObject
@@ -40,22 +41,25 @@ class ReloadChannelUseCaseSync {
     private val localDbApi: ChannelLocalDbApi
     private val mainServerApi: ChannelMainServerApi
     private val loadMorePolicy: LoadMoreChannelPolicy
+    private val projectConfigurationDb : ConfigurationLocalDbApi
 
     @Inject
     constructor(
         loadMorePolicy: LoadMoreChannelPolicy,
         mainServerApi: ChannelMainServerApi,
-        localDbApi: ChannelLocalDbApi
+        localDbApi: ChannelLocalDbApi,
+        projectConfigurationDb: ConfigurationLocalDbApi
     ) {
 
         this.loadMorePolicy = loadMorePolicy
         this.mainServerApi = mainServerApi
         this.localDbApi = localDbApi
+        this.projectConfigurationDb = projectConfigurationDb
     }
 
     suspend fun execute(): Result = withContext(BackgroundDispatcher) {
         try {
-            val lastUpdate = localDbApi.getLatestUpdateTime()
+            val lastUpdate = projectConfigurationDb.getChannelLastUpdateTime()
             val result: ArrayList<ChannelEntity> = ArrayList();
             val channelsFromServer = mainServerApi.getChannelsOverPeriodOfTime(lastUpdate, Date().time)
             result.addAll(channelsFromServer.map {
@@ -99,6 +103,9 @@ class ReloadChannelUseCaseSync {
                     channelModel.id
                 )
             })
+
+            val lastUpdate = localDbApi.getLatestUpdateTime()
+            projectConfigurationDb.setChannelLastUpdateTime(lastUpdate)
         }
     }
 }

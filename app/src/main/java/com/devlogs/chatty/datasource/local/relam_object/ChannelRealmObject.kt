@@ -1,5 +1,6 @@
 package com.devlogs.chatty.datasource.local.relam_object
 
+import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import io.realm.RealmList
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
@@ -42,4 +43,26 @@ open class ChannelRealmObject : RealmObject {
     }
 
     constructor() {}
+}
+
+fun ChannelEntity.to () : ChannelRealmObject {
+    val seenDb = RealmList<String>()
+    seen.forEach {
+        seenDb.add(it)
+    }
+    val memberDb = RealmList<ChannelMemberRealmObject>()
+    members.forEach {
+        memberDb.add(it.to())
+    }
+
+    return ChannelRealmObject(
+        latestUpdate = this.latestUpdate,
+        createdDate = this.createdDate,
+        seen = seenDb,
+        members = memberDb,
+        status = status.to(),
+        adminEmail = admin,
+        title = title,
+        id = id
+    )
 }

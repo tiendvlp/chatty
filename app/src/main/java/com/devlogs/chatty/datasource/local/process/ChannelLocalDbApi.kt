@@ -4,6 +4,7 @@ import com.devlogs.chatty.common.CHANNEL_LIMIT
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
+import com.devlogs.chatty.domain.error.CommonErrorEntity
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.Sort
@@ -24,7 +25,6 @@ class ChannelLocalDbApi {
     }
 
     suspend fun addChannel (channelROs: List<ChannelRealmObject>) = withContext(BackgroundDispatcher) {
-
         overrideChannel(channelROs)
     }
 
@@ -41,6 +41,15 @@ class ChannelLocalDbApi {
             .sort("latestUpdate", Sort.DESCENDING)
             .findAll()
         result
+    }
+
+    fun getChannel (id: String) : ChannelRealmObject {
+        val realmInstance = Realm.getInstance(currentRealmConfiguration)
+        return realmInstance
+            .where(ChannelRealmObject::class.java)
+            .equalTo("id", id)
+            .findFirst()
+            ?: throw CommonErrorEntity.NotFoundErrorEntity("Channel (id=$id) does not exist in realm db")
     }
 
     suspend fun getPreviousChannels (since: Long, count: Int) : List<ChannelRealmObject> = withContext(BackgroundDispatcher) {

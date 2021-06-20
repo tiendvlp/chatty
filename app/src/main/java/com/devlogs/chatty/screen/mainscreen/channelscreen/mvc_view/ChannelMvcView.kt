@@ -36,6 +36,7 @@ interface ChannelMvcView: ObservableMvcView <Listener>{
     fun showUserInfo (user: UserPresentationModel)
     fun showNewChannel (newChannel : ChannelPresentationModel)
     fun showReloadedChannel (channels: TreeSet<ChannelPresentationModel>)
+    fun updateChannel(channels: ChannelPresentationModel)
 }
 
 fun MvcViewFactory.getMainMvcView (container: ViewGroup?, channelRcvAdapter: ChannelRcvAdapter) : ChannelMvcView = ChannelMvcViewImp(getLayoutInflater(), container, channelRcvAdapter)

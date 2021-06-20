@@ -14,11 +14,17 @@ class MainScreenNavigator {
     private val mRootFragmentListener : FragNavController.RootFragmentListener = object : FragNavController.RootFragmentListener {
         override val numberOfRootFragments: Int
             get() = 2
+    private lateinit var channelFragment: ChannelFragment
+    private lateinit var userFragment: AccountFragment
 
         override fun getRootFragment(index: Int): Fragment {
-            when (index) {
-                TAB1 -> return ChannelFragment.getInstance()
-                TAB2 -> return AccountFragment.getInstance()
+            return when (index) {
+                TAB1 -> {
+                    ChannelFragment.getInstance()
+                }
+                TAB2 -> {
+                    AccountFragment.getInstance()
+                }
                 else -> throw IndexOutOfBoundsException("MainScreenNavigator only has 2 tabs but tab ${index}th was accessed")
             }
         }

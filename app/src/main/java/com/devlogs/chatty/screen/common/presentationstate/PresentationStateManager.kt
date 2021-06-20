@@ -2,14 +2,14 @@ package com.devlogs.chatty.screen.common.presentationstate
 
 import android.os.Bundle
 import com.devlogs.chatty.common.base.BaseObservable
+import com.devlogs.chatty.common.helper.normalLog
 
 class PresentationStateManager : BaseObservable<PresentationStateChangedListener>() {
     lateinit var currentState: PresentationState private set
     private lateinit var currentAction : PresentationAction
-    private lateinit var previousState : PresentationState
+    private var previousState : PresentationState? = null
 
     fun init(savedInstanceState: Bundle?, defaultState: PresentationState) {
-            previousState = defaultState
         if (savedInstanceState != null && savedInstanceState.containsKey(defaultState.getTag())) {
             currentAction = CommonPresentationAction.RestoreAction
             currentState = savedInstanceState.getSerializable(defaultState.getTag()) as PresentationState
@@ -29,6 +29,14 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
 
         getListener().forEach {
             it.onStateChanged(previousState, currentState, action)
+        }
+    }
+
+    fun register (listener: PresentationStateChangedListener, getPreviousEvent: Boolean) {
+        register(listener)
+        if (getPreviousEvent && previousState != null) {
+            normalLog("GetFired from previous event")
+            listener.onStateChanged(previousState, currentState, CommonPresentationAction.RestoreAction)
         }
     }
 

@@ -66,36 +66,36 @@ class LoadChannelController {
         scope.launch (Dispatchers.Main.immediate) {
                 val result = reloadChannelUseCaseSync.execute()
             normalLog("ReloadChannelResult: ${result}")
-            if (result is ReloadChannelUseCaseSync.Result.NetworkError) {
-                normalLog("ReLoad channel failed due to network error")
-                mPresentationStateManager.consumeAction(
-                    ReloadChannelFailedAction
-                )
-                return@launch
-            }
-            else if (result is ReloadChannelUseCaseSync.Result.GeneralError) {
-                normalLog("ReLoad channel failed due to general error")
-                mPresentationStateManager.consumeAction(
-                    ReloadChannelFailedAction
-                )
-            }
-
-            else if (result is ReloadChannelUseCaseSync.Result.UnAuthorized) {
-                normalLog("Reload channel failed invalid refreshtoken")
-                mPresentationStateManager.consumeAction(
-                    ReloadChannelFailedAction
-                )
-            }
-
-            else if (result is ReloadChannelUseCaseSync.Result.Success) {
-                if (result.channels.size > 0) {
-                    normalLog("Reload channel success: " + result.channels[0].status.content)
-                } else {
-                    normalLog("No channels update")
+            when (result) {
+                is ReloadChannelUseCaseSync.Result.NetworkError -> {
+                    normalLog("ReLoad channel failed due to network error")
+                    mPresentationStateManager.consumeAction(
+                        ReloadChannelFailedAction
+                    )
+                    return@launch
                 }
-                val channelPMS = TreeSet<ChannelPresentationModel>()
-                channelPMS.addAll(result.channels.to())
-                mPresentationStateManager.consumeAction(ReLoadChannelSuccessAction(channelPMS))
+                is ReloadChannelUseCaseSync.Result.GeneralError -> {
+                    normalLog("ReLoad channel failed due to general error")
+                    mPresentationStateManager.consumeAction(
+                        ReloadChannelFailedAction
+                    )
+                }
+                is ReloadChannelUseCaseSync.Result.UnAuthorized -> {
+                    normalLog("Reload channel failed invalid refreshtoken")
+                    mPresentationStateManager.consumeAction(
+                        ReloadChannelFailedAction
+                    )
+                }
+                is ReloadChannelUseCaseSync.Result.Success -> {
+                    if (result.channels.size > 0) {
+                        normalLog("Reload channel success: " + result.channels[0].status.content)
+                    } else {
+                        normalLog("No channels update")
+                    }
+                    val channelPMS = TreeSet<ChannelPresentationModel>()
+                    channelPMS.addAll(result.channels.to())
+                    mPresentationStateManager.consumeAction(ReLoadChannelSuccessAction(channelPMS))
+                }
             }
         }
     }
@@ -107,6 +107,7 @@ class LoadChannelController {
             if (result is LoadMoreUseCaseSync.Result.Success) {
                 val channelPMS = TreeSet<ChannelPresentationModel>()
                     channelPMS.addAll(result.channels.to())
+                warningLog("LoadMoreChannels execute success: ${channelPMS.size}")
                 mPresentationStateManager.consumeAction(LoadMoreChannelSuccessAction(channelPMS))
                 return@launch
             }

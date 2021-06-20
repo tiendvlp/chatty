@@ -8,28 +8,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.devlogs.chatty.androidservice.bindSocketEventService
 import com.devlogs.chatty.channel.GetUserChannelsOverPeriodOfTimeUseCaseSync
 import com.devlogs.chatty.common.application.ApplicationEventObservable
 import com.devlogs.chatty.common.application.ServerConnectionEvent
 import com.devlogs.chatty.common.helper.normalLog
-import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync
-import com.devlogs.chatty.realtime.ChannelRealtime
+import com.devlogs.chatty.resource.GetUserAvatarUrlUseCaseSync
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
-import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
-import com.devlogs.chatty.screen.common.presentationstate.PresentationState
-import com.devlogs.chatty.screen.common.presentationstate.PresentationStateChangedListener
-import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
-import com.devlogs.chatty.screen.mainscreen.channelscreen.model.to
+import com.devlogs.chatty.screen.common.presentationstate.*
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view.ChannelMvcView
 import com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view.getMainMvcView
 import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationAction.*
 import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationState.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.lang.Exception
 import javax.inject.Inject
 
@@ -39,39 +31,34 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
 
     companion object {
         fun getInstance(): ChannelFragment {
-            normalLog("New instance")
             return ChannelFragment()
         }
     }
 
     @Inject
-    lateinit var channelRcvAdapter: ChannelRcvAdapter
-
+    protected lateinit var channelRcvAdapter: ChannelRcvAdapter
     @Inject
-    lateinit var loginWithEmailUseCaseSync: LoginWithEmailUseCaseSync
-
+    protected lateinit var loginWithEmailUseCaseSync: LoginWithEmailUseCaseSync
     @Inject
-    lateinit var getChannelOverPeriodOfTimeUseCaseSync: GetUserChannelsOverPeriodOfTimeUseCaseSync
-
+    protected lateinit var getChannelOverPeriodOfTimeUseCaseSync: GetUserChannelsOverPeriodOfTimeUseCaseSync
     @Inject
-    lateinit var mvcViewFactory: MvcViewFactory
-
+    protected lateinit var mvcViewFactory: MvcViewFactory
     @Inject
-    lateinit var presentationStateManager: PresentationStateManager
-
+    protected lateinit var presentationStateManager: PresentationStateManager
     @Inject
-    lateinit var loadChannelController: LoadChannelController
-
+    protected lateinit var loadChannelController: LoadChannelController
     @Inject
-    lateinit var applicationEventObservable: ApplicationEventObservable
+    protected lateinit var applicationEventObservable: ApplicationEventObservable
     @Inject
-    lateinit var channelSocketController: ChannelSocketEventListener
-
+    protected lateinit var getAvatarUrl: GetUserAvatarUrlUseCaseSync
+    @Inject
+    protected lateinit var channelSocketController: ChannelSocketEventListener
     private lateinit var mvcView: ChannelMvcView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationStateManager.init(savedInstanceState, LoadingState);
+        normalLog("OnCreate")
+        presentationStateManager.init(savedInstanceState, LoadingState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -84,8 +71,8 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        presentationStateManager.init(savedInstanceState, LoadingState)
-        mvcView = mvcViewFactory.getMainMvcView(container, channelRcvAdapter)
+        normalLog("OnCreateView with state: ${presentationStateManager.currentState}")
+        mvcView = mvcViewFactory.getMainMvcView(container, ChannelRcvAdapter(getAvatarUrl))
         return mvcView.getRootView()
     }
 
@@ -95,16 +82,19 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         mvcView.register(this)
         applicationEventObservable.register(this)
         presentationStateManager.register(this)
+        presentationStateManager.register(this, true)
     }
 
     override fun onStop() {
         super.onStop()
+        normalLog("OnStop")
         mvcView.unRegister(this)
         applicationEventObservable.unRegister(this)
         presentationStateManager.unRegister(this)
     }
 
     override fun onLoadMoreChannel() {
+        normalLog("Load more")
         loadChannelController.loadMoreChannels()
     }
 
@@ -113,13 +103,13 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     }
 
     override fun onStateChanged(
-        previousState: PresentationState,
+        previousState: PresentationState?,
         currentState: PresentationState,
         action: PresentationAction
     ) {
         when (currentState) {
             is DisplayState -> {
-                displayStateProcess(currentState, previousState, action)
+                displayStateProcess(currentState, previousState!!, action)
             }
             is LoadingState -> {
                 channelSocketController.onStop()
@@ -143,7 +133,12 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
             is LoadChannelSuccessAction -> {
                 channelSocketController.onStart()
                 loadChannelController.getMyUser()
-                mvcView.display(action.data)
+                mvcView.display(displayStateInstance.channels)
+            }
+            is RestoreAction -> {
+                channelSocketController.onStart()
+                loadChannelController.getMyUser()
+                mvcView.display(displayStateInstance.channels)
             }
             is LoadUserFailedAction -> {
                 mvcView.showLoadUserError()
@@ -173,11 +168,22 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
             is NewChannelAction -> {
                 mvcView.showNewChannel(action.data)
             }
+
+            is ChannelUpdatedAction -> {
+                mvcView.updateChannel (action.data)
+            }
+
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        normalLog("OnDestroyed view")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        normalLog("OnDestroyed")
     }
 
     override fun onServerDisconnected() {

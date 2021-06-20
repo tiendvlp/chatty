@@ -19,6 +19,7 @@ interface SocketConnectionListener : SocketListener {
 
 interface SocketChannelListener : SocketListener {
     fun onNewChannel (newChannel: ChannelEntity)
+    fun onChannelUpdate (updatedChannel: ChannelEntity)
 }
 
 interface SocketMessageListener : SocketListener {

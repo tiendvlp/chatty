@@ -77,7 +77,7 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
     }
 
     override fun onStateChanged(
-            previousState: PresentationState,
+            previousState: PresentationState?,
             currentState: PresentationState,
             action: PresentationAction
     ) {

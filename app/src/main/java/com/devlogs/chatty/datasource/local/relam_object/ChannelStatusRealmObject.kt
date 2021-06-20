@@ -1,5 +1,6 @@
 package com.devlogs.chatty.datasource.local.relam_object
 
+import com.devlogs.chatty.domain.entity.channel.ChannelStatusEntity
 import io.realm.RealmObject
 import io.realm.annotations.Required
 
@@ -19,3 +20,6 @@ open class ChannelStatusRealmObject : RealmObject {
     constructor()
 
 }
+
+fun ChannelStatusEntity.to() : ChannelStatusRealmObject
+= ChannelStatusRealmObject(senderEmail, content, type)

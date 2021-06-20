@@ -30,7 +30,7 @@ sealed class ChannelScreenPresentationState : PresentationState {
                     return ErrorState("Canceled")
                 }
             }
-            throw InvalidActionException("${getTag()}.LoadingState", action.toString())
+            return super.consumeAction(previousState, action)
         }
     }
 
@@ -44,7 +44,7 @@ sealed class ChannelScreenPresentationState : PresentationState {
                     return LoadingState
                 }
             }
-            throw InvalidActionException("${getTag()}.ErrorState", action.toString())
+            return super.consumeAction(previousState, action)
         }
     }
 
@@ -57,6 +57,7 @@ sealed class ChannelScreenPresentationState : PresentationState {
         ): PresentationState {
             when (action) {
                 is NewChannelAction -> return copy(channels = appendChannels(action.data))
+                is ChannelUpdatedAction -> return copy(channels = replaceChannel(action.data))
                 is LoadMoreChannelAction -> return copy()
                 is LoadMoreChannelSuccessAction -> {
                     return copy(channels = appendChannels(action.data))
@@ -72,16 +73,22 @@ sealed class ChannelScreenPresentationState : PresentationState {
 
                 is LoadUserSuccessAction -> return copy(user=action.user)
                 is LoadUserFailedAction -> return copy()
-
-
             }
-            throw InvalidActionException("${getTag()}.DisplayState", action.toString())
+            return super.consumeAction(previousState, action)
         }
 
         private fun appendChannels(addedChannels: TreeSet<ChannelPresentationModel>): TreeSet<ChannelPresentationModel> {
             val newChannels = TreeSet<ChannelPresentationModel>()
             newChannels.addAll(channels)
             newChannels.addAll(addedChannels)
+            return newChannels
+        }
+
+        private fun replaceChannel (newChannel: ChannelPresentationModel): TreeSet<ChannelPresentationModel> {
+            val newChannels = TreeSet<ChannelPresentationModel>()
+            newChannels.addAll(channels)
+            newChannels.removeIf { it.compareTo(newChannel) == 0 }
+            newChannels.add(newChannel)
             return newChannels
         }
 

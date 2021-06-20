@@ -130,6 +130,12 @@ ext {
             api: [configuration: "implementation", dependency: [group: apolloGraphql.group, name: "apollo-api", version: apolloGraphql.version]],
     ]
 
+    def glide = [group: "com.github.bumptech.glide", version: "4.12.0"]
+    glideDependencies = [
+            glide: [configuration: "implementation", dependency: [group: glide.group, name: "glide", version: glide.version]],
+            glideCompiler: [configuration: "annotationProcessor", dependency: [group: glide.group, name: "compiler", version: glide.version]]
+    ]
+
     def dataStore = [group: "androidx.datastore", version: "1.0.0-alpha05"]
     dataStoreDependencies = [
             dataStorePreferences: [configuration: "implementation", dependency: [group: dataStore.group, name: "datastore-preferences", version: dataStore.version]],
@@ -162,7 +168,7 @@ ext {
                 rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() + dataStoreDependencies.values() +
                 circleImageDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values()
                 + eventBusDependencies.values() + fragNavDependencies.values() + picassoDependencies.values() + swipeToRefreshDependencies.values()
-                + leakCanaryDependencies.values() + workManagerDependences.values()
+                + leakCanaryDependencies.values() + workManagerDependences.values() + glideDependencies.values()
             ,
 
             plugins: [

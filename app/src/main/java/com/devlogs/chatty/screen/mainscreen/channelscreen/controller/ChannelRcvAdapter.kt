@@ -7,16 +7,19 @@ import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
+import com.bumptech.glide.Glide
 import com.devlogs.chatty.R
 import com.devlogs.chatty.common.helper.normalLog
-import com.devlogs.chatty.common.helper.toBitmap
 import com.devlogs.chatty.resource.GetAvatarUseCaseSync
+import com.devlogs.chatty.resource.GetUserAvatarUrlUseCaseSync
+import com.devlogs.chatty.resource.UrlType.LOCAL
 import com.devlogs.chatty.screen.common.viewholder.ItemLoadingViewHolder
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 import java.util.*
 import javax.inject.Inject
 
@@ -27,14 +30,17 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
         private val txtTitle: TextView
         private val txtSender: TextView
         private val txtMessage: TextView
-        private val getAvatarUseCaseSync: GetAvatarUseCaseSync
-
-        constructor(view: View, getAvatarUseCaseSync: GetAvatarUseCaseSync) : super(view) {
+        private val getAvatarUrl: GetUserAvatarUrlUseCaseSync
+        private val coroutineScope = CoroutineScope(Dispatchers.Main.immediate)
+        constructor(
+            view: View,
+            getAvatarUrl: GetUserAvatarUrlUseCaseSync
+        ) : super(view) {
             imgAvatar = view.findViewById(R.id.imgAvatar)
             txtMessage = view.findViewById(R.id.txtMessageBody)
             txtTitle = view.findViewById(R.id.txtChannelTitle)
             txtSender = view.findViewById(R.id.txtSenderName)
-            this.getAvatarUseCaseSync = getAvatarUseCaseSync
+            this.getAvatarUrl = getAvatarUrl
         }
 
         fun bind (channel: ChannelPresentationModel) {
@@ -42,10 +48,23 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
                 itemView.setPadding(10, 100, 10, 10)
             }
 
-            CoroutineScope(Dispatchers.Main.immediate).launch {
-                val result = getAvatarUseCaseSync.execute(channel.displayedElement[0])
-                if (result is GetAvatarUseCaseSync.Result.Success) {
-                    imgAvatar.setImageBitmap(result.bytes.toBitmap())
+            coroutineScope.launch {
+                val result = getAvatarUrl.execute(channel.displayedElement[0]);
+                if (result is GetUserAvatarUrlUseCaseSync.Result.Success) {
+                    if (result.type == LOCAL) {
+                        Glide
+                            .with(itemView.context)
+                            .load(File(result.url))
+                            .centerCrop()
+                            .into(imgAvatar);
+                    } else {
+                        Glide
+                            .with(itemView.context)
+                            .load(result.url)
+                            .centerCrop()
+                            .into(imgAvatar);
+                    }
+
                 }
             }
 
@@ -63,17 +82,23 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
     private val CHANNEL_TYPE = 2
     private val LOAD_MORE_TYPE = 3
 
-    private val getAvatarUseCaseSync: GetAvatarUseCaseSync;
     private  var channelSources: TreeSet<ChannelPresentationModel> = TreeSet()
-    private var isLoading: Boolean = false
+    var isLoading: Boolean = false
+    var isLoadMoreEnable = true;  set(value) {
+       field = value
+       notifyItemChanged(channelSources.size + 1)
+    }
     private var lastVisibleItem = 0
     private var totalItemCount = 0
     private var visibleThreadHold = 3
+    private val getAvatarUrl: GetUserAvatarUrlUseCaseSync
     var onLoadMore : (() -> Unit)? = null
 
     @Inject
-    constructor(getAvatarUseCaseSync: GetAvatarUseCaseSync) {
-        this.getAvatarUseCaseSync = getAvatarUseCaseSync
+    constructor(
+        getAvatarUrl: GetUserAvatarUrlUseCaseSync
+    ) {
+        this.getAvatarUrl = getAvatarUrl
     }
 
     fun setSource (channelSources: TreeSet<ChannelPresentationModel>) {
@@ -88,7 +113,7 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
                 super.onScrolled(recyclerView, dx, dy)
                 totalItemCount = layoutManager.itemCount
                 lastVisibleItem = layoutManager.findLastVisibleItemPosition()
-                if (!isLoading && totalItemCount <= (lastVisibleItem+visibleThreadHold)) {
+                if (isLoadMoreEnable && !isLoading && totalItemCount <= (lastVisibleItem+visibleThreadHold)) {
                     onLoadMore?.invoke()
                     isLoading = true
                 }
@@ -101,8 +126,10 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
             return SearchViewHolder (inflater.inflate(R.layout.item_search_channel, parent, false))
         }
         if (viewType == CHANNEL_TYPE) {
-            return ChannelViewHolder(inflater.inflate(R.layout.item_channel_main, parent, false), getAvatarUseCaseSync)
-
+            return ChannelViewHolder(
+                inflater.inflate(R.layout.item_channel_main, parent, false),
+                getAvatarUrl
+            )
         }
         return ItemLoadingViewHolder(inflater, parent)
     }
@@ -112,7 +139,13 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
             val channel = channelSources.elementAt(position - 1)
             normalLog("Binding View Holder: ${channel.id}")
             holder.bind(channel)
+            return
         }
+
+        if (holder is ItemLoadingViewHolder) {
+            holder.bind(isLoadMoreEnable)
+        }
+
     }
 
     override fun getItemCount(): Int = channelSources.size + 2

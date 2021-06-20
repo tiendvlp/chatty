@@ -14,7 +14,6 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.devlogs.chatty.R
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
-import com.devlogs.chatty.common.helper.warningLog
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
 import com.devlogs.chatty.screen.common.mvcview.LoadingMvcView
 import com.devlogs.chatty.screen.common.presentationmodel.UserPresentationModel
@@ -26,7 +25,6 @@ import java.util.*
 
 class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
     ChannelToolbarMvcView.Listener {
-
     private lateinit var mLvChannel : RecyclerView
     private  var mChannelAdapter: ChannelRcvAdapter
     private val loadedChannels: TreeSet<ChannelPresentationModel> = TreeSet()
@@ -37,7 +35,6 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
     private lateinit var loadingLayoutContainer : FrameLayout
     private lateinit var loadingMvcView: LoadingMvcView
     private lateinit var swipeToRefresh: SwipeRefreshLayout
-    private lateinit var itemAnimator: RecyclerView.ItemAnimator
     private val coroutineScope = CoroutineScope(BackgroundDispatcher)
 
     constructor(layoutInflater: LayoutInflater, container: ViewGroup?, channelRcvAdapter: ChannelRcvAdapter) {
@@ -57,9 +54,8 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
         val lvChannelLayoutManager = LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false)
         mLvChannel.layoutManager = lvChannelLayoutManager
         mChannelAdapter.setRecyclerView(mLvChannel)
-        mLvChannel.adapter = mChannelAdapter
         mChannelAdapter.setSource(loadedChannels)
-        itemAnimator = mLvChannel.itemAnimator!!
+        mLvChannel.adapter = mChannelAdapter
     }
 
     private fun addControls() {
@@ -106,55 +102,109 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
         mChannelAdapter.notifyItemInserted(0)
     }
 
+    /**
+    * Sync database with ui
+    * Only run animation when the changed channels less than 8
+     * If not we run notifydatasetchanged
+     * First we detect which channel need to be: Update/Insert/Skip (Skip because
+     * in some cases channel was inserted/updated before sync, so that's mean
+     * it's already synced, we don't need to sync it again
+     * We call delay after adapter.notify... to let the adapter run it's anim])
+    * */
+
     override fun showReloadedChannel(channels: TreeSet<ChannelPresentationModel>) {
         coroutineScope.launch (BackgroundDispatcher) {
+            normalLog("Length new channel comming: ${channels.size}")
             if (channels.isEmpty()) {
                 hideRefresh()
                 return@launch
             }
+            // TODO: Fix reload channel, it's only works with notifyDataSetchanged, the problems is Adapter notify is not running correctly
+            val useAnim = false
+            val delayTime : Long = 250
 
-            val useAnim = channels.size <= 8
-
-            val delayTime : Long
-            if (useAnim) {
-                delayTime = 250
-                mLvChannel.itemAnimator = itemAnimator
-            } else {
-                delayTime = 100
-                mLvChannel.itemAnimator = null
-            }
             val insertedChannel = TreeSet<ChannelPresentationModel> ()
             var isUpdateProcess: Boolean
+            var loadedChannelCache : ChannelPresentationModel? = null
+            var replacedIndex = -1
+            var isInsertedProcess = false
+
             channels.forEach { newChannel ->
+                replacedIndex = -1
                 isUpdateProcess = false
+                isInsertedProcess = false
+                this@ChannelMvcViewImp.normalLog("======Start analyzing======")
                 for (i in 0 until  loadedChannels.size) {
-                    if (newChannel.compareTo(loadedChannels.elementAt(i)) == 0) {
+                    loadedChannelCache = loadedChannels.elementAt(i)
+                    this@ChannelMvcViewImp.normalLog("Check: ${loadedChannelCache!!.message}")
+                    if (newChannel.id.equals(loadedChannelCache!!.id)
+                        && newChannel.lastUpdate != loadedChannelCache!!.lastUpdate) {
+                        this@ChannelMvcViewImp.normalLog("Check: UPDATE")
+                        replacedIndex = i
                         isUpdateProcess = true
-                        loadedChannels.remove(newChannel)
-                        insertedChannel.add(newChannel)
-                        withContext(Dispatchers.Main.immediate) {
-                            if (i != 0) {
-                                mChannelAdapter.notifyItemMoved(i + 1, 1)
-                                delay(delayTime)
-                            }
-                            mChannelAdapter.notifyItemChanged(1)
-                        }
+                        isInsertedProcess = false
                         break
                     }
                 }
+                if (loadedChannelCache != null && !newChannel.id.equals((loadedChannelCache!!.id))) {
+                    this@ChannelMvcViewImp.normalLog("Check: INSERT")
+                    isInsertedProcess = true
+                    isUpdateProcess = false
+                }
+                if (isUpdateProcess) {
+                        loadedChannels.remove(loadedChannelCache)
+                        loadedChannels.add(newChannel)
+                        if (useAnim) {
+                            withContext(Dispatchers.Main.immediate) {
+                                if (replacedIndex == 0) {
+                                    this@ChannelMvcViewImp.normalLog("Check: UPDATE ANIM 1")
+                                    mChannelAdapter.notifyItemChanged(1)
+                                    delay(delayTime)
+                                } else {
+                                    this@ChannelMvcViewImp.normalLog("Check: UPDATE ANIM 2")
+                                    mChannelAdapter.notifyItemMoved(replacedIndex + 1, 1)
+                                    delay(delayTime)
+                                    mChannelAdapter.notifyItemChanged(1)
+                                    delay(delayTime)
+                                }
+                            }
+                        }
 
-                if (!isUpdateProcess) {
-                    // insert process
-                    insertedChannel.add(newChannel)
+                } else if (isInsertedProcess) {
+                    loadedChannels.remove(loadedChannelCache)
+                    loadedChannels.add(newChannel)
+                    if (useAnim) {
+                        withContext(Dispatchers.Main.immediate) {
+                            mChannelAdapter.notifyItemRangeInserted(1, insertedChannel.size)
+                            this@ChannelMvcViewImp.normalLog("Check: INSERT ANIM ")
+                            delay(delayTime)
+                        }
+                    }
                 }
             }
-            if (insertedChannel.isNotEmpty()) {
-                loadedChannels.addAll(insertedChannel)
+            if (!useAnim) {
                 withContext(Dispatchers.Main.immediate) {
-                    mChannelAdapter.notifyItemRangeInserted(1, insertedChannel.size-1)
+                    mChannelAdapter.notifyDataSetChanged()
                 }
             }
-                hideRefresh()
+            hideRefresh()
+        }
+    }
+
+    override fun updateChannel(channel: ChannelPresentationModel) {
+        coroutineScope.launch(Dispatchers.Main.immediate) {
+            val replacedIndex = loadedChannels.indexOfFirst { it.compareTo(channel) == 0 }
+            if (replacedIndex == -1) return@launch
+            loadedChannels.remove(loadedChannels.elementAt(replacedIndex))
+            loadedChannels.add(channel)
+            if (replacedIndex == 0) {
+                mChannelAdapter.notifyItemChanged(1)
+                delay(200)
+            } else {
+                mChannelAdapter.notifyItemMoved(replacedIndex, 1)
+                delay(200)
+                mChannelAdapter.notifyItemChanged(1)
+            }
         }
     }
 
@@ -174,6 +224,7 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
 
     override fun display(channels: TreeSet<ChannelPresentationModel>) {
         hideTopError()
+        normalLog("Display channels: ${channels.size}")
         loadedChannels.clear()
         loadedChannels.addAll(channels)
         mChannelAdapter.notifyDataSetChanged()
@@ -181,8 +232,15 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
     }
 
     override fun showMoreChannel(channels: TreeSet<ChannelPresentationModel>) {
-        loadedChannels.addAll(channels)
-        mChannelAdapter.notifyDataSetChanged()
+        if (channels.isEmpty()) {
+            mChannelAdapter.isLoadMoreEnable = false
+            return
+        } else {
+            mChannelAdapter.isLoadMoreEnable = true
+            loadedChannels.addAll(channels)
+            mChannelAdapter.notifyDataSetChanged()
+            mChannelAdapter.isLoading = false
+        }
     }
 
     override fun showLoadMoreError(errorType: ErrorType) {
@@ -199,7 +257,6 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
 
     override fun hideTopError () {
         hideRefresh()
-        warningLog("currentThreadName: " + Thread.currentThread().name)
         txtErrorMessage.text = ""
         txtErrorMessage.visibility = View.GONE
     }
@@ -212,7 +269,6 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
 
     override fun showTopError (errorType: ErrorType) {
         hideRefresh()
-        warningLog("currentThreadName: " + Thread.currentThread().name)
         txtErrorMessage.visibility = View.VISIBLE
         if (errorType == ErrorType.Network) {
             txtErrorMessage.text = "Connection error"

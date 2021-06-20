@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 class ChannelSocketEventListener @Inject constructor(
     private val socketEventObservable: SocketEventObservable,
-    private val presentationStateManager: PresentationStateManager) : SocketChannelListener, SocketMessageListener {
+    private val presentationStateManager: PresentationStateManager) : SocketChannelListener {
     private val coroutine: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate)
 
     private var isStarted = false;
@@ -44,6 +44,14 @@ class ChannelSocketEventListener @Inject constructor(
         }
     }
 
-    override fun onNewMessage(newMessage: MessageEntity) {
+    override fun onChannelUpdate(updatedChannel: ChannelEntity) {
+        normalLog("onChannel Updated")
+        coroutine.launch {
+            val channelPM = withContext(BackgroundDispatcher) { updatedChannel.to() }
+            presentationStateManager.consumeAction(
+                ChannelScreenPresentationAction.ChannelUpdatedAction(channelPM)
+            )
+        }
     }
+
 }
