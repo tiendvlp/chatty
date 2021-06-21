@@ -12,4 +12,4 @@ interface AccountMvcView : ObservableMvcView<AccountMvcView.Listener> {
 }
 
 fun MvcViewFactory.getAccountMvcView  (container: ViewGroup?) :
-        AccountMvcViewImp = AccountMvcViewImp(getLayoutInflater(), container)
+        AccountMvcViewImp = AccountMvcViewImp(uiToolkit, container)

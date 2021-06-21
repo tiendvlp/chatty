@@ -13,6 +13,7 @@ import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
 import com.devlogs.chatty.screen.common.mvcview.CheckingInputMvcView
 import com.devlogs.chatty.screen.common.mvcview.ProgressButtonMvcView
+import com.devlogs.chatty.screen.common.mvcview.UIToolkit
 import kotlinx.coroutines.*
 
 class RegisterMvcViewImp : BaseMvcView<RegisterMvcView.Listener>, RegisterMvcView {
@@ -50,10 +51,10 @@ class RegisterMvcViewImp : BaseMvcView<RegisterMvcView.Listener>, RegisterMvcVie
             preventInvalidInput()
         }
 
-    constructor(layoutInflater: LayoutInflater, container: ViewGroup?) {
-        setRootView(layoutInflater.inflate(R.layout.layout_register, container, false))
+    constructor(uiToolkit: UIToolkit, container: ViewGroup?) {
+        setRootView(uiToolkit.layoutInflater.inflate(R.layout.layout_register, container, false))
         findViewsById()
-        addSubMvcView(layoutInflater)
+        addSubMvcView(uiToolkit.layoutInflater)
         addEvents()
 
     }

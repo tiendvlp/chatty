@@ -15,14 +15,10 @@ import com.devlogs.chatty.screen.mainscreen.account_screen.mvc_view.AccountMvcVi
  * */
 
 class MvcViewFactory {
-      val mLayoutInflater: LayoutInflater
+    val uiToolkit: UIToolkit
 
-    constructor(layoutInflater: LayoutInflater) {
-        mLayoutInflater = layoutInflater
-    }
-
-    fun getLayoutInflater () : LayoutInflater {
-        return mLayoutInflater
+    constructor(uiToolkit: UIToolkit) {
+        this.uiToolkit = uiToolkit
     }
 
 }

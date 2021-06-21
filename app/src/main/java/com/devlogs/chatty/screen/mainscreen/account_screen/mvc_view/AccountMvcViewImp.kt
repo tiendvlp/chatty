@@ -6,6 +6,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import com.devlogs.chatty.R
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
+import com.devlogs.chatty.screen.common.mvcview.UIToolkit
 import de.hdodenhof.circleimageview.CircleImageView
 
 class AccountMvcViewImp : BaseMvcView<AccountMvcView.Listener>, AccountMvcView {
@@ -14,8 +15,8 @@ class AccountMvcViewImp : BaseMvcView<AccountMvcView.Listener>, AccountMvcView {
     private lateinit var btnSignOut: Button
     private lateinit var btnInviteChannel: ImageButton
 
-    constructor(layoutInflater: LayoutInflater, container: ViewGroup?) {
-        setRootView(layoutInflater.inflate(R.layout.layout_account, container, false))
+    constructor(toolKit: UIToolkit, container: ViewGroup?) {
+        setRootView(toolKit.layoutInflater.inflate(R.layout.layout_account, container, false))
         addControls ()
         addEvents ()
     }

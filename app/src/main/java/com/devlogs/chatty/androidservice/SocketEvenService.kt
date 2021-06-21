@@ -85,7 +85,7 @@ class SocketEvenService : Service() {
     private fun registerSocketMessageEvent () {
             socketInstance.on(SocketEventType.NEW_MESSAGE) { payload ->
                 val jsonData = JSONObject(payload[0].toString())
-                normalLog("NewMessageComing: ${jsonData.getString("content")}")
+                normalLog("NewMessageComing: ${jsonData.getString("content")} || ${jsonData.getString("createdDate")}")
                 val newMessageEntity = MessageEntity(
                     jsonData.getString("_id"),
                     jsonData.getString("channelId"),
@@ -158,7 +158,7 @@ class SocketEvenService : Service() {
                 createdDate = jsonData.getLong("createdDate"),
                 latestUpdate = jsonData.getLong("latestUpdate")
             )
-
+            normalLog("NewChannelCreated: ${jsonData.getLong("latestUpdate")}")
             coroutine.launch {
                 withContext(BackgroundDispatcher) {
                     channelLocalDbApi.addChannel(newChannelEntity.to())

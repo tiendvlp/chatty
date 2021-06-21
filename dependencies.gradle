@@ -4,11 +4,10 @@ ext {
     buildToolsVersion  = "30.0.2"
     applicationId = "com.devlogs.chatty"
     minSdkVersion = 24
-    targetSdkVersion = 30
+    targetSdkVersion = 28
     versionCode = 1
     versionName = "1.0"
     //endregion project configuration
-
     //region - Plugins
     def plugins = [
             androidApplication: 'com.android.application',
@@ -21,8 +20,15 @@ ext {
             daggerHiltPlugin: 'dagger.hilt.android.plugin'
     ]
     //endregion Plugins
-
     //region - Dependencies
+    def eightbitlab = [group: 'com.eightbitlab', version: '1.6.6']
+    eightbitlab_dependencies = [
+            blurview: [configuration: "implementation", dependency: [group: eightbitlab.group, name: "blurview", version: eightbitlab.version]]
+    ]
+    def wasabeef = [group: 'jp.wasabeef', version: '4.0.0']
+    wasabeef_dependencies = [
+            blurry : [configuration: "implementation", dependency: [group: wasabeef.group, name: "blurry", version: wasabeef.version]]
+    ]
     def workmanager = [group: 'androidx.work', version: "2.5.0"]
     workManagerDependences = [workmanager: [configuration: "implementation", dependency: [group: workmanager.group, name: "work-runtime-ktx", version: workmanager.version]]]    
 
@@ -166,9 +172,9 @@ ext {
                 androidXAppCompatDependencies.values() + materialDependencies.values() + constraintLayoutDependencies.values()+
                 junitDependencies.values() + androidXTestDependencies.values() + espressoDependencies.values() +
                 rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() + dataStoreDependencies.values() +
-                circleImageDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values()
+                circleImageDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values() + eightbitlab_dependencies.values()
                 + eventBusDependencies.values() + fragNavDependencies.values() + picassoDependencies.values() + swipeToRefreshDependencies.values()
-                + leakCanaryDependencies.values() + workManagerDependences.values() + glideDependencies.values()
+                + leakCanaryDependencies.values() + workManagerDependences.values() + glideDependencies.values() + wasabeef_dependencies.values()
             ,
 
             plugins: [

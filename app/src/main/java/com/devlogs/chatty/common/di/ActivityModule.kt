@@ -3,13 +3,16 @@ package com.devlogs.chatty.common.di
 import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.Window
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.devlogs.chatty.R
 import com.devlogs.chatty.datasource.local.internalfilesystem.InternalResourceImp
 import com.devlogs.chatty.domain.datasource.local.InternalResource
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
+import com.devlogs.chatty.screen.chatscreen.ChatScreenNavigator
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
+import com.devlogs.chatty.screen.common.mvcview.UIToolkit
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import com.devlogs.chatty.screen.mainscreen.MainScreenNavigator
 import com.ncapdevi.fragnav.FragNavController
@@ -38,8 +41,13 @@ class ActivityModule {
     }
 
     @Provides
-    fun provideMvcViewFactory (layoutInflater: LayoutInflater): MvcViewFactory {
-        return MvcViewFactory(layoutInflater)
+    fun provideUIToolkit (activity: Activity, inflater: LayoutInflater) : UIToolkit {
+        return UIToolkit(activity.window, activity, inflater)
+    }
+
+    @Provides
+    fun provideMvcViewFactory (toolKit: UIToolkit): MvcViewFactory {
+        return MvcViewFactory(toolKit)
     }
 
     @Provides
@@ -49,6 +57,10 @@ class ActivityModule {
     @Provides
     @ActivityScoped
     fun provideMainScreenNavigator (fragmentManager: FragmentManager) : MainScreenNavigator = MainScreenNavigator(getMainFragNavController(fragmentManager))
+
+    @Provides
+    @ActivityScoped
+    fun provideChatScreenNavigator (fragmentManager: FragmentManager) : ChatScreenNavigator = ChatScreenNavigator(getChatFragNavController(fragmentManager))
 
 
     @Provides
@@ -63,6 +75,10 @@ class ActivityModule {
 
     private fun getMainFragNavController (fragmentManager: FragmentManager) : FragNavController {
         return FragNavController(fragmentManager, R.id.mainLayoutContainer)
+    }
+
+    private fun getChatFragNavController (fragmentManager: FragmentManager) : FragNavController {
+        return FragNavController(fragmentManager, R.id.chatScreenContainer)
     }
 
     @ActivityScoped

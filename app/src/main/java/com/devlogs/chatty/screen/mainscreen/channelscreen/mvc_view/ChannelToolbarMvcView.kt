@@ -7,6 +7,7 @@ import android.widget.Button
 import android.widget.ImageButton
 import com.devlogs.chatty.R
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
+import com.devlogs.chatty.screen.common.mvcview.UIToolkit
 import de.hdodenhof.circleimageview.CircleImageView
 
 class ChannelToolbarMvcView : BaseMvcView <ChannelToolbarMvcView.Listener> {
@@ -18,8 +19,8 @@ class ChannelToolbarMvcView : BaseMvcView <ChannelToolbarMvcView.Listener> {
     private lateinit var btnNewChat: ImageButton
     private lateinit var imgAvatar: CircleImageView
 
-    constructor(inflater: LayoutInflater, container: ViewGroup?) {
-        setRootView(inflater.inflate(R.layout.layout_maintoolbar, container, false))
+    constructor(toolKit:UIToolkit, container: ViewGroup?) {
+        setRootView(toolKit.layoutInflater.inflate(R.layout.layout_maintoolbar, container, false))
         addControls()
         addEvents()
     }

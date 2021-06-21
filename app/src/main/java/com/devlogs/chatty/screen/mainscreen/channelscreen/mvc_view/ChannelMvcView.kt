@@ -39,4 +39,4 @@ interface ChannelMvcView: ObservableMvcView <Listener>{
     fun updateChannel(channels: ChannelPresentationModel)
 }
 
-fun MvcViewFactory.getMainMvcView (container: ViewGroup?, channelRcvAdapter: ChannelRcvAdapter) : ChannelMvcView = ChannelMvcViewImp(getLayoutInflater(), container, channelRcvAdapter)
+fun MvcViewFactory.getMainMvcView (container: ViewGroup?, channelRcvAdapter: ChannelRcvAdapter) : ChannelMvcView = ChannelMvcViewImp(uiToolkit, container, channelRcvAdapter)

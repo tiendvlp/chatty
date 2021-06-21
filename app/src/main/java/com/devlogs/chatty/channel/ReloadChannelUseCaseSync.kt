@@ -93,14 +93,14 @@ class ReloadChannelUseCaseSync {
                 })
 
                 ChannelRealmObject(
-                    channelModel.latestUpdate,
-                    channelModel.createdDate,
-                    channelSeen,
-                    channelMemberLocals,
-                    ChannelStatusRealmObject(channelModel.status.senderEmail, channelModel.status.content, channelModel.status.type),
-                    channelModel.admin,
-                    channelModel.title,
-                    channelModel.id
+                    latestUpdate = channelModel.latestUpdate,
+                    createdDate = channelModel.createdDate,
+                    seen= channelSeen,
+                    members = channelMemberLocals,
+                    status = ChannelStatusRealmObject(channelModel.status.senderEmail, channelModel.status.content, channelModel.status.type),
+                    adminEmail = channelModel.admin,
+                    title = channelModel.title,
+                    id = channelModel.id
                 )
             })
 

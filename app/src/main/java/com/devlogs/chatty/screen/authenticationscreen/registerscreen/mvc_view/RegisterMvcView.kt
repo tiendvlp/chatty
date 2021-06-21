@@ -16,4 +16,4 @@ interface RegisterMvcView : ObservableMvcView<RegisterMvcView.Listener> {
 
 }
 
-fun MvcViewFactory.getRegisterMvcView (container: ViewGroup?) : RegisterMvcView = RegisterMvcViewImp(mLayoutInflater, container)
+fun MvcViewFactory.getRegisterMvcView (container: ViewGroup?) : RegisterMvcView = RegisterMvcViewImp(uiToolkit, container)

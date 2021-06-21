@@ -35,7 +35,7 @@ class ChannelSocketEventListener @Inject constructor(
     }
 
     override fun onNewChannel(newChannel: ChannelEntity) {
-        normalLog("onNewchannel")
+        normalLog("onNewchannel: ${newChannel.latestUpdate}")
         coroutine.launch {
             val channelPM = withContext(BackgroundDispatcher) { newChannel.to() }
             presentationStateManager.consumeAction(
@@ -45,7 +45,7 @@ class ChannelSocketEventListener @Inject constructor(
     }
 
     override fun onChannelUpdate(updatedChannel: ChannelEntity) {
-        normalLog("onChannel Updated")
+        normalLog("onChannel Updated: ${updatedChannel.latestUpdate}")
         coroutine.launch {
             val channelPM = withContext(BackgroundDispatcher) { updatedChannel.to() }
             presentationStateManager.consumeAction(

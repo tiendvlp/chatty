@@ -15,6 +15,7 @@ import com.devlogs.chatty.common.helper.isEmail
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
 import com.devlogs.chatty.screen.common.mvcview.ProgressButtonMvcView
+import com.devlogs.chatty.screen.common.mvcview.UIToolkit
 import kotlinx.coroutines.*
 
 class LoginMvcViewImp : BaseMvcView<LoginMvcView.Listener>, LoginMvcView {
@@ -26,15 +27,15 @@ class LoginMvcViewImp : BaseMvcView<LoginMvcView.Listener>, LoginMvcView {
     private val edtEmail: EditText
     private val edtPassword: EditText
 
-    constructor(layoutInflater: LayoutInflater, container: ViewGroup?) {
-        val rootView = layoutInflater.inflate(R.layout.layout_login, container, false)
+    constructor(toolKit: UIToolkit, container: ViewGroup?) {
+        val rootView = toolKit.layoutInflater.inflate(R.layout.layout_login, container, false)
         setRootView(rootView)
         elementBtnLogin = findViewById(R.id.elementBtnLogin)
         btnRegister = findViewById(R.id.btnSignUp)
         btnForgotPassword = findViewById(R.id.btnForgotPassword)
         edtEmail = findViewById(R.id.edtEmail)
         edtPassword = findViewById(R.id.edtPassword)
-        btnLoginMvcView = ProgressButtonMvcView(layoutInflater, elementBtnLogin, "Login")
+        btnLoginMvcView = ProgressButtonMvcView(toolKit.layoutInflater, elementBtnLogin, "Login")
         elementBtnLogin.addView(btnLoginMvcView.getRootView())
         btnLoginMvcView.deactivate()
         addEvents()

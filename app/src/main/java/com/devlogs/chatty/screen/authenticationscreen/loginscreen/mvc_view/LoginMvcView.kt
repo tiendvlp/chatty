@@ -18,4 +18,4 @@ interface LoginMvcView : ObservableMvcView<LoginMvcView.Listener> {
 }
 
 fun MvcViewFactory.getLoginMvcView(container: ViewGroup?): LoginMvcView =
-        LoginMvcViewImp(mLayoutInflater, container)
+        LoginMvcViewImp(uiToolkit, container)

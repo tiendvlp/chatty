@@ -5,7 +5,7 @@ import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import kotlinx.coroutines.withContext
 
-data class ChannelPresentationModel(
+ class ChannelPresentationModel(
     var title: String,
     var message: String,
     var sender: String,
@@ -14,19 +14,20 @@ data class ChannelPresentationModel(
     var displayedElement : Array<String>,
     var id: String,
 
-) : Comparable<ChannelPresentationModel> {
-    override fun compareTo(other: ChannelPresentationModel): Int {
-        if (other.id.equals(id)) {
-            return 0
-        }
+): Comparable<ChannelPresentationModel> {
+     override fun compareTo(other: ChannelPresentationModel): Int {
+         if (other.id.equals(id)) {
+             return 0
+         }
 
-        if (other.lastUpdate < lastUpdate) {
-            return -1
-        }
+         if (other.lastUpdate < lastUpdate) {
+             return -1
+         }
 
-        return 1
-    }
-}
+         return 1
+     }
+
+ }
 
 // it's too heavy to run on MainThread
 suspend fun ChannelEntity.to () : ChannelPresentationModel = withContext(BackgroundDispatcher) {
