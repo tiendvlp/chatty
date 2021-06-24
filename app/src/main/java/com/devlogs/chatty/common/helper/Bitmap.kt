@@ -8,7 +8,6 @@ import android.graphics.drawable.BitmapDrawable
 
 import android.graphics.drawable.Drawable
 import com.devlogs.chatty.common.getFullDownloadAvatarUrl
-import com.devlogs.chatty.config.LOCALHOST
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.net.URL

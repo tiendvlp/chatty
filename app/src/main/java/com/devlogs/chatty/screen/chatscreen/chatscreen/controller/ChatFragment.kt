@@ -1,12 +1,16 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.controller
 
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
+import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.ChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.getChatMvcView
+import com.devlogs.chatty.screen.common.compat.ChattyCompat
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -26,6 +30,11 @@ class ChatFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
     }
 
     override fun onCreateView(

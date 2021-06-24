@@ -57,9 +57,11 @@ ext {
             kotlinStdlib : [configuration: "implementation", dependency: [group: kotlin.group, name: "kotlin-stdlib", version: kotlin.verion]],
     ]
 
-    def androidxCore = [group: "androidx.core", version: "1.3.2"]
+    def androidxCore = [group: "androidx.core", version: "1.6.0-alpha03"]
     androidxCoreDependencies = [
            coreKtx: [configuration: "implementation", dependency: [group: androidxCore.group, name: "core-ktx", version: androidxCore.version]],
+           coreAnimation: [configuration: "implementation", dependency: [group: androidxCore.group, name: "core-animation", version: "1.0.0-alpha02"]],
+
     ]
 
     def androidXAppCompat = [group: "androidx.appcompat", version: '1.2.0']
@@ -67,7 +69,6 @@ ext {
            androidXAppCompat: [configuration: "implementation", dependency: [group: androidXAppCompat.group, name: "appcompat", version: androidXAppCompat.version]],
     ]
 
-//       implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
     def swipeToRefresh = [group: "androidx.swiperefreshlayout", version: "1.1.0"]
     swipeToRefreshDependencies = [
             swipeToRefresh : [configuration: "implementation", dependency: [group: swipeToRefresh.group,name: "swiperefreshlayout", version: swipeToRefresh.version]]

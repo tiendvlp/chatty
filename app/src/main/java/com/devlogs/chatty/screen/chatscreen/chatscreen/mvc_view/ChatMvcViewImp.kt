@@ -1,15 +1,21 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view
 
+import android.os.Build
 import android.view.ViewGroup
-import android.widget.FrameLayout
+import android.view.Window
+import android.widget.LinearLayout
 import android.widget.Toolbar
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devlogs.chatty.R
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.chat_adapter.ChatAdapterSharedBox
 import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.chat_adapter.ChatRcvAdapter
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatType
+import com.devlogs.chatty.screen.common.compat.ChattyCompat
+import com.devlogs.chatty.screen.common.compat.KeyboardMovementCompatListener
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
 import com.devlogs.chatty.screen.common.mvcview.UIToolkit
 
@@ -32,18 +38,25 @@ import com.devlogs.chatty.screen.common.mvcview.UIToolkit
      ChatPresentableModel("123123", ChatType.TEXT, "thuylinhp@gmail.com", "Okay <3", 12328428423),
  )
 
-class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener> {
+class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
+    KeyboardMovementCompatListener {
 
     private val toolbarMvcView: ChatToolbarMvcView
     private val chatBoxMvcView: ChatBoxMvcView
     private val toolbar: Toolbar
-    private val chatBoxContainer: FrameLayout
+    private val chatBoxContainer: LinearLayout
     private val lvChat: RecyclerView
     private val chatRcvAdapter: ChatRcvAdapter
+    private val layoutMain: LinearLayout
 
+    @RequiresApi(Build.VERSION_CODES.R)
     constructor(toolKit: UIToolkit, container: ViewGroup?) {
         setRootView(toolKit.layoutInflater.inflate(R.layout.layout_chat, container, false))
         toolbar = findViewById(R.id.toolbar)
+        layoutMain = findViewById(R.id.layoutMain)
+        val compat = ChattyCompat(container!!, getRootView(), toolKit.window)
+        compat.setupUiWindowInsets()
+        compat.setupKeyboardAnimations()
         toolbarMvcView = ChatToolbarMvcView(toolKit, toolbar);
         chatBoxContainer = findViewById(R.id.chatBoxContainer)
         chatRcvAdapter = ChatRcvAdapter(ChatAdapterSharedBox(getContext()))
@@ -51,10 +64,22 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener> {
         chatBoxMvcView = ChatBoxMvcView(toolKit, chatBoxContainer)
         chatBoxContainer.addView(chatBoxMvcView.getRootView())
         lvChat = findViewById(R.id.lvChat)
-        lvChat.layoutManager = LinearLayoutManager(getContext())
+        val manager = LinearLayoutManager(getContext())
+        manager.stackFromEnd = true
+        lvChat.layoutManager = manager
         chatRcvAdapter.setSource(spawnMessage)
         lvChat.adapter = chatRcvAdapter
+        normalLog("Is Root same with container: ${getRootView() == layoutMain}")
+        compat.setKeyboardAnimArea(layoutMain)
+        compat.setKeyboardMovementCompatListener(this)
     }
 
+
+    private fun setUpKeyboardAnimating (window: Window) {
+    }
+
+    override fun callback(delta: Int, distance: Int, maxDistance: Int) {
+        chatBoxMvcView.callback(delta, distance, maxDistance)
+    }
 
 }

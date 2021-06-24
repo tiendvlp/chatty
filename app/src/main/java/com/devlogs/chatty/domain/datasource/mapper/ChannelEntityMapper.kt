@@ -1,8 +1,5 @@
 package com.devlogs.chatty.domain.datasource.mapper
 
-import com.devlogs.chatty.common.helper.getImageBytes
-import com.devlogs.chatty.common.helper.getUserAvatar
-import com.devlogs.chatty.config.LOCALHOST
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
 import com.devlogs.chatty.domain.datasource.mainserver.model.ChannelMainServerModel
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity

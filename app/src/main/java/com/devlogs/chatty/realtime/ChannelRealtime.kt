@@ -1,10 +1,6 @@
 package com.devlogs.chatty.realtime
 
 import com.devlogs.chatty.common.base.BaseObservable
-import com.devlogs.chatty.common.helper.getImageBytes
-import com.devlogs.chatty.common.helper.getUserAvatar
-import com.devlogs.chatty.common.mapper.Mapper
-import com.devlogs.chatty.config.LOCALHOST
 import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.entity.channel.ChannelMemberEntity

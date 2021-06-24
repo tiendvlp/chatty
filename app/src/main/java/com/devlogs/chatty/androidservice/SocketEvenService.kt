@@ -98,7 +98,6 @@ class SocketEvenService : Service() {
                 socketEventObservable.getListeners().forEach { listener ->
                     if (listener is SocketMessageListener) {
                         listener.onNewMessage(newMessageEntity)
-                        listener
                     }
                 }
         }

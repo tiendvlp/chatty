@@ -4,49 +4,75 @@
     android:id="@+id/blurView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:blurOverlayColor="@color/white_95"
-    >
+    app:blurOverlayColor="@color/white_95">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
 
         <com.devlogs.chatty.screen.common.customview.ImageButton
             android:id="@+id/btnIcon"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginBottom="5dp"
-            android:layout_marginLeft="@dimen/global_margin_horizontal"
+            android:layout_marginRight="10dp"
             android:background="@null"
             android:scaleType="centerInside"
             android:src="@drawable/icon_smile"
             app:layout_constraintBottom_toBottomOf="@id/edtMessage"
-            app:layout_constraintLeft_toLeftOf="parent" />
+            app:layout_constraintEnd_toStartOf="@+id/edtMessage"
+            app:layout_constraintLeft_toRightOf="@id/btnGallery" />
+
+        <com.devlogs.chatty.screen.common.customview.ImageButton
+            android:id="@+id/btnGallery"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginLeft="@dimen/global_margin_horizontal"
+            android:layout_marginBottom="5dp"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/icon_smile"
+            app:layout_constraintBottom_toBottomOf="@id/edtMessage"
+            app:layout_constraintRight_toLeftOf="@id/btnIcon" />
+
+        <com.devlogs.chatty.screen.common.customview.ImageButton
+            android:id="@+id/btnGif"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginLeft="@dimen/global_margin_horizontal"
+            android:layout_marginRight="8dp"
+            android:layout_marginBottom="5dp"
+            android:background="@null"
+            android:scaleType="centerInside"
+            android:src="@drawable/icon_smile"
+            app:layout_constraintBottom_toBottomOf="@id/edtMessage"
+            app:layout_constraintRight_toLeftOf="@id/btnGallery" />
 
         <EditText
             android:id="@+id/edtMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="120dp"
+            android:layout_marginTop="20dp"
             android:layout_marginRight="10dp"
+            android:layout_marginBottom="20dp"
             android:background="@drawable/circularviewbg_chatframe"
             android:backgroundTint="@color/grey_200"
             android:gravity="center|start"
             android:hint="Aa"
             android:lineSpacingExtra="1dp"
-            android:layout_marginTop="20dp"
             android:maxLines="4"
             android:minLines="1"
             android:paddingLeft="12dp"
             android:paddingTop="5dp"
             android:paddingRight="12dp"
             android:paddingBottom="10dp"
-            android:layout_marginBottom="20dp"
-            app:layout_constraintBottom_toBottomOf="parent"
             android:textSize="16sp"
-            app:layout_constraintLeft_toRightOf="@id/btnIcon"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toLeftOf="@id/btnSend"
             app:layout_constraintTop_toTopOf="parent" />
 

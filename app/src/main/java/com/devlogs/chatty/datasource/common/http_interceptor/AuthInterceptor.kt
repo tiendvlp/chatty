@@ -1,6 +1,6 @@
 package com.devlogs.chatty.datasource.common.http_interceptor
 
-import com.devlogs.chatty.config.LOCALHOST
+import com.devlogs.chatty.common.HOST
 import com.devlogs.chatty.datasource.common.restconfig.AuthServerRestClientConfig
 import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.*
@@ -51,7 +51,7 @@ class AuthInterceptor : Interceptor {
         val reqBody: RequestBody = RequestBody.create(MediaType.get("application/json"), "{\"refreshToken\": \"$refreshToken\"}")
 
         val authReq: Request = Request.Builder()
-                .url("http://$LOCALHOST:4000/auth/token/generateaccesstoken")
+                .url("http://$HOST:4000/auth/token/generateaccesstoken")
                 .method("POST", reqBody)
                 .build()
         val authRes = chain.proceed(authReq)

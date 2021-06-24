@@ -1,5 +1,6 @@
 package com.devlogs.chatty.domain.entity.channel
 
+
 data class ChannelEntity (
     val id : String,
     val title : String,

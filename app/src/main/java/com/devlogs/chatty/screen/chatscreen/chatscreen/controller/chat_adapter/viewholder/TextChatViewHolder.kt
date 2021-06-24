@@ -53,16 +53,8 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
         val previousItem = resource.getOrNull(pos -1)
         val nextItem = resource.getOrNull(pos + 1)
 
-        var isSameGroupWithPrevious = false
-        var isSameGroupWithNext = false
-
-        if (previousItem != null) {
-            isSameGroupWithPrevious = previousItem.senderEmail.equals(data.senderEmail)
-        }
-        if (nextItem != null) {
-            isSameGroupWithNext = nextItem.senderEmail.equals(data.senderEmail)
-        }
-
+        val isSameGroupWithPrevious = previousItem != null && previousItem.senderEmail.equals(data.senderEmail)
+        val isSameGroupWithNext = nextItem != null && nextItem.senderEmail.equals(data.senderEmail)
 
         if (isSameGroupWithNext && isSameGroupWithPrevious){
               dynamicBackground.background = ContextCompat.getDrawable(itemView.context,R.drawable.circularview_rightcornersbg)
@@ -75,7 +67,9 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
 
         else if (isSameGroupWithNext) {
              dynamicBackground.background = ContextCompat.getDrawable(itemView.context,R.drawable.circularview_bottomrightcornerbg)
-        } else {
+        }
+
+        else {
             dynamicBackground.background = ContextCompat.getDrawable(itemView.context,R.drawable.circularviewbg_a)
         }
 

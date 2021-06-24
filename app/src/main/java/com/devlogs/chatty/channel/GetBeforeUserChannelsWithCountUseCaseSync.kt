@@ -36,8 +36,8 @@ class GetBeforeUserChannelsWithCountUseCaseSync {
     suspend fun execute (since: Long, count: Int) : Result = withContext(BackgroundDispatcher) {
         try {
             val response = mChannelMainSerApi.getPreviousChannels(since, count)
-            val channelMemberLocalModels = RealmList<ChannelMemberRealmObject>();
-            val channelMemberEntities = ArrayList<ChannelMemberEntity>();
+            val channelMemberLocalModels = RealmList<ChannelMemberRealmObject>()
+            val channelMemberEntities = ArrayList<ChannelMemberEntity>()
             val channels : List<ChannelEntity> = response.map { channelModel ->
                 for (member in channelModel.members) {
                     channelMemberEntities.add(ChannelMemberEntity(member.id, member.email))
