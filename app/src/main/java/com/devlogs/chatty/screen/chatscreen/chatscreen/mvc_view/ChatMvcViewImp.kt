@@ -3,9 +3,11 @@ package com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view
 import android.os.Build
 import android.view.ViewGroup
 import android.view.Window
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.Toolbar
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devlogs.chatty.R
@@ -44,10 +46,10 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
     private val toolbarMvcView: ChatToolbarMvcView
     private val chatBoxMvcView: ChatBoxMvcView
     private val toolbar: Toolbar
-    private val chatBoxContainer: LinearLayout
+    private val chatBoxContainer: FrameLayout
     private val lvChat: RecyclerView
     private val chatRcvAdapter: ChatRcvAdapter
-    private val layoutMain: LinearLayout
+    private val layoutMain: ConstraintLayout
 
     @RequiresApi(Build.VERSION_CODES.R)
     constructor(toolKit: UIToolkit, container: ViewGroup?) {
@@ -70,7 +72,6 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
         chatRcvAdapter.setSource(spawnMessage)
         lvChat.adapter = chatRcvAdapter
         normalLog("Is Root same with container: ${getRootView() == layoutMain}")
-        compat.setKeyboardAnimArea(layoutMain)
         compat.setKeyboardMovementCompatListener(this)
     }
 
@@ -78,8 +79,16 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
     private fun setUpKeyboardAnimating (window: Window) {
     }
 
-    override fun callback(delta: Int, distance: Int, maxDistance: Int) {
-        chatBoxMvcView.callback(delta, distance, maxDistance)
+    override fun onStart() {
+        chatBoxMvcView.onStart()
+    }
+
+    override fun onFinished() {
+        chatBoxMvcView.onFinished()
+    }
+
+    override fun onProgress(delta: Int, distance: Int, maxDistance: Int) {
+        chatBoxMvcView.onProgress(delta, distance, maxDistance)
     }
 
 }

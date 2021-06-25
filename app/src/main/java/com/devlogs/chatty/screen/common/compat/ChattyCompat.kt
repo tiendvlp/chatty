@@ -1,7 +1,9 @@
 package com.devlogs.chatty.screen.common.compat
 
 import android.annotation.SuppressLint
+import android.content.SharedPreferences
 import android.os.CancellationSignal
+import android.preference.PreferenceManager
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -11,14 +13,19 @@ import androidx.core.graphics.Insets
 import androidx.core.view.*
 import com.devlogs.chatty.common.helper.normalLog
 
-class ChattyCompat(private val view: View, private val container: View, private val window: Window) : ChattyCompatAction {
+class ChattyCompat constructor(private val view: View, private val container: View, private val window: Window) : ChattyCompatAction {
     private var animationController: WindowInsetsAnimationControllerCompat? = null
 
     private var posTop = 0
     private var posBottom = 0
     private var bottomSize = 0
     private var keyboardMovementCompatListener : KeyboardMovementCompatListener? = null
-    private var keyboardHeight: Int = 0
+    private var sharedPreferences: SharedPreferences = PreferenceManager.getDefaultSharedPreferences(view.context)
+
+    private var keyboardHeight: Int = sharedPreferences.getInt("KeyboardHeight",-1); set(value) {
+        sharedPreferences.edit().putInt("KeyboardHeight", value).apply()
+        field = value
+    }
 
     private val animationControlListener: WindowInsetsAnimationControlListenerCompat by lazy {
         object : WindowInsetsAnimationControlListenerCompat {
@@ -27,30 +34,27 @@ class ChattyCompat(private val view: View, private val container: View, private 
                 controller: WindowInsetsAnimationControllerCompat,
                 types: Int
             ) {
-                normalLog("Ready to launch")
+                normalLog("ON ANLOL")
                 animationController = controller
             }
 
             override fun onFinished(controller: WindowInsetsAnimationControllerCompat) {
-                normalLog("Finished")
-                if (getWindowInset().isVisible(WindowInsetsCompat.Type.ime()) && keyboardHeight == 0) {
-                    keyboardHeight = controller.currentInsets.bottom
-                }
                 animationController = null
             }
 
             override fun onCancelled(controller: WindowInsetsAnimationControllerCompat?) {
-                normalLog("Canceled")
                 animationController = null
             }
         }
     }
 
+    private fun isKeyboardVisible () = getWindowInset().isVisible(WindowInsetsCompat.Type.ime())
+
     fun setKeyboardMovementCompatListener (listener: KeyboardMovementCompatListener) {
         this.keyboardMovementCompatListener = listener
     }
 
-    fun getWindowInset () =  WindowInsetsCompat.toWindowInsetsCompat(view.rootWindowInsets)
+    private fun getWindowInset () =  WindowInsetsCompat.toWindowInsetsCompat(view.rootWindowInsets)
 
     override fun setupUiWindowInsets() {
         setUiWindowInsets()
@@ -63,21 +67,24 @@ class ChattyCompat(private val view: View, private val container: View, private 
 
 
     fun setUiWindowInsets() {
+
         ViewCompat.setOnApplyWindowInsetsListener(container) { v, insets ->
             if (posBottom == 0) {
                 posTop = insets.getInsets(WindowInsetsCompat.Type.systemBars()).top
                 bottomSize =insets.getInsets(WindowInsetsCompat.Type.systemBars()).bottom
                 posBottom = bottomSize
             }
+            normalLog("OnApply")
+            if (isKeyboardVisible() && keyboardHeight == -1) {
+                keyboardHeight = getWindowInset().getInsets(WindowInsetsCompat.Type.ime()).bottom
+            }
+
 
             v.updatePadding(top = posTop, bottom = posBottom)
 
             insets
         }
     }
-
-
-
 
     @SuppressLint("ClickableViewAccessibility")
     fun setKeyboardAnimArea (viewGroup: ViewGroup) {
@@ -87,18 +94,12 @@ class ChattyCompat(private val view: View, private val container: View, private 
         var visible = false
         var first = true;
         viewGroup.setOnTouchListener { v, event ->
-
-            normalLog("OnTouch: ${event.action}")
-
             val y: Float = event.y
-            normalLog("OnTouch: ${event.action}")
-
             when (event.action) {
                 MotionEvent.ACTION_MOVE -> {
                     visible = getWindowInset().isVisible(
                         WindowInsetsCompat.Type.ime())
                     if (first) {
-                        normalLog("First setup" )
                         first = false
 
                         if (visible) {
@@ -110,7 +111,6 @@ class ChattyCompat(private val view: View, private val container: View, private 
                     }
 
 
-
                     val dy: Float = previousY - y
                     scrollToOpenKeyboard = scrolledY < scrolledY + dy
 
@@ -119,7 +119,6 @@ class ChattyCompat(private val view: View, private val container: View, private 
                     if (scrolledY < 0) {
                         scrolledY = 0f
                     }
-                    normalLog("Action moved: ${scrolledY}")
 
                     animationController?.setInsetsAndAlpha(
                         Insets.of(0, 0, 0, scrolledY.toInt()),
@@ -129,7 +128,6 @@ class ChattyCompat(private val view: View, private val container: View, private 
                 }
 
                 MotionEvent.ACTION_UP -> {
-                    normalLog("UP action" )
                     first = true
                     scrolledY = 0f
                     animationController?.finish(scrollToOpenKeyboard)
@@ -158,24 +156,43 @@ class ChattyCompat(private val view: View, private val container: View, private 
     }
 
     fun animateKeyboardDisplay() {
+
         val cb = object : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
             var previous = 0
+            var delta = 0
+            var distance = 0
+            override fun onStart(
+                animation: WindowInsetsAnimationCompat,
+                bounds: WindowInsetsAnimationCompat.BoundsCompat
+            ): WindowInsetsAnimationCompat.BoundsCompat {
+                keyboardMovementCompatListener?.onStart()
+                return super.onStart(animation, bounds)
+            }
+
+            override fun onEnd(animation: WindowInsetsAnimationCompat) {
+                keyboardMovementCompatListener?.onFinished()
+                super.onEnd(animation)
+            }
             override fun onProgress(insets: WindowInsetsCompat,
                                     animations: MutableList<WindowInsetsAnimationCompat>): WindowInsetsCompat {
                 posBottom = insets.getInsets(WindowInsetsCompat.Type.ime()).bottom
 
-                val delta = posBottom - previous
-
+                delta = posBottom - previous
                 previous = posBottom
-                var distance = posBottom - bottomSize
+
+                distance = posBottom - bottomSize
 
                 if (posBottom <= bottomSize) {
                     posBottom = bottomSize
                     distance = 0
                 }
 
+                if ((delta == 0)) {
+                    return insets
+                }
+
+                keyboardMovementCompatListener?.onProgress(delta, distance, keyboardHeight)
                 container.updatePadding(top = posTop, bottom = posBottom)
-                keyboardMovementCompatListener?.callback(delta, distance, keyboardHeight)
                 return insets
             }
         }

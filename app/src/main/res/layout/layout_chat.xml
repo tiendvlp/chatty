@@ -1,37 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/layoutMain"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
-
-    <include
-        app:layout_constraintTop_toTopOf="parent"
+   >
+    <LinearLayout
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/toolbar"
-        layout="@layout/element_toolbar"/>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/lvChat"
-        android:background="@color/white"
-        android:paddingRight="@dimen/global_margin_horizontal"
-        android:paddingLeft="@dimen/global_margin_horizontal"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        app:layout_constraintTop_toBottomOf="@id/toolbar"
-        app:layout_constraintBottom_toTopOf="@id/chatBoxContainer"
-        />
+        android:layout_height="0dp">
+        <include
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:id="@+id/toolbar"
+            layout="@layout/element_toolbar"/>
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lvChat"
+            android:paddingRight="@dimen/global_margin_horizontal"
+            android:paddingLeft="@dimen/global_margin_horizontal"
+            app:layout_constraintTop_toBottomOf="@id/toolbar"
 
-    <LinearLayout
-        android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@null"
+            />
+
+    </LinearLayout>
+    <FrameLayout
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/chatBoxContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
