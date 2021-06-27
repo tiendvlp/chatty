@@ -8,6 +8,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
+import androidx.core.view.isVisible
 
 class ImageButton : androidx.appcompat.widget.AppCompatImageButton {
 
@@ -24,6 +25,15 @@ class ImageButton : androidx.appcompat.widget.AppCompatImageButton {
 
     constructor(context : Context, attributeSet: AttributeSet) : super(context, attributeSet) {
         setOnTouchListener(null)
+    }
+
+    override fun setVisibility(visibility: Int) {
+        super.setVisibility(visibility)
+        if (isVisible) {
+          alpha = 1f
+        } else {
+            alpha = 0f
+        }
     }
 
     @SuppressLint("ClickableViewAccessibility")

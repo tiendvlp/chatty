@@ -1,7 +1,6 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view
 
-import android.animation.Animator
-import android.animation.ValueAnimator
+import android.animation.*
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
@@ -9,11 +8,11 @@ import android.view.Window
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
-import androidx.core.animation.addListener
-import androidx.core.animation.doOnEnd
+import androidx.core.animation.doOnCancel
 import androidx.core.animation.doOnStart
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updateMargins
+import androidx.core.widget.doOnTextChanged
 import com.devlogs.chatty.R
 import com.devlogs.chatty.common.helper.convertDpToPx
 import com.devlogs.chatty.common.helper.normalLog
@@ -36,9 +35,19 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
     private val buttonWraper: LinearLayout
     private val btnGallery: ImageButton
     private val btnExpand: ImageButton
+    private val btnSubmit: ImageButton
     private val expandMenuAnimator : ValueAnimator
+    private val layoutEdt: LinearLayout
 
-    constructor(toolkit: UIToolkit, container: ViewGroup?) {
+    private val animBtnSubmitScaleDown : ValueAnimator
+    private val animBtnSubmitScaleUp : ValueAnimator
+    private val animBtnSubmit : AnimatorSet
+
+    private val drawableLike : Drawable
+    private val drawableSend : Drawable
+    private var currentDrawble : Drawable
+
+    constructor (toolkit: UIToolkit, container: ViewGroup?) {
         this.window = toolkit.window
         setRootView(toolkit.layoutInflater.inflate(R.layout.layout_chatbox, container, false))
         mainLayout = findViewById(R.id.mainLayout)
@@ -46,16 +55,84 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
         buttonWraper = findViewById(R.id.buttonWraper)
         edtMessage = findViewById(R.id.edtMessage)
         btnExpand = findViewById(R.id.btnExpand)
+        layoutEdt = findViewById(R.id.layoutEdt)
+        btnSubmit = findViewById(R.id.btnSubmit)
         btnGallery = findViewById(R.id.btnGallery)
-        expandMenuAnimator = ValueAnimator.ofFloat(convertDpToPx(getContext(), -78f), 0f).setDuration(300)
+
+        drawableLike = getContext().resources.getDrawable(R.drawable.icon_like)
+        drawableSend = getContext().resources.getDrawable(R.drawable.icon_send)
+        currentDrawble = drawableLike
+        btnSubmit.setImageDrawable(currentDrawble)
+        expandMenuAnimator = ValueAnimator.ofFloat(convertDpToPx(getContext(), -78f), 0f).setDuration(150)
+
+        animBtnSubmitScaleDown = ValueAnimator.ofFloat(1f, 0.6f).setDuration(80).apply {
+
+            addUpdateListener {
+                btnSubmit.scaleX = (animatedValue as Float)
+                btnSubmit.scaleY = (animatedValue as Float) * -1
+            }
+
+            doOnCancel {
+                btnSubmit.scaleY = 1f
+                btnSubmit.scaleX = 1f
+            }
+
+        }
+        animBtnSubmitScaleUp = ValueAnimator.ofFloat(0.6f, 1f).setDuration(80).apply {
+
+            addUpdateListener {
+                btnSubmit.scaleX = (animatedValue as Float)
+                btnSubmit.scaleY = (animatedValue as Float) * -1
+            }
+
+            doOnStart {
+                    btnSubmit.setImageDrawable(currentDrawble)
+            }
+
+            doOnCancel {
+                btnSubmit.scaleY = 1f
+                btnSubmit.scaleX = 1f
+            }
+
+        }
+        animBtnSubmit = AnimatorSet()
+        animBtnSubmit.playSequentially(animBtnSubmitScaleDown, animBtnSubmitScaleUp)
+
         blur()
         addEvents()
     }
 
     private var isAnimReversed = false
 
+    private fun showButtonLike () {
+        if (currentDrawble == drawableLike) {
+            return
+        }
+        if (animBtnSubmit.isStarted && currentDrawble != drawableLike) {
+            animBtnSubmitScaleDown.cancel()
+        }
+        if (!animBtnSubmit.isStarted) {
+            currentDrawble = drawableLike
+            animBtnSubmit.start()
+        }
+    }
+
+    private fun showButtonSend () {
+        if (currentDrawble == drawableSend) {
+            return
+        }
+        if (animBtnSubmit.isRunning && currentDrawble != drawableSend) {
+            animBtnSubmitScaleDown.cancel()
+        }
+        if (!animBtnSubmit.isRunning) {
+            currentDrawble = drawableSend
+            animBtnSubmit.start()
+        }
+    }
+
     private fun addEvents () {
         expandMenuAnimator.apply {
+            setCurrentFraction(0.5f)
             addUpdateListener {
                 buttonWraper.updateLayoutParams<ViewGroup.MarginLayoutParams> {
                     updateMargins(left = (it.animatedValue as Float).toInt())
@@ -63,38 +140,54 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
             }
 
             doOnStart {
+                mainLayout.layoutTransition.disableTransitionType(LayoutTransition.CHANGING)
                 if (isAnimReversed) {
                     btnExpand.visibility = View.VISIBLE
-                    btnGallery.visibility = View.GONE
+                    btnGallery.visibility = View.INVISIBLE
                 } else {
-                    btnExpand.visibility = View.GONE
+                    btnExpand.visibility = View.INVISIBLE
                     btnGallery.visibility = View.VISIBLE
                 }
             }
         }
 
-        edtMessage.setOnClickListener {
-            isAnimReversed = true
-            if (isAnimReversed) {
-                btnExpand.visibility = View.VISIBLE
-                btnGallery.visibility = View.GONE
-            } else {
-                btnExpand.visibility = View.GONE
-                btnGallery.visibility = View.VISIBLE
+        edtMessage.doOnTextChanged { text, start, before, count ->
+            showButtonSend()
+//            if (!mainLayout.layoutTransition.isTransitionTypeEnabled(LayoutTransition.CHANGING)) {
+//                mainLayout.layoutTransition.enableTransitionType(LayoutTransition.CHANGING)
+//            }
+            if (!isAnimReversed) {
+                isAnimReversed = true
+                buttonWraper.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    updateMargins(left = convertDpToPx(getContext(), -78f).toInt())
+                }
+                expandMenuAnimator.reverse()
             }
-            expandMenuAnimator.reverse()
+        }
+
+        edtMessage.setOnClickListener {
+            if (edtMessage.length() > 0) {
+                showButtonSend()
+            }
+            if (!isAnimReversed) {
+                isAnimReversed = true
+                expandMenuAnimator.reverse()
+                buttonWraper.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+                    updateMargins(left = 0)
+                }
+            }
+        }
+
+        btnGallery.setOnClickListener {
+            normalLog("BtnGallery")
         }
 
         btnExpand.setOnClickListener {
-            isAnimReversed = false
+            normalLog("BtnExpand")
             if (isAnimReversed) {
-                btnExpand.visibility = View.VISIBLE
-                btnGallery.visibility = View.GONE
-            } else {
-                btnExpand.visibility = View.GONE
-                btnGallery.visibility = View.VISIBLE
+                isAnimReversed = false
+                expandMenuAnimator.start()
             }
-            expandMenuAnimator.start()
         }
     }
 
@@ -112,17 +205,24 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
     private var currentMargin: Float = 0f
 
     override fun onStart() {
+        mainLayout.layoutTransition.disableTransitionType(LayoutTransition.CHANGING)
         if (currentMargin == 0f) {
             // is opening
             btnGallery.visibility = View.GONE
             btnExpand.visibility = View.VISIBLE
+            isAnimReversed = true
         } else {
             btnGallery.visibility = View.VISIBLE
             btnExpand.visibility = View.GONE
+            isAnimReversed = false
         }
     }
 
     override fun onFinished() {
+        if (currentMargin == 0f) {
+            // is closed
+                    showButtonLike()
+        }
         normalLog("Keyboard stopped:")
     }
 
@@ -130,6 +230,7 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
         if (maxDistance == 0) {
             return
         }
+
         buttonWraper.updateLayoutParams<ViewGroup.MarginLayoutParams> {
             currentMargin = leftMargin - (delta * (convertDpToPx(getContext(), 117f)/maxDistance))
 
@@ -138,6 +239,7 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
             } else if (currentMargin < convertDpToPx(getContext(), -78f)) {
                 currentMargin = convertDpToPx(getContext(), -78f)
             }
+
             updateMargins(left = (currentMargin+0.5).toInt())
         }
     }

@@ -4,14 +4,16 @@
     android:id="@+id/blurView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:scaleY="-1"
     app:blurOverlayColor="@color/white_95">
 
     <LinearLayout
         android:id="@+id/mainLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
+        android:gravity="top"
         android:paddingTop="6dp"
+        android:animateLayoutChanges="true"
         android:paddingBottom="10dp"
         android:paddingLeft="@dimen/global_margin_horizontal"
         android:paddingRight="@dimen/global_margin_horizontal"
@@ -20,7 +22,7 @@
         <LinearLayout
             android:id="@+id/buttonWraper"
             android:gravity="center"
-            android:layout_marginLeft="0dp"
+            android:scaleY="-1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <com.devlogs.chatty.screen.common.customview.ImageButton
@@ -28,14 +30,17 @@
                 android:layout_width="25dp"
                 android:layout_height="25dp"
                 android:background="@null"
-                android:layout_margin="7dp"
+                android:layout_marginRight="6dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginBottom="1dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/icon_gif_blue" />
 
             <com.devlogs.chatty.screen.common.customview.ImageButton
                 android:id="@+id/btnCamera"
                 android:layout_width="25dp"
-                android:layout_margin="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginLeft="5dp"
                 android:layout_height="25dp"
                 android:background="@null"
                 android:scaleType="centerInside"
@@ -68,7 +73,7 @@
                 android:layout_height="25dp"
                 android:background="@null"
                 android:scaleX="-1"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:backgroundTint="@color/main_color"
                 android:scaleType="centerInside"
                 android:src="@drawable/icon_back"
@@ -76,33 +81,43 @@
                 />
         </androidx.constraintlayout.widget.ConstraintLayout>
         </LinearLayout>
-        <EditText
-            android:id="@+id/edtMessage"
+        <LinearLayout
+            android:id="@+id/layoutEdt"
             android:layout_width="wrap_content"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-
-            android:background="@drawable/circularviewbg_chatframe"
-            android:backgroundTint="@color/grey_100"
-            android:gravity="center|start"
-            android:hint="Aa"
-            android:lineSpacingExtra="1dp"
-            android:maxLines="4"
-            android:minLines="1"
-            android:layout_marginLeft="10dp"
-            android:paddingLeft="12dp"
-            android:paddingTop="5dp"
-            android:paddingRight="12dp"
-            android:paddingBottom="10dp"
-            android:textSize="16sp" />
+            android:layout_weight="1"
+            >
+            <EditText
+                android:id="@+id/edtMessage"
+                android:layout_width="wrap_content"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:scaleY="-1"
+                android:background="@drawable/circularviewbg_chatframe"
+                android:backgroundTint="@color/grey_100"
+                android:gravity="center|start"
+                android:hint="Aa"
+                android:lineSpacingExtra="1dp"
+                android:maxLines="4"
+                android:minLines="1"
+                android:layout_marginLeft="10dp"
+                android:paddingLeft="16dp"
+                android:paddingTop="10dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="10dp"
+                android:textSize="16sp" />
+        </LinearLayout>
 
         <com.devlogs.chatty.screen.common.customview.ImageButton
-            android:id="@+id/btnSend"
+            android:id="@+id/btnSubmit"
             android:layout_width="35dp"
             android:layout_marginLeft="10dp"
+            android:layout_marginTop="6dp"
+            android:scaleY="-1"
             android:layout_height="35dp"
+            android:scaleType="centerInside"
             android:background="@null"
-            android:src="@drawable/icon_send" />
+            android:src="@drawable/icon_like" />
 
     </LinearLayout>
 </eightbitlab.com.blurview.BlurView>

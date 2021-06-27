@@ -34,7 +34,6 @@ class ChattyCompat constructor(private val view: View, private val container: Vi
                 controller: WindowInsetsAnimationControllerCompat,
                 types: Int
             ) {
-                normalLog("ON ANLOL")
                 animationController = controller
             }
 

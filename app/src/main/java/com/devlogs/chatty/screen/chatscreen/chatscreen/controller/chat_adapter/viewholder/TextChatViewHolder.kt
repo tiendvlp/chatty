@@ -70,7 +70,7 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
         }
 
         else {
-            dynamicBackground.background = ContextCompat.getDrawable(itemView.context,R.drawable.circularviewbg_a)
+            dynamicBackground.background = ContextCompat.getDrawable(itemView.context,R.drawable.circularviewbg_chatframe)
         }
 
         var marginTop = 10
