@@ -8,6 +8,7 @@ import android.os.IBinder
 import com.devlogs.chatty.androidservice.SocketConnectionListener
 import com.devlogs.chatty.androidservice.SocketEventObservable
 import com.devlogs.chatty.androidservice.bindSocketEventService
+import com.devlogs.chatty.chat.spawnChat
 import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
 import com.devlogs.chatty.realtime.MessageRealtime
 import com.google.gson.Gson
@@ -46,6 +47,7 @@ class MyApplication : Application(), SocketConnectionListener, ServiceConnection
         Realm.init(this)
         socketEventObservable.register(this)
         applicationContext.bindSocketEventService(this)
+        spawnChat()
     }
 
     override fun onTerminate() {

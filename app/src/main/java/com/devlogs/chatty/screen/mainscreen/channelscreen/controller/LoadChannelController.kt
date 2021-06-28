@@ -24,7 +24,6 @@ class LoadChannelController {
     private val mPresentationStateManager: PresentationStateManager
     private val mGetChannelOverPeriodOfTimeUseCaseSync: GetUserChannelsOverPeriodOfTimeUseCaseSync
     private val scope: CoroutineScope = CoroutineScope(Dispatchers.Main.immediate)
-    private val getBeforeChannelWithCountUseCase: GetBeforeUserChannelsWithCountUseCaseSync
     private val loadMoreChannel: LoadMoreUseCaseSync
     private val reloadChannelUseCaseSync : ReloadChannelUseCaseSync
     private val getLoadedChannel: GetLoadedChannelUseCaseSync
@@ -37,7 +36,6 @@ class LoadChannelController {
             getLoadedChannelUseCaseSync: GetLoadedChannelUseCaseSync,
             getChannelOverPeriodOfTimeUseCaseSync: GetUserChannelsOverPeriodOfTimeUseCaseSync,
             presentationStateManager: PresentationStateManager,
-            getBeforeChannelWithCountUseCase: GetBeforeUserChannelsWithCountUseCaseSync,
             loadMoreChannel: LoadMoreUseCaseSync,
             reloadChannelUseCaseSync: ReloadChannelUseCaseSync,
             getAccountUseCase: GetAccountUseCase,
@@ -49,7 +47,6 @@ class LoadChannelController {
         this.reloadChannelUseCaseSync = reloadChannelUseCaseSync
         mGetChannelOverPeriodOfTimeUseCaseSync = getChannelOverPeriodOfTimeUseCaseSync
         mPresentationStateManager = presentationStateManager
-        this.getBeforeChannelWithCountUseCase = getBeforeChannelWithCountUseCase
         this.loadMoreChannel = loadMoreChannel
         this.getAccountUseCase = getAccountUseCase
         this.socketIOInstance = socketIOInstance

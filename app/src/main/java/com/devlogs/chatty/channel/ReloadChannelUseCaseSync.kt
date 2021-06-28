@@ -14,6 +14,8 @@ import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity
 import io.realm.RealmList
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -79,8 +81,8 @@ class ReloadChannelUseCaseSync {
         }
     }
 
-    private suspend fun saveChannelsToDb (serverRespond : List<ChannelMainServerModel>) = withContext(BackgroundDispatcher) {
-        withContext (BackgroundDispatcher) {
+    private suspend fun saveChannelsToDb (serverRespond : List<ChannelMainServerModel>) = withContext(NonCancellable + BackgroundDispatcher) {
+        launch {
             val channelMemberLocals : RealmList<ChannelMemberRealmObject> = RealmList()
             val channelSeen = RealmList<String>()
             localDbApi.overrideChannel(serverRespond.map {

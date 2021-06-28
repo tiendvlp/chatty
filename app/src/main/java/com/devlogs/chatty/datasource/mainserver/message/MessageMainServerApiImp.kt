@@ -60,7 +60,7 @@ class MessageMainServerApiImp : MessageMainServerApi {
             val result : List<GetPreviousMessageWithCountQuery.GetPreviousMessageWithCount?> = response.data?.getPreviousMessageWithCount?:throw NotFoundErrorEntity("Couldn't find your message")
             return result.map { queryResult ->
                 normalLog("MESSAGE: " + queryResult!!.content)
-                MessageMainServerModel(queryResult.id, queryResult.type, queryResult.content, queryResult.createdDate.toString().toLong(), queryResult.channelId)
+                MessageMainServerModel(queryResult.id, queryResult.type, queryResult.content, queryResult.createdDate.toString().toLong(),queryResult.senderEmail ,queryResult.channelId )
             }
         } catch (e: ApolloException) {
             throw NetworkErrorEntity(e.message?:"")
@@ -85,10 +85,11 @@ class MessageMainServerApiImp : MessageMainServerApi {
             val result : List<GetMessageOverPeriodOfTimeQuery.GetMessageOverPeriodOfTime?> = response.data?.getMessageOverPeriodOfTime?:throw NotFoundErrorEntity("Couldn't find your message")
             return result.map { queryResult ->
                 normalLog("MESSAGE: " + queryResult!!.content)
-                MessageMainServerModel(queryResult.id, queryResult.type, queryResult.content, queryResult.createdDate.toString().toLong(), queryResult.channelId)
+                MessageMainServerModel(queryResult.id, queryResult.type, queryResult.content, queryResult.createdDate.toString().toLong(),queryResult.senderEmail, queryResult.channelId)
             }
         } catch (e: ApolloException) {
             throw NetworkErrorEntity(e.message?:"")
-        }      }
+        }
+    }
 
 }

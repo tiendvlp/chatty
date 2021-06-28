@@ -30,4 +30,5 @@ class UpdateChannelStatusUseCaseSync @Inject constructor( private val channelLoc
             Result.NotFound
         }
     }
+
 }

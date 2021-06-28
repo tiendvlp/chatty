@@ -45,7 +45,7 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
 
     private val drawableLike : Drawable
     private val drawableSend : Drawable
-    private var currentDrawble : Drawable
+    private var currentDrawable : Drawable
 
     constructor (toolkit: UIToolkit, container: ViewGroup?) {
         this.window = toolkit.window
@@ -61,8 +61,8 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
 
         drawableLike = getContext().resources.getDrawable(R.drawable.icon_like)
         drawableSend = getContext().resources.getDrawable(R.drawable.icon_send)
-        currentDrawble = drawableLike
-        btnSubmit.setImageDrawable(currentDrawble)
+        currentDrawable = drawableLike
+        btnSubmit.setImageDrawable(currentDrawable)
         expandMenuAnimator = ValueAnimator.ofFloat(convertDpToPx(getContext(), -78f), 0f).setDuration(150)
 
         animBtnSubmitScaleDown = ValueAnimator.ofFloat(1f, 0.6f).setDuration(80).apply {
@@ -86,7 +86,7 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
             }
 
             doOnStart {
-                    btnSubmit.setImageDrawable(currentDrawble)
+                    btnSubmit.setImageDrawable(currentDrawable)
             }
 
             doOnCancel {
@@ -105,27 +105,27 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
     private var isAnimReversed = false
 
     private fun showButtonLike () {
-        if (currentDrawble == drawableLike) {
+        if (currentDrawable == drawableLike) {
             return
         }
-        if (animBtnSubmit.isStarted && currentDrawble != drawableLike) {
+        if (animBtnSubmit.isStarted && currentDrawable != drawableLike) {
             animBtnSubmitScaleDown.cancel()
         }
         if (!animBtnSubmit.isStarted) {
-            currentDrawble = drawableLike
+            currentDrawable = drawableLike
             animBtnSubmit.start()
         }
     }
 
     private fun showButtonSend () {
-        if (currentDrawble == drawableSend) {
+        if (currentDrawable == drawableSend) {
             return
         }
-        if (animBtnSubmit.isRunning && currentDrawble != drawableSend) {
+        if (animBtnSubmit.isRunning && currentDrawable != drawableSend) {
             animBtnSubmitScaleDown.cancel()
         }
         if (!animBtnSubmit.isRunning) {
-            currentDrawble = drawableSend
+            currentDrawable = drawableSend
             animBtnSubmit.start()
         }
     }

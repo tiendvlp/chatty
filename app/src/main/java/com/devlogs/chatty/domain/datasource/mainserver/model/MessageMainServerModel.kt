@@ -5,4 +5,5 @@ data class MessageMainServerModel (
         val type: String,
         val content: String,
         val createdDate: Long,
+        val senderEmail: String,
         val channelId : String)

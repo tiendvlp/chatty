@@ -72,7 +72,7 @@ class ChannelLocalDbApi {
         return Date().time
     }
 
-    suspend fun getLatestLastUpdateTime () : Long {
+     fun getLatestLastUpdateTime () : Long {
         val realmInstance = Realm.getInstance(currentRealmConfiguration)
         val result = realmInstance.where(ChannelRealmObject::class.java)
             .sort("latestUpdate", Sort.ASCENDING)

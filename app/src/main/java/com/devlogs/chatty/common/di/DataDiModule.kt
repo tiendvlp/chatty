@@ -2,6 +2,8 @@ package com.devlogs.chatty.common.di
 
 import com.devlogs.chatty.channel.LoadMoreChannelPolicy
 import com.devlogs.chatty.channel.LoadMoreChannelPolicyImp
+import com.devlogs.chatty.chat.LoadMoreChatPolicy
+import com.devlogs.chatty.chat.LoadMoreChatPolicyImp
 import com.devlogs.chatty.datasource.authserver.authentication.AuthServerRestApiImp
 import com.devlogs.chatty.datasource.local.internalfilesystem.InternalResourceImp
 import com.devlogs.chatty.datasource.mainserver.channel.ChannelMainServerApiImp
@@ -39,6 +41,9 @@ class DataDiModule {
 
     @Provides
     fun provideLoadChannelPolicy (loadMoreChannelPolicyImp: LoadMoreChannelPolicyImp) : LoadMoreChannelPolicy = loadMoreChannelPolicyImp
+
+    @Provides
+    fun provideLoadMessagePolicy (loadMoreMessagePolicy: LoadMoreChatPolicyImp) : LoadMoreChatPolicy = loadMoreMessagePolicy
 
 //    @Provides
 //    fun provideInternalResource (internalResourceImp: InternalResourceImp) : InternalResource = internalResourceImp

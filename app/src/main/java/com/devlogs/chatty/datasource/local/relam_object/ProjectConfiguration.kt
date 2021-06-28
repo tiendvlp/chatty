@@ -9,10 +9,13 @@ open class ProjectConfiguration : RealmObject {
     var id: String? = null
     @Required
     var lastUpdateChannelTime: Long? = null
+    @Required
+    var lastUpdateMessageTime: Long? = null
 
-    constructor(lastUpdateChannel: Long) {
+    constructor(lastUpdateChannel: Long?, lastUpdateMessageTime: Long?) {
         id = "CONFIG"
         this.lastUpdateChannelTime = lastUpdateChannel
+        this.lastUpdateMessageTime = lastUpdateMessageTime
     }
 
     constructor() {

@@ -36,6 +36,13 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     }
 
     @Inject
+    protected lateinit var getAvatarUrl: GetUserAvatarUrlUseCaseSync
+    @Inject
+    protected lateinit var channelSocketController: ChannelSocketEventListener
+    private lateinit var mvcView: ChannelMvcView
+    @Inject
+    protected lateinit var loadChannelController: LoadChannelController
+    @Inject
     protected lateinit var channelRcvAdapter: ChannelRcvAdapter
     @Inject
     protected lateinit var loginWithEmailUseCaseSync: LoginWithEmailUseCaseSync
@@ -45,15 +52,8 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     protected lateinit var mvcViewFactory: MvcViewFactory
     @Inject
     protected lateinit var presentationStateManager: PresentationStateManager
-    @Inject
-    protected lateinit var loadChannelController: LoadChannelController
-    @Inject
+     @Inject
     protected lateinit var applicationEventObservable: ApplicationEventObservable
-    @Inject
-    protected lateinit var getAvatarUrl: GetUserAvatarUrlUseCaseSync
-    @Inject
-    protected lateinit var channelSocketController: ChannelSocketEventListener
-    private lateinit var mvcView: ChannelMvcView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,12 +178,10 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
 
     override fun onDestroyView() {
         super.onDestroyView()
-        normalLog("OnDestroyed view")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        normalLog("OnDestroyed")
     }
 
     override fun onServerDisconnected() {
