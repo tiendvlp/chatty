@@ -23,8 +23,8 @@ class LoadChatController @Inject constructor(
 
     fun loadMoreChat (channelId: String, since: Long) {
         coroutineScope.launch {
+            normalLog("LoadMoreChatStared")
             val result = loadMoreChatUseCaseSync.execute(channelId, since)
-
             when (result) {
                 is LoadMoreChatUseCaseSync.Result.Success -> {
                     normalLog("LoadMoreSuccess: ${result.data.size}")

@@ -1,5 +1,7 @@
 package com.devlogs.chatty.screen.chatscreen
 
+import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.FrameLayout
@@ -11,6 +13,13 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatActivity : AppCompatActivity() {
+
+    companion object {
+        fun start (context: Context) {
+            context.startActivity(Intent(context, ChatActivity::class.java))
+        }
+    }
+
     @Inject
     protected lateinit var navigator: ChatScreenNavigator
 

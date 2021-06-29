@@ -14,6 +14,7 @@ import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.Login
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.getLoginMvcView
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationAction.*
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState.*
+import com.devlogs.chatty.screen.chatscreen.ChatActivity
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.PresentationState
@@ -88,7 +89,7 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
             is LoginSuccessState -> {
                 mMvcView.loginSuccess()
 
-                MainActivity.start(requireContext())
+                ChatActivity.start(requireContext())
             }
             is LoadingState -> {
                 if (action is LoginAction) {

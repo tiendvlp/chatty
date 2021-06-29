@@ -5,9 +5,12 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.Adapter
+import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.common.helper.convertDpToPx
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.chat_adapter.viewholder.TextChatViewHolder
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
+import java.util.*
 
 private const val TEXT_CHAT = 1
 private const val VIDEO_CHAT = 2
@@ -17,7 +20,7 @@ private const val BALANCE_SIZE = 4
 
 class ChatRcvAdapter : Adapter<RecyclerView.ViewHolder> {
 
-    private var source: ArrayList<ChatPresentableModel> = arrayListOf()
+    private var source: TreeSet<ChatPresentableModel> = TreeSet()
     private var sharedBox: ChatAdapterSharedBox
 
     constructor(sharedBox: ChatAdapterSharedBox) {
@@ -41,18 +44,26 @@ class ChatRcvAdapter : Adapter<RecyclerView.ViewHolder> {
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if (holder is TextChatViewHolder) {
             holder.bind(
-                source[position],
+                source.elementAt(position),
                 position,
-                if (source[position].senderEmail.equals("tiendvlp@gmail.com")) TextChatViewHolder.Type.ORIGIN else TextChatViewHolder.Type.OPPOSITE
+                if (source.elementAt(position).senderEmail.equals(SharedMemory.email)) TextChatViewHolder.Type.ORIGIN else TextChatViewHolder.Type.OPPOSITE
             )
         }
     }
 
     override fun getItemCount(): Int = source.size + 1 // plus the balance_size item
 
-    fun setSource(source: ArrayList<ChatPresentableModel>) {
+    fun add (data: TreeSet<ChatPresentableModel>) {
+        if (data.isEmpty()) return
+        normalLog("Size reload: ${data.size}")
+        source.addAll(data)
+        notifyItemRangeChanged(0, data.size + 1)
+    }
+
+    fun setSource(source: TreeSet<ChatPresentableModel>) {
         this.source.clear()
         this.source.addAll(source)
+        notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int): Int {

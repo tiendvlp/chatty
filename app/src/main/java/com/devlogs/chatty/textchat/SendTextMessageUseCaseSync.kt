@@ -10,29 +10,29 @@ import javax.inject.Inject
 
 class SendTextMessageUseCaseSync {
 
-    sealed class Result {
+            sealed class Result {
         object Success : Result()
         object NetworkError : Result()
         object GeneralError : Result()
         object InvalidRefreshToken : Result ()
     }
 
-    private val mMessageMainServerApi : MessageMainServerApi
+        private val mMessageMainServerApi : MessageMainServerApi
 
-    @Inject
-    constructor(messageMainServerApi : MessageMainServerApi) {
-        mMessageMainServerApi = messageMainServerApi
-    }
+        @Inject
+        constructor(messageMainServerApi : MessageMainServerApi) {
+            mMessageMainServerApi = messageMainServerApi
+        }
 
-    suspend fun execute (message: String, channelId: String) : Result = withContext(BackgroundDispatcher) {
-        try {
-            mMessageMainServerApi.sendTextMessage(message, channelId)
-            Success
-        } catch (e: NetworkErrorEntity) {
-            NetworkError
-        } catch (e: GeneralErrorEntity) {
-            GeneralError
-        } catch (e: InvalidRefreshTokenErrorEntity) {
+        suspend fun execute (message: String, channelId: String) : Result = withContext(BackgroundDispatcher) {
+            try {
+                mMessageMainServerApi.sendTextMessage(message, channelId)
+                Success
+            } catch (e: NetworkErrorEntity) {
+                NetworkError
+            } catch (e: GeneralErrorEntity) {
+                GeneralError
+            } catch (e: InvalidRefreshTokenErrorEntity) {
             InvalidRefreshToken
         }
     }

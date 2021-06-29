@@ -1,7 +1,7 @@
 package com.devlogs.chatty.common
 
 const val PROTOCOL_TYPE = "http"
-const val HOST = "10.0.2.2"
+const val HOST = "192.168.1.9"  //"10.0.2.2"
 const val MAIN_PORT = 3000
 const val AUTH_PORT = 4000
 const val CHANNEL_LIMIT : Long = 10;

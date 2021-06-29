@@ -21,9 +21,10 @@ import com.devlogs.chatty.screen.common.compat.ChattyCompat
 import com.devlogs.chatty.screen.common.compat.KeyboardMovementCompatListener
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
 import com.devlogs.chatty.screen.common.mvcview.UIToolkit
+import java.util.*
 
 class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
-    KeyboardMovementCompatListener {
+    KeyboardMovementCompatListener, ChatBoxMvcView.Listener {
 
     private val toolbarMvcView: ChatToolbarMvcView
     private val chatBoxMvcView: ChatBoxMvcView
@@ -32,8 +33,8 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
     private val lvChat: RecyclerView
     private val chatRcvAdapter: ChatRcvAdapter
     private val layoutMain: ConstraintLayout
+    private val loadedChats : TreeSet<ChatPresentableModel> = TreeSet()
 
-    @RequiresApi(Build.VERSION_CODES.R)
     constructor(toolKit: UIToolkit, container: ViewGroup?) {
         setRootView(toolKit.layoutInflater.inflate(R.layout.layout_chat, container, false))
         toolbar = findViewById(R.id.toolbar)
@@ -51,14 +52,20 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
         val manager = LinearLayoutManager(getContext())
         manager.stackFromEnd = true
         lvChat.layoutManager = manager
-        chatRcvAdapter.setSource(spawnMessage)
+        chatRcvAdapter.setSource(loadedChats)
         lvChat.adapter = chatRcvAdapter
         normalLog("Is Root same with container: ${getRootView() == layoutMain}")
         compat.setKeyboardMovementCompatListener(this)
+        chatBoxMvcView.register(this)
     }
 
 
+    private fun addEvents () {
+
+    }
+
     private fun setUpKeyboardAnimating (window: Window) {
+
     }
 
     override fun onStart() {
@@ -71,6 +78,17 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
 
     override fun onProgress(delta: Int, distance: Int, maxDistance: Int) {
         chatBoxMvcView.onProgress(delta, distance, maxDistance)
+    }
+
+    override fun onBtnSendClicked(message: String) {
+        getListener().forEach {
+            it.onBtnSendClicked(message)
+        }
+    }
+
+    override fun showMore(data: TreeSet<ChatPresentableModel>) {
+        chatRcvAdapter.add(data)
+//        chatRcvAdapter.notifyItemRangeInserted(startIndex, data.size - 1)
     }
 
 }

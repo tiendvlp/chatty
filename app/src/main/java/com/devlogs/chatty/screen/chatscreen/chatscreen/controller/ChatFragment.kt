@@ -9,9 +9,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.devlogs.chatty.common.application.ApplicationEventObservable
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.ChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.getChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenAction.*
+import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenState
 import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenState.*
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
@@ -21,6 +23,7 @@ import com.devlogs.chatty.screen.common.presentationstate.PresentationStateChang
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.Exception
+import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,11 +40,15 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     protected lateinit var presentationStateManager: PresentationStateManager
     @Inject
     protected lateinit var applicationEventObservable: ApplicationEventObservable
+    @Inject
+    protected lateinit var loadChatController: LoadChatController
     private lateinit var mvcView: ChatMvcView
+
+    val channelID = "60cf0b5193d24d143385f257"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationStateManager.init(savedInstanceState, LoadingState)
+        presentationStateManager.init(savedInstanceState, DisplayState(TreeSet()))
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -77,7 +84,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     ) {
         when (currentState) {
             is DisplayState -> {
-                processDisplayState(currentState, previousState!!, action)
+                processDisplayState(previousState, currentState, action)
             }
             is LoadingState -> {
             }
@@ -92,13 +99,17 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
                                       action: PresentationAction) {
         when (action) {
             is LoadChatSuccessAction -> {
+
             }
+
             is RestoreAction -> {
             }
+
             is LoadMoreChatFailedAction -> {
             }
 
             is LoadMoreChatSuccessAction -> {
+                mvcView.showMore(action.data)
             }
 
             is ReloadChatFailedAction -> {
@@ -110,11 +121,16 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
             is NewChatAction -> {
             }
         }
-    }
+    }//
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
+    }
+
+    override fun onBtnSendClicked(message: String) {
+        normalLog("OnBTSendClicked")
+        loadChatController.loadMoreChat(channelID, (presentationStateManager.currentState as ChatScreenState).latestTime)
     }
 }

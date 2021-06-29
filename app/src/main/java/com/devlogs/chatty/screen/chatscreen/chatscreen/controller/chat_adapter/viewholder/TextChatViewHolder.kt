@@ -14,6 +14,7 @@ import com.devlogs.chatty.R
 import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.chat_adapter.ChatAdapterSharedBox
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
 import de.hdodenhof.circleimageview.CircleImageView
+import java.util.*
 
 
 class TextChatViewHolder : RecyclerView.ViewHolder {
@@ -25,7 +26,7 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
     private val txtMessage: TextView
     private val imgAvatar: CircleImageView
     private val dynamicBackground: LinearLayout
-    private val resource: List<ChatPresentableModel>
+    private val resource: TreeSet<ChatPresentableModel>
     private val txtSender: TextView
     private val wrapperLayout: LinearLayout
     private val sharedBox: ChatAdapterSharedBox
@@ -37,7 +38,7 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
     constructor(
         layoutInflater: LayoutInflater,
         container: ViewGroup?,
-        resource: List<ChatPresentableModel>,
+        resource: TreeSet<ChatPresentableModel>,
         sharedBox: ChatAdapterSharedBox
     ) : super(layoutInflater.inflate(R.layout.item_textchat,container, false)) {
         this.resource = resource
@@ -50,8 +51,8 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
     }
 
     fun bind (data: ChatPresentableModel, pos: Int, type: Type) {
-        val previousItem = resource.getOrNull(pos -1)
-        val nextItem = resource.getOrNull(pos + 1)
+        val previousItem = resource.elementAtOrNull(pos -1)
+        val nextItem = resource.elementAtOrNull(pos + 1)
 
         val isSameGroupWithPrevious = previousItem != null && previousItem.senderEmail.equals(data.senderEmail)
         val isSameGroupWithNext = nextItem != null && nextItem.senderEmail.equals(data.senderEmail)
@@ -103,6 +104,6 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
             txtMessage.scaleX = 1f
         }
         txtSender.text = data.senderEmail.split("@")[0]
-        txtMessage.text = data.content
+        txtMessage.text = "$pos. " + Date(data.createdDate).toLocaleString()
     }
 }

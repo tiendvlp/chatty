@@ -16,9 +16,9 @@
         android:testOnly="false"
         android:theme="@style/Theme.Chatty"
         android:usesCleartextTraffic="true">
-        <activity android:name=".screen.authenticationscreen.AuthenticationActivity"></activity>
+        <activity android:name=".screen.chatscreen.ChatActivity"></activity>
         <activity
-            android:name=".screen.chatscreen.ChatActivity"
+            android:name=".screen.authenticationscreen.AuthenticationActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

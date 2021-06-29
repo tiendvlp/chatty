@@ -29,7 +29,7 @@ class ConfigurationLocalDbApi {
     suspend fun setChannelLastUpdateTime (lastupdate: Long) = withContext(BackgroundDispatcher) {
         Realm.getInstance(currentRealmConfiguration).executeTransaction {
             val lastUpdateMessageTime = it.where(ProjectConfiguration::class.java).findFirst()?.lastUpdateMessageTime
-            val newConfiguration = ProjectConfiguration(lastupdate, lastUpdateMessageTime)
+            val newConfiguration = ProjectConfiguration(lastupdate, lastUpdateMessageTime ?:0)
                 it.copyToRealmOrUpdate(newConfiguration, )
         }
     }
@@ -47,7 +47,7 @@ class ConfigurationLocalDbApi {
     suspend fun setMessageLastUpdateTime (lastupdate: Long) = withContext(BackgroundDispatcher) {
         Realm.getInstance(currentRealmConfiguration).executeTransaction {
             var lastUpdateChannelTime = it.where(ProjectConfiguration::class.java).findFirst()?.lastUpdateChannelTime
-            val newConfiguration = ProjectConfiguration(lastUpdateChannelTime, lastupdate)
+            val newConfiguration = ProjectConfiguration(lastUpdateChannelTime ?:0, lastupdate)
             it.copyToRealmOrUpdate(newConfiguration, )
         }
     }

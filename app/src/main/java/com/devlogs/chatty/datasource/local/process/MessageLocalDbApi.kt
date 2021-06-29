@@ -5,6 +5,7 @@ import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.local.relam_object.MessageRealmObject
 import io.realm.Realm
 import io.realm.RealmConfiguration
+import io.realm.Sort
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -21,9 +22,8 @@ class MessageLocalDbApi {
     suspend fun addNewMessage (messageRO: MessageRealmObject) = withContext(BackgroundDispatcher) {
         val realmInstance = Realm.getInstance(realmConfiguration)
         realmInstance.executeTransaction {
-            realmInstance.insert(messageRO)
+            realmInstance.copyToRealmOrUpdate(messageRO)
         }
-        realmInstance.close()
     }
 
     suspend fun getChannelMessageInPeriodOfTime (channelId: String, from: Long, to: Long) : List<MessageRealmObject> = withContext(BackgroundDispatcher) {
@@ -32,25 +32,25 @@ class MessageLocalDbApi {
         val result = realmInstance
             .where(MessageRealmObject::class.java)
             .equalTo("channelId", channelId)
+            .sort("createdDate", Sort.DESCENDING)
             .greaterThan("createdDate", from)
             .lessThan("createdDate", to)
             .findAll().toList()
 
-        realmInstance.close()
         result
     }
 
-    suspend fun getPreviousMessage (channelId: String, since: Long, count: Int = 10) : List<MessageRealmObject> = withContext(BackgroundDispatcher) {
+    suspend fun getPreviousMessage (channelId: String, since: Long, count: Int) : List<MessageRealmObject> = withContext(BackgroundDispatcher) {
         val realmInstance = Realm.getInstance(realmConfiguration)
 
         val result = realmInstance
             .where(MessageRealmObject::class.java)
             .equalTo("channelId", channelId)
             .lessThan("createdDate", since)
+            .sort("createdDate", Sort.DESCENDING)
             .limit(count.toLong())
             .findAll().toList()
 
-        realmInstance.close()
         result
     }
 
@@ -66,9 +66,8 @@ class MessageLocalDbApi {
     suspend fun addNewMessages (messageROs: List<MessageRealmObject>) = withContext(BackgroundDispatcher) {
         val realmInstance = Realm.getInstance(realmConfiguration)
         realmInstance.executeTransaction {
-            realmInstance.insert(messageROs)
+            realmInstance.copyToRealmOrUpdate(messageROs)
         }
-        realmInstance.close()
     }
 
 }

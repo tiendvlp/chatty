@@ -25,6 +25,7 @@ import eightbitlab.com.blurview.RenderScriptBlur
 class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCompatListener {
 
     interface Listener {
+        fun onBtnSendClicked(message: String)
 
     }
 
@@ -131,6 +132,12 @@ class ChatBoxMvcView : BaseMvcView<ChatBoxMvcView.Listener>, KeyboardMovementCom
     }
 
     private fun addEvents () {
+        btnSubmit.setOnClickListener {
+            getListener().forEach {
+                it.onBtnSendClicked(edtMessage.text.toString())
+            }
+        }
+
         expandMenuAnimator.apply {
             setCurrentFraction(0.5f)
             addUpdateListener {

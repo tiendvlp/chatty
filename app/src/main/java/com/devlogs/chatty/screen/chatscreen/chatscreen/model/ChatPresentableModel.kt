@@ -17,7 +17,7 @@ data class ChatPresentableModel(
         if (other.id.equals(id)) {
             return 0
         }
-        if (other.createdDate < createdDate) {
+        if (createdDate < other.createdDate) {
             return -1
         }
         return 1
@@ -25,7 +25,7 @@ data class ChatPresentableModel(
 }
 
 fun MessageEntity.to () : ChatPresentableModel {
-    var chatType : ChatType? = null
+    var chatType : ChatType? = ChatType.TEXT
 
     if (type.equals("text", ignoreCase = true)) {
         chatType = ChatType.TEXT
