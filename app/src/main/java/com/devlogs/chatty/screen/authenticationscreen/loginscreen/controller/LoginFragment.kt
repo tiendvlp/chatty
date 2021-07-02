@@ -6,9 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkRequest
+import com.devlogs.chatty.common.application.SharedMemory
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.LoginMvcView
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.getLoginMvcView
@@ -16,10 +16,8 @@ import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPre
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState.*
 import com.devlogs.chatty.screen.chatscreen.ChatActivity
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
-import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
-import com.devlogs.chatty.screen.common.presentationstate.PresentationState
-import com.devlogs.chatty.screen.common.presentationstate.PresentationStateChangedListener
-import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
+import com.devlogs.chatty.screen.common.presentationstate.*
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import com.devlogs.chatty.screen.mainscreen.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -43,9 +41,6 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         presentationStateManager.init(savedInstanceState, NotLoggedInState)
-        if (presentationStateManager.currentState is NotLoggedInState) {
-            presentationStateManager.consumeAction(LoginSilentlyAction)
-        }
     }
 
     override fun onCreateView(
@@ -67,7 +62,7 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
     override fun onStart() {
         super.onStart()
         mMvcView.register(this)
-        presentationStateManager.register(this)
+        presentationStateManager.register(this, true)
     }
 
     override fun onStop() {
@@ -84,14 +79,19 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
     ) {
         when (currentState) {
             is NotLoggedInState -> {
+                if (action is InitAction) {
+                    normalLog("Init Action")
+                    presentationStateManager.consumeAction(LoginSilentlyAction)
+                }
                 if (action is LoginFailedAction) mMvcView.loginFailed(action.errorMessage)
             }
             is LoginSuccessState -> {
+                normalLog("Login Success")
                 mMvcView.loginSuccess()
-
                 ChatActivity.start(requireContext())
             }
             is LoadingState -> {
+                normalLog("Loading State")
                 if (action is LoginAction) {
                     loginController.login(action.email, action.password)
                 } else if (action is LoginSilentlyAction) {
@@ -102,6 +102,7 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
         }
     }
 
+    private var email = ""
     override fun onBtnLoginClicked(email: String, password: String) {
         presentationStateManager.consumeAction(LoginAction(email, password))
     }

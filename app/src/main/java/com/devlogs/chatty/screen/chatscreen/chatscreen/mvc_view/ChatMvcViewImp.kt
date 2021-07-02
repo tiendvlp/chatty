@@ -33,7 +33,6 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
     private val lvChat: RecyclerView
     private val chatRcvAdapter: ChatRcvAdapter
     private val layoutMain: ConstraintLayout
-    private val loadedChats : TreeSet<ChatPresentableModel> = TreeSet()
 
     constructor(toolKit: UIToolkit, container: ViewGroup?) {
         setRootView(toolKit.layoutInflater.inflate(R.layout.layout_chat, container, false))
@@ -52,16 +51,21 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
         val manager = LinearLayoutManager(getContext())
         manager.stackFromEnd = true
         lvChat.layoutManager = manager
-        chatRcvAdapter.setSource(loadedChats)
-        lvChat.adapter = chatRcvAdapter
         normalLog("Is Root same with container: ${getRootView() == layoutMain}")
         compat.setKeyboardMovementCompatListener(this)
         chatBoxMvcView.register(this)
+        addEvents()
+        chatRcvAdapter.setRecyclerView(lvChat)
     }
 
 
     private fun addEvents () {
-
+        chatRcvAdapter.onLoadMore = {
+            normalLog("Load moreeee")
+            getListener().forEach { listener ->
+                listener.onLoadMore()
+            }
+        }
     }
 
     private fun setUpKeyboardAnimating (window: Window) {
@@ -87,8 +91,20 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
     }
 
     override fun showMore(data: TreeSet<ChatPresentableModel>) {
-        chatRcvAdapter.add(data)
+        chatRcvAdapter.isLoading = false
+        if (data.isEmpty()) {
+            chatRcvAdapter.isLoadMoreEnable = false
+        } else {
+            chatRcvAdapter.isLoadMoreEnable = true
+            chatRcvAdapter.add(data)
+        }
 //        chatRcvAdapter.notifyItemRangeInserted(startIndex, data.size - 1)
+    }
+
+    override fun showChat(data: TreeSet<ChatPresentableModel>) {
+        chatRcvAdapter.clear()
+        lvChat.adapter = chatRcvAdapter
+        chatRcvAdapter.add(data)
     }
 
 }

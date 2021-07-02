@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.mvcview.ObservableMvcView
 import com.devlogs.chatty.screen.common.presentationmodel.UserPresentationModel
+import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import com.devlogs.chatty.screen.mainscreen.channelscreen.controller.ChannelRcvAdapter
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
 import com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view.ChannelMvcView.Listener
@@ -21,7 +22,7 @@ interface ChannelMvcView: ObservableMvcView <Listener>{
         fun onRefreshChannel ()
     }
 
-
+    fun saveState()
     fun showLoading ()
     fun showError (errorType: ErrorType)
     fun display (channels: TreeSet<ChannelPresentationModel>)
@@ -39,4 +40,4 @@ interface ChannelMvcView: ObservableMvcView <Listener>{
     fun updateChannel(channels: ChannelPresentationModel)
 }
 
-fun MvcViewFactory.getMainMvcView (container: ViewGroup?, channelRcvAdapter: ChannelRcvAdapter) : ChannelMvcView = ChannelMvcViewImp(uiToolkit, container, channelRcvAdapter)
+fun MvcViewFactory.getMainMvcView (container: ViewGroup?, channelRcvAdapter: ChannelRcvAdapter, screenStateManager: PresentationStateManager) : ChannelMvcView = ChannelMvcViewImp(uiToolkit, container, channelRcvAdapter,screenStateManager)

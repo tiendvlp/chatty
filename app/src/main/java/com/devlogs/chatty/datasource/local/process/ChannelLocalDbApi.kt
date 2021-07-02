@@ -1,6 +1,5 @@
 package com.devlogs.chatty.datasource.local.process
 
-import com.devlogs.chatty.common.CHANNEL_LIMIT
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.local.relam_object.ChannelRealmObject
@@ -8,6 +7,9 @@ import com.devlogs.chatty.domain.error.CommonErrorEntity
 import io.realm.Realm
 import io.realm.RealmConfiguration
 import io.realm.Sort
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
@@ -18,7 +20,8 @@ class ChannelLocalDbApi {
     @Inject
     constructor(realmConfiguration: RealmConfiguration) {
         currentRealmConfiguration = realmConfiguration
-    }
+
+       }
 
     suspend fun addChannel (channelRO: ChannelRealmObject) = withContext(BackgroundDispatcher) {
         overrideChannel(listOf(channelRO))
@@ -35,7 +38,11 @@ class ChannelLocalDbApi {
         }
     }
     suspend fun getAllChannel () : List<ChannelRealmObject> = withContext(BackgroundDispatcher) {
+
+
         val realmInstance = Realm.getInstance(currentRealmConfiguration)
+        val count = realmInstance.where(ChannelRealmObject::class.java)
+            .count()
         val result = realmInstance
             .where(ChannelRealmObject::class.java)
             .sort("latestUpdate", Sort.DESCENDING)
@@ -58,7 +65,7 @@ class ChannelLocalDbApi {
             .where(ChannelRealmObject::class.java)
             .sort("latestUpdate", Sort.DESCENDING)
             .lessThan("latestUpdate", since)
-            .limit(CHANNEL_LIMIT)
+            .limit(count.toLong())
             .findAll()
         result
     }

@@ -10,10 +10,12 @@ import java.util.*
 interface ChatMvcView : ObservableMvcView<ChatMvcView.Listener> {
     interface Listener {
          fun onBtnSendClicked(message: String)
+        fun onLoadMore()
 
     }
 
     fun showMore(data: TreeSet<ChatPresentableModel>)
+    fun showChat (data: TreeSet<ChatPresentableModel>)
 }
 
 fun MvcViewFactory.getChatMvcView (container: ViewGroup?) : ChatMvcView = ChatMvcViewImp(uiToolkit, container)

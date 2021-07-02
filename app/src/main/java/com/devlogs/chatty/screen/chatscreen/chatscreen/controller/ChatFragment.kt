@@ -48,7 +48,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationStateManager.init(savedInstanceState, DisplayState(TreeSet()))
+        presentationStateManager.init(savedInstanceState, LoadingState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -68,7 +68,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     override fun onStart() {
         super.onStart()
         mvcView.register(this)
-        presentationStateManager.register(this)
+        presentationStateManager.register(this, true)
     }
 
     override fun onStop() {
@@ -87,6 +87,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
                 processDisplayState(previousState, currentState, action)
             }
             is LoadingState -> {
+                loadChatController.loadMoreChat(channelID, (presentationStateManager.currentState as ChatScreenState).latestTime)
             }
             is ErrorState -> {
             }
@@ -95,14 +96,16 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     }
 
     private fun processDisplayState ( previousState: PresentationState?,
-                                      currentState: PresentationState,
+                                      currentState: DisplayState,
                                       action: PresentationAction) {
+        normalLog("Load Chat Success Action: $action")
         when (action) {
             is LoadChatSuccessAction -> {
-
+                mvcView.showChat(currentState.data)
             }
 
             is RestoreAction -> {
+                mvcView.showChat(currentState.data)
             }
 
             is LoadMoreChatFailedAction -> {
@@ -113,6 +116,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
             }
 
             is ReloadChatFailedAction -> {
+
             }
 
             is ReLoadChatSuccessAction -> {
@@ -130,7 +134,9 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     }
 
     override fun onBtnSendClicked(message: String) {
-        normalLog("OnBTSendClicked")
+    }
+
+    override fun onLoadMore() {
         loadChatController.loadMoreChat(channelID, (presentationStateManager.currentState as ChatScreenState).latestTime)
     }
 }

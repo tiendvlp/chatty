@@ -139,6 +139,7 @@ ext {
 
     def glide = [group: "com.github.bumptech.glide", version: "4.12.0"]
     glideDependencies = [
+            okHttp: [configuration: "implementation", dependency: [group: glide.group, name: "okhttp3-integration", version: glide.version]],
             glide: [configuration: "implementation", dependency: [group: glide.group, name: "glide", version: glide.version]],
             glideCompiler: [configuration: "annotationProcessor", dependency: [group: glide.group, name: "compiler", version: glide.version]]
     ]

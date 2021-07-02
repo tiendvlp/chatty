@@ -8,6 +8,7 @@ import android.widget.FrameLayout
 import androidx.core.view.WindowCompat
 import com.devlogs.chatty.R
 import com.devlogs.chatty.common.helper.isAtLeastAndroid11
+import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,7 +23,6 @@ class ChatActivity : AppCompatActivity() {
 
     @Inject
     protected lateinit var navigator: ChatScreenNavigator
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.area_chat)

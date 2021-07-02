@@ -11,42 +11,36 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
 
     fun init(savedInstanceState: Bundle?, defaultState: PresentationState) {
         if (savedInstanceState != null && savedInstanceState.containsKey(defaultState.getTag())) {
+            normalLog("Restore")
             currentAction = CommonPresentationAction.RestoreAction
             currentState = savedInstanceState.getSerializable(defaultState.getTag()) as PresentationState
         } else {
             currentAction = CommonPresentationAction.InitAction
             currentState = defaultState
         }
-        getListener().forEach {
-            it.onStateChanged(previousState, currentState, currentAction)
-        }
+
+        consumeAction(currentAction)
+//        getListener().forEach {
+//            it.onStateChanged(previousState, currentState, currentAction)
+//        }
     }
 
     fun consumeAction (action: PresentationAction) {
+        normalLog("Consum action: ${action.javaClass.simpleName} at state: ${currentState.javaClass.simpleName}")
         previousState = currentState
-        currentState = currentState.consumeAction(currentState,action)
-        currentAction = action
-
+        val causeAndEffect = currentState.consumeAction(previousState!!, action)
+        currentState = causeAndEffect.state
+        currentAction = causeAndEffect.action
         getListener().forEach {
-            it.onStateChanged(previousState, currentState, action)
+            it.onStateChanged(previousState, currentState, currentAction)
         }
     }
 
     fun register (listener: PresentationStateChangedListener, getPreviousEvent: Boolean) {
         register(listener)
         if (getPreviousEvent && previousState != null) {
-            normalLog("GetFired from previous event")
-            listener.onStateChanged(previousState, currentState, CommonPresentationAction.RestoreAction)
+            listener.onStateChanged(previousState, currentState, currentAction)
         }
-    }
-
-    override fun onFirstListenerRegistered() {
-        super.onFirstListenerRegistered()
-         currentState.let {
-             getListener().forEach {
-                 it.onStateChanged(previousState, currentState, currentAction)
-             }
-         }
     }
 
     fun onSavedInstanceState (outState: Bundle) {

@@ -1,6 +1,7 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.controller
 
 import android.content.ComponentName
+import android.content.Context
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
@@ -59,6 +60,9 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         super.onCreate(savedInstanceState)
         normalLog("OnCreate")
         presentationStateManager.init(savedInstanceState, LoadingState)
+        if (presentationStateManager.currentState is LoadingState) {
+            loadChannelController.getLoadedChannel()
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -71,8 +75,10 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        normalLog("OnCreateView with state: ${presentationStateManager.currentState}")
-        mvcView = mvcViewFactory.getMainMvcView(container, ChannelRcvAdapter(getAvatarUrl))
+        normalLog("OnCreateView with state: ${presentationStateManager.currentState.javaClass.simpleName}")
+//        if (!::mvcView.isInitialized) {
+            mvcView = mvcViewFactory.getMainMvcView(container, ChannelRcvAdapter(getAvatarUrl), presentationStateManager)
+//        }
         return mvcView.getRootView()
     }
 
@@ -80,18 +86,20 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         super.onStart()
         normalLog("onStart")
         mvcView.register(this)
-        applicationEventObservable.register(this)
-        presentationStateManager.register(this)
-        presentationStateManager.register(this, true)
+//        applicationEventObservable.register(this)
+//        presentationStateManager.register(this)
+        presentationStateManager.register(this, false)
     }
 
     override fun onStop() {
         super.onStop()
         normalLog("OnStop")
+        mvcView.saveState()
         mvcView.unRegister(this)
         applicationEventObservable.unRegister(this)
         presentationStateManager.unRegister(this)
     }
+
 
     override fun onLoadMoreChannel() {
         normalLog("Load more")
@@ -109,11 +117,12 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     ) {
         when (currentState) {
             is DisplayState -> {
+                normalLog("Display State: ${currentState.javaClass.simpleName}, action la ${action.javaClass.simpleName}")
                 displayStateProcess(currentState, previousState!!, action)
             }
             is LoadingState -> {
+                normalLog("Loading state: ")
                 channelSocketController.onStop()
-                loadChannelController.getLoadedChannel()
                 mvcView.showLoading()
             }
             is ErrorState -> {
@@ -174,14 +183,6 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
             }
 
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
     }
 
     override fun onServerDisconnected() {

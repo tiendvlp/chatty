@@ -18,9 +18,12 @@ import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
 import com.devlogs.chatty.screen.common.mvcview.LoadingMvcView
 import com.devlogs.chatty.screen.common.mvcview.UIToolkit
 import com.devlogs.chatty.screen.common.presentationmodel.UserPresentationModel
+import com.devlogs.chatty.screen.common.presentationstate.PresentationState
+import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import com.devlogs.chatty.screen.mainscreen.channelscreen.controller.ChannelRcvAdapter
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
 import com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view.ChannelMvcView.*
+import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationState.DisplayState
 import kotlinx.coroutines.*
 import java.util.*
 
@@ -38,12 +41,15 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
     private lateinit var swipeToRefresh: SwipeRefreshLayout
     private val coroutineScope = CoroutineScope(BackgroundDispatcher)
     private val toolKit: UIToolkit
-
+    private val screenStateManager: PresentationStateManager
+    private lateinit var lvChannelLayoutManager: LinearLayoutManager
     constructor(
         toolKit: UIToolkit,
         container: ViewGroup?,
-        channelRcvAdapter: ChannelRcvAdapter
+        channelRcvAdapter: ChannelRcvAdapter,
+        screenStateManager: PresentationStateManager
     ) {
+        this.screenStateManager = screenStateManager
         this.toolKit = toolKit
         setRootView(toolKit.layoutInflater.inflate(R.layout.layout_channel, container, false))
         addControls()
@@ -51,6 +57,15 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
         mChannelAdapter = channelRcvAdapter
         setup(toolKit.layoutInflater)
         addEvents()
+        restore(screenStateManager.currentState)
+    }
+
+    private fun restore (currentState: PresentationState) {
+        if (currentState is DisplayState) {
+            display(currentState.channels)
+            normalLog("Restore scroll position: ${currentState.scrollPosition}")
+            mLvChannel.scrollToPosition(currentState.scrollPosition);
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -58,12 +73,13 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
         mToolbarMvcSubView = ChannelToolbarMvcView(toolKit, mToolbarElement)
         mToolbarElement.addView(mToolbarMvcSubView.getRootView())
 
-        val lvChannelLayoutManager =
+         lvChannelLayoutManager =
             LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false)
         mLvChannel.layoutManager = lvChannelLayoutManager
         mChannelAdapter.setRecyclerView(mLvChannel)
         mChannelAdapter.setSource(loadedChannels)
         mLvChannel.adapter = mChannelAdapter
+        mChannelAdapter.isLoadMoreEnable = false
     }
 
     private fun addControls() {
@@ -188,6 +204,15 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
         }
     }
 
+    override fun saveState() {
+        if (screenStateManager.currentState is DisplayState) {
+           (screenStateManager.currentState as DisplayState).scrollPosition = lvChannelLayoutManager.findFirstVisibleItemPosition()
+        }
+        val v: View = lvChannelLayoutManager.getChildAt(0)!!
+        val top = if (v == null) 0 else v.top - mLvChannel.paddingTop
+
+    }
+
     override fun showLoading() {
         loadingMvcView.showLoading()
     }
@@ -208,6 +233,7 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
         loadedChannels.clear()
         loadedChannels.addAll(channels)
         mChannelAdapter.notifyDataSetChanged()
+        mChannelAdapter.isLoadMoreEnable= true
         loadingMvcView.success()
     }
 

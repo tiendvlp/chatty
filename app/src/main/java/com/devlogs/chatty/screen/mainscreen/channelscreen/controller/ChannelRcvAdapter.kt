@@ -93,7 +93,6 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
     private var visibleThreadHold = 3
     private val getAvatarUrl: GetUserAvatarUrlUseCaseSync
     var onLoadMore : (() -> Unit)? = null
-
     @Inject
     constructor(
         getAvatarUrl: GetUserAvatarUrlUseCaseSync
@@ -118,7 +117,8 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
                     isLoading = true
                 }
             }
-        })    }
+        })
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
@@ -135,9 +135,9 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        normalLog("ChannelSize: ${channelSources.size}")
         if (holder is ChannelViewHolder) {
             val channel = channelSources.elementAt(position - 1)
-            normalLog("Binding View Holder: ${channel.id}")
             holder.bind(channel)
             return
         }

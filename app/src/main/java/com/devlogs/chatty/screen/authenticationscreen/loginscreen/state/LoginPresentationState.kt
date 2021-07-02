@@ -1,9 +1,8 @@
 package com.devlogs.chatty.screen.authenticationscreen.loginscreen.state
 
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationAction.*
-import com.devlogs.chatty.screen.common.presentationstate.InvalidActionException
-import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
-import com.devlogs.chatty.screen.common.presentationstate.PresentationState
+import com.devlogs.chatty.screen.common.presentationstate.*
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 
 sealed class LoginPresentationState : PresentationState {
     override val allowSave: Boolean = true
@@ -12,28 +11,29 @@ sealed class LoginPresentationState : PresentationState {
     }
 
     object NotLoggedInState : LoginPresentationState() {
-        override fun consumeAction(previousState: PresentationState, action: PresentationAction): PresentationState {
+        override fun consumeAction(previousState: PresentationState, action: PresentationAction): CauseAndEffect {
             when (action) {
-                is LoginAction ->  return LoadingState(action.email, action.password)
-                is LoginSilentlyAction -> return LoadingState("", "")
+                is InitAction -> return CauseAndEffect(action, this)
+                is LoginAction ->  return CauseAndEffect(action, LoadingState(action.email, action.password))
+                is LoginSilentlyAction -> return CauseAndEffect(action, LoadingState("", ""))
             }
-               throw InvalidActionException("${getTag()}.NotLoggedInState", action.toString())
+                return super.consumeAction(previousState, action)
         }
     }
 
     data class LoadingState (val inputEmail: String, val inputPassword: String) : LoginPresentationState() {
-        override fun consumeAction(previousState: PresentationState, action: PresentationAction): PresentationState {
+        override fun consumeAction(previousState: PresentationState, action: PresentationAction): CauseAndEffect {
             when (action) {
-                is LoginFailedAction ->  return NotLoggedInState
-                is LoginSuccessAction ->  return LoginSuccessState
+                is LoginFailedAction ->  return CauseAndEffect(action, NotLoggedInState)
+                is LoginSuccessAction ->  return CauseAndEffect(action, LoginSuccessState)
             }
-            throw InvalidActionException("${getTag()}.LoadingState", action.toString())
+            return super.consumeAction(previousState, action)
         }
     }
 
     object LoginSuccessState : LoginPresentationState () {
-        override fun consumeAction(previousState: PresentationState, action: PresentationAction): PresentationState {
-            throw InvalidActionException("${getTag()}.LoginSuccessState", action.toString())
+        override fun consumeAction(previousState: PresentationState, action: PresentationAction): CauseAndEffect {
+            return super.consumeAction(previousState, action)
         }
     }
 }

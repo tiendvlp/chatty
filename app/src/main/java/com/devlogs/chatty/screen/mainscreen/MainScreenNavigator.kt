@@ -7,6 +7,7 @@ import com.devlogs.chatty.screen.mainscreen.channelscreen.controller.ChannelFrag
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavController.Companion.TAB1
 import com.ncapdevi.fragnav.FragNavController.Companion.TAB2
+import com.ncapdevi.fragnav.FragNavTransactionOptions
 import java.lang.IndexOutOfBoundsException
 
 class MainScreenNavigator {
@@ -20,10 +21,16 @@ class MainScreenNavigator {
         override fun getRootFragment(index: Int): Fragment {
             return when (index) {
                 TAB1 -> {
-                    ChannelFragment.getInstance()
+                    if (!::channelFragment.isInitialized) {
+                        channelFragment = ChannelFragment.getInstance()
+                    }
+                    channelFragment
                 }
                 TAB2 -> {
-                    AccountFragment.getInstance()
+                    if (!::userFragment.isInitialized) {
+                        userFragment = AccountFragment.getInstance()
+                    }
+                    userFragment
                 }
                 else -> throw IndexOutOfBoundsException("MainScreenNavigator only has 2 tabs but tab ${index}th was accessed")
             }

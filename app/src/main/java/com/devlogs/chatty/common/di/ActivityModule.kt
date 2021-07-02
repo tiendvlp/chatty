@@ -62,12 +62,12 @@ class ActivityModule {
     @ActivityScoped
     fun provideChatScreenNavigator (fragmentManager: FragmentManager) : ChatScreenNavigator = ChatScreenNavigator(getChatFragNavController(fragmentManager))
 
-
-    @Provides
-    @ActivityScoped
-    fun providePresentationStateManager () : PresentationStateManager {
-        return PresentationStateManager()
-    }
+//
+//    @Provides
+//    @ActivityScoped
+//    fun providePresentationStateManager () : PresentationStateManager {
+//        return PresentationStateManager()
+//    }
 
     private fun getAuthenticationFragNavController (fragmentManager: FragmentManager) : FragNavController {
         return FragNavController(fragmentManager, R.id.frameAuthenticationContent)

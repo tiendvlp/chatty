@@ -1,9 +1,9 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.state
 
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.common.presentationmodel.UserPresentationModel
-import com.devlogs.chatty.screen.common.presentationstate.InvalidActionException
-import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
-import com.devlogs.chatty.screen.common.presentationstate.PresentationState
+import com.devlogs.chatty.screen.common.presentationstate.*
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
 import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationAction.*
 import java.util.*
@@ -18,16 +18,20 @@ sealed class ChannelScreenPresentationState : PresentationState {
         override fun consumeAction(
             previousState: PresentationState,
             action: PresentationAction
-        ): PresentationState {
+        ): CauseAndEffect {
             when (action) {
+                is InitAction -> {
+                    return CauseAndEffect(action,LoadingState)
+                }
                 is LoadChannelFailedAction -> {
-                    return ErrorState(action.errMessage)
+                    return CauseAndEffect(action, ErrorState(action.errMessage))
                 }
                 is LoadChannelSuccessAction -> {
-                    return DisplayState(action.data)
+                    normalLog("LoadChannelSuccessAction occurs")
+                    return CauseAndEffect(action, DisplayState(action.data))
                 }
                 is CancelAction -> {
-                    return ErrorState("Canceled")
+                    return CauseAndEffect(action, ErrorState("Canceled"))
                 }
             }
             return super.consumeAction(previousState, action)
@@ -38,10 +42,10 @@ sealed class ChannelScreenPresentationState : PresentationState {
         override fun consumeAction(
             previousState: PresentationState,
             action: PresentationAction
-        ): PresentationState {
+        ): CauseAndEffect {
             when (action) {
                 is LoadAction -> {
-                    return LoadingState
+                    return CauseAndEffect(action, LoadingState)
                 }
             }
             return super.consumeAction(previousState, action)
@@ -49,30 +53,30 @@ sealed class ChannelScreenPresentationState : PresentationState {
     }
 
 
-    data class DisplayState(val channels: TreeSet<ChannelPresentationModel>, val user: UserPresentationModel? = null) :
+    data class DisplayState(val channels: TreeSet<ChannelPresentationModel>, val user: UserPresentationModel? = null, var scrollPosition: Int = 0) :
         ChannelScreenPresentationState() {
         override fun consumeAction(
             previousState: PresentationState,
             action: PresentationAction
-        ): PresentationState {
+        ): CauseAndEffect {
             when (action) {
-                is NewChannelAction -> return copy(channels = appendChannels(action.data))
-                is ChannelUpdatedAction -> return copy(channels = replaceChannel(action.data))
-                is LoadMoreChannelAction -> return copy()
+                is NewChannelAction -> return CauseAndEffect(action, copy(channels = appendChannels(action.data)))
+                is ChannelUpdatedAction -> return CauseAndEffect(action, copy(channels = replaceChannel(action.data)))
+                is LoadMoreChannelAction -> return CauseAndEffect(action, copy())
                 is LoadMoreChannelSuccessAction -> {
-                    return copy(channels = appendChannels(action.data))
+                    return CauseAndEffect(action, copy(channels = appendChannels(action.data)))
                 }
-                is LoadMoreChannelFailedAction -> {return copy()}
+                is LoadMoreChannelFailedAction -> {return CauseAndEffect(action, copy())}
 
                 is ReLoadChannelSuccessAction -> {
-                    return copy(channels = appendChannels(action.data))
+                    return CauseAndEffect(action, copy(channels = appendChannels(action.data)))
                 }
                 is ReloadChannelFailedAction -> {
-                    return copy()
+                    return CauseAndEffect(action, copy())
                 }
 
-                is LoadUserSuccessAction -> return copy(user=action.user)
-                is LoadUserFailedAction -> return copy()
+                is LoadUserSuccessAction -> return CauseAndEffect(action, copy(user=action.user))
+                is LoadUserFailedAction -> return CauseAndEffect(action, copy())
             }
             return super.consumeAction(previousState, action)
         }

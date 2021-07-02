@@ -3,13 +3,13 @@ package com.devlogs.chatty.screen.chatscreen.chatscreen.state
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
 import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenAction.*
-import com.devlogs.chatty.screen.common.presentationmodel.UserPresentationModel
-import com.devlogs.chatty.screen.common.presentationstate.PresentationAction
-import com.devlogs.chatty.screen.common.presentationstate.PresentationState
+import com.devlogs.chatty.screen.common.presentationstate.*
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import java.util.*
 
 sealed class ChatScreenState : PresentationState {
     override val allowSave: Boolean = false
+
     override fun getTag(): String {
         return "ChatScreenState" + javaClass.simpleName
     }
@@ -18,19 +18,38 @@ sealed class ChatScreenState : PresentationState {
 
 
     object LoadingState : ChatScreenState() {
+        private lateinit var loadedChat: TreeSet<ChatPresentableModel>
+
         override fun consumeAction(
             previousState: PresentationState,
             action: PresentationAction
-        ): PresentationState {
+        ): CauseAndEffect {
             when (action) {
+                is InitAction -> {
+                    loadedChat = TreeSet()
+                    return CauseAndEffect(action, LoadingState)
+                }
                 is LoadChatFailedAction -> {
-                    return ErrorState(action.errMessage)
+                    return CauseAndEffect(action, ErrorState(action.errMessage))
+                }
+                is LoadMoreChatSuccessAction -> {
+                    loadedChat.addAll(action.data)
+                    return checkState() ?: CauseAndEffect(action, LoadingState)
                 }
                 is LoadChatSuccessAction -> {
-                    return DisplayState(action.data)
+                    normalLog("LoadChat Success Action")
+                    return CauseAndEffect(action, DisplayState(action.data))
                 }
             }
             return super.consumeAction(previousState, action)
+        }
+
+        private fun checkState () : CauseAndEffect? {
+            if (loadedChat.isNotEmpty()) {
+                normalLog("Is not empty")
+                return consumeAction(LoadingState,LoadChatSuccessAction(loadedChat))
+            }
+            return null
         }
     }
 
@@ -38,10 +57,10 @@ sealed class ChatScreenState : PresentationState {
         override fun consumeAction(
             previousState: PresentationState,
             action: PresentationAction
-        ): PresentationState {
+        ): CauseAndEffect {
             when (action) {
                 is LoadAction -> {
-                    return LoadingState
+                    return CauseAndEffect(action, LoadingState)
                 }
             }
             return super.consumeAction(previousState, action)
@@ -49,7 +68,7 @@ sealed class ChatScreenState : PresentationState {
     }
 
 
-    data class DisplayState constructor( val data: TreeSet<ChatPresentableModel>) :
+    data class DisplayState constructor(val data: TreeSet<ChatPresentableModel>,val currentScrollPosition : Int = 0) :
         ChatScreenState() {
 
         init {
@@ -62,21 +81,21 @@ sealed class ChatScreenState : PresentationState {
         override fun consumeAction(
             previousState: PresentationState,
             action: PresentationAction
-        ): PresentationState {
+        ): CauseAndEffect {
 
             when (action) {
-                is NewChatAction -> return copy(data = appendChats(action.data))
-                is LoadMoreChatAction -> return copy()
+                is NewChatAction -> return CauseAndEffect(action, copy(data = appendChats(action.data)))
+                is LoadMoreChatAction -> return CauseAndEffect(action, copy())
                 is LoadMoreChatSuccessAction -> {
-                    return copy(data = appendChats(action.data))
+                    return CauseAndEffect(action, copy(data = appendChats(action.data)))
                 }
-                is LoadMoreChatFailedAction -> {return copy()}
+                is LoadMoreChatFailedAction -> {return CauseAndEffect(action, copy())}
 
                 is ReLoadChatSuccessAction -> {
-                    return copy(data = appendChats(action.data))
+                    return CauseAndEffect(action, copy(data = appendChats(action.data)))
                 }
                 is ReloadChatFailedAction -> {
-                    return copy()
+                    return CauseAndEffect(action, copy())
                 }
                 // refresh updateTime
 
