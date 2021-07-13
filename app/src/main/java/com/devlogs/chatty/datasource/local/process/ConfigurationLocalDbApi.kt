@@ -48,7 +48,7 @@ class ConfigurationLocalDbApi {
         Realm.getInstance(currentRealmConfiguration).executeTransaction {
             var lastUpdateChannelTime = it.where(ProjectConfiguration::class.java).findFirst()?.lastUpdateChannelTime
             val newConfiguration = ProjectConfiguration(lastUpdateChannelTime ?:0, lastupdate)
-            it.copyToRealmOrUpdate(newConfiguration, )
+            it.copyToRealmOrUpdate(newConfiguration)
         }
     }
 }

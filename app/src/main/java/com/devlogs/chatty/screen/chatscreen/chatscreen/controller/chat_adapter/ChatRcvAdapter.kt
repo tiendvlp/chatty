@@ -18,7 +18,7 @@ private const val TEXT_CHAT = 1
 private const val VIDEO_CHAT = 2
 private const val URL_CHAT = 3
 private const val BALANCE_SIZE = 4
-private val LOAD_MORE_TYPE = 5
+private const val LOAD_MORE_TYPE = 5
 
 
 class ChatRcvAdapter : Adapter<RecyclerView.ViewHolder> {
@@ -89,15 +89,44 @@ class ChatRcvAdapter : Adapter<RecyclerView.ViewHolder> {
     }
 
     override fun getItemCount(): Int = source.size + 1+ 1 // plus the balance_size item plus loadMore item
+
     fun clear () {
         source.clear()
     }
-    fun add (data: TreeSet<ChatPresentableModel>) {
+
+    fun addOldMessage (data: TreeSet<ChatPresentableModel>) {
         if (data.isEmpty()) return
-        normalLog("Size reload: ${data.size}")
+        val previousSize = source.size
         source.addAll(data)
+        if (source.size == previousSize) return
         notifyItemRangeInserted(1, data.size-1)
         notifyItemRangeChanged(data.size-1, data.size + 1)
+    }
+
+    fun getItemPositionBaseDataPosition ( dataPosition: Int) : Int {
+        return dataPosition + 1;
+    }
+
+    fun addNewMessages (data: TreeSet<ChatPresentableModel>) {
+        if (data.isEmpty()) return
+        val indexBeforeChanged = getItemPositionBaseDataPosition(source.size-1)
+        val previousSize = source.size
+        if (data.size == 1) {
+            source.add(data.elementAt(0))
+            // if after add the size didn't change => we already add
+            if (source.size == previousSize) return
+            notifyItemInserted(indexBeforeChanged + 1)
+            if (source.size > 1) {
+                notifyItemChanged(indexBeforeChanged)
+            }
+        } else {
+            source.addAll(data)
+            if (source.size == previousSize) return
+            if (source.size > data.size) {
+                notifyItemRangeInserted(indexBeforeChanged+1, data.size)
+                notifyItemChanged(indexBeforeChanged)
+            }
+        }
     }
 
     override fun getItemViewType(position: Int): Int {

@@ -16,6 +16,9 @@ interface ChatMvcView : ObservableMvcView<ChatMvcView.Listener> {
 
     fun showMore(data: TreeSet<ChatPresentableModel>)
     fun showChat (data: TreeSet<ChatPresentableModel>)
+    fun newChat(data: TreeSet<ChatPresentableModel>) {
+
+    }
 }
 
 fun MvcViewFactory.getChatMvcView (container: ViewGroup?) : ChatMvcView = ChatMvcViewImp(uiToolkit, container)

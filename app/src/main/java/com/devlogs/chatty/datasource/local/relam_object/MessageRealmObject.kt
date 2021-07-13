@@ -1,5 +1,6 @@
 package com.devlogs.chatty.datasource.local.relam_object
 
+import com.devlogs.chatty.domain.entity.message.MessageEntity
 import io.realm.RealmObject
 import io.realm.annotations.PrimaryKey
 import io.realm.annotations.Required
@@ -37,4 +38,8 @@ open class MessageRealmObject : RealmObject {
 
     constructor()
 
+}
+
+fun MessageEntity.to() : MessageRealmObject {
+    return MessageRealmObject(id, channelId, type, content, senderEmail, createdDate)
 }

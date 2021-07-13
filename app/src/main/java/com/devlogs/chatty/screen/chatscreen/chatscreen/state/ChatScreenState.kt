@@ -14,7 +14,10 @@ sealed class ChatScreenState : PresentationState {
         return "ChatScreenState" + javaClass.simpleName
     }
 
-    var latestTime : Long = Date().time
+    var latestTime : Long = -10; get() {
+        if (field < 0) return System.currentTimeMillis()
+        return field
+    }
 
 
     object LoadingState : ChatScreenState() {
@@ -73,9 +76,13 @@ sealed class ChatScreenState : PresentationState {
 
         init {
             if (data.isNotEmpty()) {
-                latestTime = data.first().createdDate
+                updateLastestTime()
             }
             normalLog(Date(latestTime).toGMTString())
+        }
+
+        private fun updateLastestTime () {
+            latestTime = data.first().createdDate
         }
 
         override fun consumeAction(
@@ -97,9 +104,8 @@ sealed class ChatScreenState : PresentationState {
                 is ReloadChatFailedAction -> {
                     return CauseAndEffect(action, copy())
                 }
-                // refresh updateTime
-
             }
+            updateLastestTime()
             return super.consumeAction(previousState, action)
         }
 

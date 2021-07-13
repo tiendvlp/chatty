@@ -44,7 +44,7 @@ class LoadChatController @Inject constructor(
         }
     }
 
-    fun reloadChat (channelId: String, since: Long) {
+    fun reloadChat (channelId: String) {
         coroutineScope.launch {
             val result = reloadChatUseCaseSync.execute(channelId)
 

@@ -9,6 +9,7 @@ import com.ncapdevi.fragnav.FragNavController
 import java.lang.IndexOutOfBoundsException
 
 class ChatScreenNavigator {
+    private var channelId = "";
     private val mFragNavController: FragNavController
     private val mRootFragmentListener : FragNavController.RootFragmentListener = object : FragNavController.RootFragmentListener {
         override val numberOfRootFragments: Int
@@ -19,7 +20,7 @@ class ChatScreenNavigator {
         override fun getRootFragment(index: Int): Fragment {
             return when (index) {
                 FragNavController.TAB1 -> {
-                    ChatFragment.getInstance()
+                    ChatFragment.getInstance(channelId)
                 }
                 else -> throw IndexOutOfBoundsException("MainScreenNavigator only has 2 tabs but tab ${index}th was accessed")
             }
@@ -30,7 +31,8 @@ class ChatScreenNavigator {
         mFragNavController = fragNavController
     }
 
-    fun init (savedInstanceState : Bundle?) {
+    fun init (channelId: String, savedInstanceState : Bundle?) {
+        this.channelId = channelId
         mFragNavController.rootFragmentListener = mRootFragmentListener
         mFragNavController.initialize(FragNavController.TAB1, savedInstanceState)
     }

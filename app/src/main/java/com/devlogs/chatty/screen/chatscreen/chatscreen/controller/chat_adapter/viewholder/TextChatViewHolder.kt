@@ -104,6 +104,6 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
             txtMessage.scaleX = 1f
         }
         txtSender.text = data.senderEmail.split("@")[0]
-        txtMessage.text = "$pos. " + Date(data.createdDate).toLocaleString()
+        txtMessage.text = data.content
     }
 }

@@ -81,8 +81,8 @@ class ReloadChannelUseCaseSync {
         }
     }
 
-    private suspend fun saveChannelsToDb (serverRespond : List<ChannelMainServerModel>) = withContext(NonCancellable + BackgroundDispatcher) {
-        launch {
+    private suspend fun saveChannelsToDb (serverRespond : List<ChannelMainServerModel>) = withContext( BackgroundDispatcher) {
+        launch (NonCancellable) {
             val channelMemberLocals : RealmList<ChannelMemberRealmObject> = RealmList()
             val channelSeen = RealmList<String>()
             localDbApi.overrideChannel(serverRespond.map {

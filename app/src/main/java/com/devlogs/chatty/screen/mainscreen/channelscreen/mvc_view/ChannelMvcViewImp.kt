@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.Toolbar
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -94,6 +95,7 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
     }
 
     private fun addEvents() {
+        mChannelAdapter.onChannelClicked = ::onChannelClicked
         mToolbarMvcSubView.register(this)
         swipeToRefresh.setOnRefreshListener {
             getListener().forEach {
@@ -201,6 +203,12 @@ class ChannelMvcViewImp : BaseMvcView<Listener>, ChannelMvcView,
                 mChannelAdapter.notifyItemChanged(1)
 
             }
+        }
+    }
+
+    private fun onChannelClicked (channel: ChannelPresentationModel) {
+        getListener().forEach { listener ->
+            listener.onUserSelectedChannel(channel)
         }
     }
 

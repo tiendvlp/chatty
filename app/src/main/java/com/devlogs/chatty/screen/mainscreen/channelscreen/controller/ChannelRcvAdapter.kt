@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
 
-    class ChannelViewHolder : ViewHolder {
+    inner class ChannelViewHolder : ViewHolder {
         private val imgAvatar: CircleImageView
         private val txtTitle: TextView
         private val txtSender: TextView
@@ -46,6 +46,9 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
         fun bind (channel: ChannelPresentationModel) {
             if (layoutPosition == 0) {
                 itemView.setPadding(10, 100, 10, 10)
+            }
+            itemView.setOnClickListener {
+                onChannelClicked?.invoke(channel)
             }
 
             coroutineScope.launch {
@@ -93,6 +96,7 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
     private var visibleThreadHold = 3
     private val getAvatarUrl: GetUserAvatarUrlUseCaseSync
     var onLoadMore : (() -> Unit)? = null
+    var onChannelClicked: (( selectedChannel: ChannelPresentationModel) -> Unit)? = null
     @Inject
     constructor(
         getAvatarUrl: GetUserAvatarUrlUseCaseSync

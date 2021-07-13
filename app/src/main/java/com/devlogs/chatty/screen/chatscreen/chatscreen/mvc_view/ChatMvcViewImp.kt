@@ -1,22 +1,17 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view
 
-import android.os.Build
 import android.view.ViewGroup
 import android.view.Window
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.Toolbar
-import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devlogs.chatty.R
-import com.devlogs.chatty.chat.spawnMessage
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.chat_adapter.ChatAdapterSharedBox
 import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.chat_adapter.ChatRcvAdapter
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
-import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatType
 import com.devlogs.chatty.screen.common.compat.ChattyCompat
 import com.devlogs.chatty.screen.common.compat.KeyboardMovementCompatListener
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView
@@ -58,10 +53,12 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
         chatRcvAdapter.setRecyclerView(lvChat)
     }
 
+    override fun newChat(data: TreeSet<ChatPresentableModel>) {
+        chatRcvAdapter.addNewMessages(data)
+    }
 
     private fun addEvents () {
         chatRcvAdapter.onLoadMore = {
-            normalLog("Load moreeee")
             getListener().forEach { listener ->
                 listener.onLoadMore()
             }
@@ -96,15 +93,14 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
             chatRcvAdapter.isLoadMoreEnable = false
         } else {
             chatRcvAdapter.isLoadMoreEnable = true
-            chatRcvAdapter.add(data)
+            chatRcvAdapter.addOldMessage(data)
         }
-//        chatRcvAdapter.notifyItemRangeInserted(startIndex, data.size - 1)
     }
 
     override fun showChat(data: TreeSet<ChatPresentableModel>) {
         chatRcvAdapter.clear()
         lvChat.adapter = chatRcvAdapter
-        chatRcvAdapter.add(data)
+        chatRcvAdapter.addOldMessage(data)
     }
 
 }

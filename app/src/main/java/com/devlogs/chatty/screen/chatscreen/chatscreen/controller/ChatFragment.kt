@@ -1,15 +1,14 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.controller
 
-import android.content.ComponentName
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.devlogs.chatty.common.application.ApplicationEventObservable
 import com.devlogs.chatty.common.helper.normalLog
+import com.devlogs.chatty.screen.chatscreen.ChatActivity
+import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.ChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.getChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenAction.*
@@ -27,15 +26,22 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedListener, ServiceConnection {
+class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedListener {
     companion object {
-        fun getInstance () : ChatFragment {
-            return ChatFragment()
+        private val CHANNEL_ID_PARAM = "CHANNEL_ID"
+        fun getInstance (channelId: String) : ChatFragment {
+            val fragment =  ChatFragment()
+            val arguments = Bundle()
+            arguments.putString(CHANNEL_ID_PARAM, channelId)
+            fragment.arguments = arguments
+            return fragment
         }
     }
 
     @Inject
     protected lateinit var mvcViewFactory: MvcViewFactory
+    @Inject
+    protected lateinit var chatEventListener: ChatEventListener
     @Inject
     protected lateinit var presentationStateManager: PresentationStateManager
     @Inject
@@ -44,10 +50,11 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     protected lateinit var loadChatController: LoadChatController
     private lateinit var mvcView: ChatMvcView
 
-    val channelID = "60cf0b5193d24d143385f257"
+    var channelID : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        this.channelID = arguments?.get(CHANNEL_ID_PARAM) as String
         presentationStateManager.init(savedInstanceState, LoadingState)
     }
 
@@ -61,18 +68,27 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        channelID = requireActivity().intent.extras!!.get(ChatActivity.CHANNEL_ID_PARAM) as String
+        normalLog("Selected channel: $channelID")
         mvcView = mvcViewFactory.getChatMvcView(container)
         return mvcView.getRootView()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        normalLog("Chat fragment get destroyed")
     }
 
     override fun onStart() {
         super.onStart()
         mvcView.register(this)
+        chatEventListener.onStart()
         presentationStateManager.register(this, true)
     }
 
     override fun onStop() {
         mvcView.register(this)
+        chatEventListener.onStop()
         presentationStateManager.register(this)
         super.onStop()
     }
@@ -90,6 +106,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
                 loadChatController.loadMoreChat(channelID, (presentationStateManager.currentState as ChatScreenState).latestTime)
             }
             is ErrorState -> {
+
             }
             else -> throw Exception("Invalid state error: ChatFragment")
         }
@@ -102,10 +119,12 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
         when (action) {
             is LoadChatSuccessAction -> {
                 mvcView.showChat(currentState.data)
+                loadChatController.reloadChat(channelID)
             }
 
             is RestoreAction -> {
                 mvcView.showChat(currentState.data)
+                loadChatController.reloadChat(channelID)
             }
 
             is LoadMoreChatFailedAction -> {
@@ -120,20 +139,20 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
             }
 
             is ReLoadChatSuccessAction -> {
+                mvcView.newChat(action.data)
             }
 
             is NewChatAction -> {
+                normalLog("New Chat action")
+                val data = TreeSet<ChatPresentableModel> ()
+                data.add(action.data)
+                mvcView.newChat(data)
             }
         }
-    }//
-
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
     }
 
     override fun onBtnSendClicked(message: String) {
+
     }
 
     override fun onLoadMore() {

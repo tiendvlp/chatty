@@ -11,6 +11,7 @@ import com.devlogs.chatty.common.application.ApplicationEventObservable
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.local.process.ChannelLocalDbApi
+import com.devlogs.chatty.datasource.local.process.MessageLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.to
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.entity.channel.ChannelMemberEntity
@@ -46,11 +47,14 @@ class SocketEvenService : Service() {
     protected lateinit var updateChannelStatusUseCase: UpdateChannelStatusUseCaseSync
     @Inject
     protected lateinit var channelLocalDbApi: ChannelLocalDbApi
+    @Inject
+    protected lateinit var messageLocalDbApi: MessageLocalDbApi
 
     private lateinit var binder: LocalBinder
     private val coroutine = CoroutineScope(Dispatchers.Main.immediate)
     override fun onCreate() {
         super.onCreate()
+        normalLog("Socket event listening")
         binder = LocalBinder()
         socketInstance.connect()
     }
@@ -84,8 +88,15 @@ class SocketEvenService : Service() {
 
     private fun registerSocketMessageEvent () {
             socketInstance.on(SocketEventType.NEW_MESSAGE) { payload ->
+                coroutine.launch(BackgroundDispatcher) {
                 val jsonData = JSONObject(payload[0].toString())
-                normalLog("NewMessageComing: ${jsonData.getString("content")} || ${jsonData.getString("createdDate")}")
+                normalLog(
+                    "NewMessageComing: ${jsonData.getString("content")} || ${
+                        jsonData.getString(
+                            "createdDate"
+                        )
+                    }"
+                )
                 val newMessageEntity = MessageEntity(
                     jsonData.getString("_id"),
                     jsonData.getString("channelId"),
@@ -95,16 +106,21 @@ class SocketEvenService : Service() {
                     jsonData.getLong("createdDate")
                 )
                 updateChannelStatusWhenMessageCome(newMessageEntity)
-                socketEventObservable.getListeners().forEach { listener ->
-                    if (listener is SocketMessageListener) {
-                        listener.onNewMessage(newMessageEntity)
+                messageLocalDbApi.addNewMessages(listOf(newMessageEntity.to()))
+                withContext(Dispatchers.Main.immediate) {
+                    socketEventObservable.getListeners().forEach { listener ->
+                        if (listener is SocketMessageListener) {
+                            listener.onNewMessage(newMessageEntity)
+                        }
                     }
                 }
+            }
         }
     }
 
     private  fun updateChannelStatusWhenMessageCome (messageEntity: MessageEntity) {
         coroutine.launch {
+            normalLog("new channel status")
            val result =  updateChannelStatusUseCase.execute(messageEntity.channelId, ChannelStatusEntity(
                 messageEntity.senderEmail,
                 messageEntity.content,

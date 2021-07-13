@@ -1,10 +1,6 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.controller
 
-import android.content.ComponentName
-import android.content.Context
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,9 +11,12 @@ import com.devlogs.chatty.common.application.ServerConnectionEvent
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync
 import com.devlogs.chatty.resource.GetUserAvatarUrlUseCaseSync
+import com.devlogs.chatty.screen.chatscreen.ChatActivity
+import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.ChatFragment
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.presentationstate.*
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
+import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
 import com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view.ChannelMvcView
 import com.devlogs.chatty.screen.mainscreen.channelscreen.mvc_view.getMainMvcView
 import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationAction.*
@@ -28,7 +27,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateChangedListener,
-    ServerConnectionEvent, ServiceConnection {
+    ServerConnectionEvent {
 
     companion object {
         fun getInstance(): ChannelFragment {
@@ -76,9 +75,7 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         savedInstanceState: Bundle?
     ): View {
         normalLog("OnCreateView with state: ${presentationStateManager.currentState.javaClass.simpleName}")
-//        if (!::mvcView.isInitialized) {
             mvcView = mvcViewFactory.getMainMvcView(container, ChannelRcvAdapter(getAvatarUrl), presentationStateManager)
-//        }
         return mvcView.getRootView()
     }
 
@@ -86,8 +83,6 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         super.onStart()
         normalLog("onStart")
         mvcView.register(this)
-//        applicationEventObservable.register(this)
-//        presentationStateManager.register(this)
         presentationStateManager.register(this, false)
     }
 
@@ -101,6 +96,7 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
     }
 
 
+
     override fun onLoadMoreChannel() {
         normalLog("Load more")
         loadChannelController.loadMoreChannels()
@@ -108,6 +104,10 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
 
     override fun onRefreshChannel() {
         loadChannelController.reloadChannels()
+    }
+
+    override fun onUserSelectedChannel(selectedChannel: ChannelPresentationModel) {
+        ChatActivity.start(requireContext(), selectedChannel.id)
     }
 
     override fun onStateChanged(
@@ -193,11 +193,4 @@ class ChannelFragment : Fragment(), ChannelMvcView.Listener, PresentationStateCh
         mvcView.hideTopError()
     }
 
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-
-    }
 }

@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
 import com.devlogs.chatty.androidservice.SocketConnectionListener
+import com.devlogs.chatty.androidservice.SocketEvenService
 import com.devlogs.chatty.androidservice.SocketEventObservable
 import com.devlogs.chatty.androidservice.bindSocketEventService
 import com.devlogs.chatty.chat.spawnChat
@@ -52,6 +53,7 @@ class MyApplication : Application(), SocketConnectionListener, ServiceConnection
 
     override fun onTerminate() {
         super.onTerminate()
+        applicationContext.unbindService(this)
         socketInstance.disconnect()
         appContext = null;
     }

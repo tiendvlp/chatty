@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.work.WorkRequest
-import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.LoginMvcView
@@ -52,8 +50,6 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
         return mMvcView.getRootView()
     }
 
-
-
     override fun onSaveInstanceState(outState: Bundle) {
         presentationStateManager.onSavedInstanceState(outState)
         super.onSaveInstanceState(outState)
@@ -88,7 +84,7 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
             is LoginSuccessState -> {
                 normalLog("Login Success")
                 mMvcView.loginSuccess()
-                ChatActivity.start(requireContext())
+                MainActivity.start(requireContext())
             }
             is LoadingState -> {
                 normalLog("Loading State")

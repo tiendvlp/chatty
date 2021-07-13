@@ -20,6 +20,7 @@ interface ChannelMvcView: ObservableMvcView <Listener>{
     interface Listener {
         fun onLoadMoreChannel()
         fun onRefreshChannel ()
+        fun onUserSelectedChannel (selectedChannel: ChannelPresentationModel)
     }
 
     fun saveState()

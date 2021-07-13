@@ -28,7 +28,6 @@ class LoadChannelController {
     private val reloadChannelUseCaseSync : ReloadChannelUseCaseSync
     private val getLoadedChannel: GetLoadedChannelUseCaseSync
     private val getAccountUseCase: GetAccountUseCase
-    private val socketIOInstance: Socket
     private val tokenApi: TokenOfflineApi
     private val getUserAvatarUseCase: GetAvatarUseCaseSync
     @Inject
@@ -49,7 +48,6 @@ class LoadChannelController {
         mPresentationStateManager = presentationStateManager
         this.loadMoreChannel = loadMoreChannel
         this.getAccountUseCase = getAccountUseCase
-        this.socketIOInstance = socketIOInstance
         this.tokenApi = tokenApi
         this.getUserAvatarUseCase = getUserAvatarUseCase
          try {
