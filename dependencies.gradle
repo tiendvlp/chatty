@@ -10,6 +10,7 @@ ext {
     //endregion project configuration
     //region - Plugins
     def plugins = [
+            ktorGraphql: 'com.expediagroup.graphql',
             androidApplication: 'com.android.application',
             kotlinKapt : 'kotlin-kapt',
             apollographql: "com.apollographql.apollo",
@@ -164,6 +165,10 @@ ext {
     picassoDependencies = [
             picasso: [configuration: "implementation", dependency: [group: picasso.group, name: "picasso", version: picasso.version]]
     ]
+    def ktor = [group:"com.expediagroup", version:"4.1.1"]
+    def ktorDependencies= [
+         graphqlclient : [configuration: "implementation", dependency: [group: ktor.group, name:"graphql-kotlin-spring-client", version: ktor.version]]
+    ]
     //endregion dependencies
 
     //region - Module
@@ -174,11 +179,10 @@ ext {
                 androidXAppCompatDependencies.values() + materialDependencies.values() + constraintLayoutDependencies.values()+
                 junitDependencies.values() + androidXTestDependencies.values() + espressoDependencies.values() +
                 rxJavaDependencies.values() + socketIODependencies.values() + retrofitDependencies.values() + dataStoreDependencies.values() +
-                circleImageDependencies.values() + kotlinCoroutineDependencies.values() + graphqlDependencies.values() + eightbitlab_dependencies.values()
+                circleImageDependencies.values() + kotlinCoroutineDependencies.values()  + eightbitlab_dependencies.values()
                 + eventBusDependencies.values() + fragNavDependencies.values() + picassoDependencies.values() + swipeToRefreshDependencies.values()
                 + leakCanaryDependencies.values() + workManagerDependences.values() + glideDependencies.values() + wasabeef_dependencies.values()
-            ,
-
+                + graphqlDependencies.values(),
             plugins: [
                     plugins.androidApplication,
                     plugins.kotlinAndroid,
@@ -187,7 +191,7 @@ ext {
                     plugins.google_service,
                     plugins.daggerHiltPlugin,
                     plugins.apollographql,
-                    plugins.realm
+                    plugins.realm,
             ]
     ]
     //endregion App Module

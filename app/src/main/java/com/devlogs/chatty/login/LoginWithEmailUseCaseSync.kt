@@ -6,6 +6,7 @@ import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi
 import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import com.devlogs.chatty.login.LoginWithEmailUseCaseSync.Result.*
+import com.devlogs.chatty.user.GetUserByEmailUseCaseSync
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
@@ -14,7 +15,7 @@ import javax.inject.Inject
 class LoginWithEmailUseCaseSync {
 
     sealed class Result {
-        object Success : Result()
+        class Success  : Result()
         object NetworkError : Result()
         object InvalidAccountError : Result()
         object GeneralError : Result()
@@ -25,7 +26,11 @@ class LoginWithEmailUseCaseSync {
     private val accountLocalDbApi: AccountLocalDbApi
 
     @Inject
-    constructor(authRestApi: AuthServerApi, tokenOfflineApi: TokenOfflineApi, accountLocalDbApi: AccountLocalDbApi) {
+    constructor(
+        authRestApi: AuthServerApi,
+        tokenOfflineApi: TokenOfflineApi,
+        accountLocalDbApi: AccountLocalDbApi,
+    ) {
         mAuthRestApi = authRestApi
         mTokenOfflineApi = tokenOfflineApi
         Dispatchers.Main.immediate
@@ -38,7 +43,8 @@ class LoginWithEmailUseCaseSync {
             mTokenOfflineApi.setRefreshToken(loginResult.refreshToken.token, loginResult.refreshToken.expiredAt)
             if (!isActive) {mTokenOfflineApi.clear(); GeneralError}
             mTokenOfflineApi.setAccessToken(loginResult.accessToken.token, loginResult.accessToken.expiredAt)
-            Success
+
+            Success()
         } catch (e : NetworkErrorEntity) {
             NetworkError
         } catch (e: NotFoundErrorEntity) {

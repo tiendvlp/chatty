@@ -6,17 +6,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.authenticationscreen.AuthenticationScreenNavigator
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.LoginMvcView
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.mvc_view.getLoginMvcView
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationAction.*
 import com.devlogs.chatty.screen.authenticationscreen.loginscreen.state.LoginPresentationState.*
-import com.devlogs.chatty.screen.chatscreen.ChatActivity
 import com.devlogs.chatty.screen.common.mvcview.MvcViewFactory
 import com.devlogs.chatty.screen.common.presentationstate.*
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import com.devlogs.chatty.screen.mainscreen.MainActivity
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -82,7 +84,22 @@ class LoginFragment : Fragment(), LoginMvcView.Listener, PresentationStateChange
                 if (action is LoginFailedAction) mMvcView.loginFailed(action.errorMessage)
             }
             is LoginSuccessState -> {
-                normalLog("Login Success")
+                normalLog("Login Success2")
+                normalLog("Subscribe to: " + currentState.id)
+                Firebase.messaging.subscribeToTopic(currentState.id)
+                    .addOnCanceledListener {
+                        normalLog("Subscribe has been canceled")
+                    }
+                    .addOnSuccessListener {
+                        normalLog("Subscribe has been failed")
+                    }
+                    .addOnCompleteListener { task ->
+                        var message = "subscribe failed" + task.getResult();
+                        if (task.isSuccessful) {
+                            message = "subscribe success ${currentState.id.isEmpty()}"
+                        }
+                        this@LoginFragment.normalLog(message)
+                    }
                 mMvcView.loginSuccess()
                 MainActivity.start(requireContext())
             }

@@ -1,4 +1,4 @@
-package com.devlogs.chatty.androidservice
+package com.devlogs.chatty.androidservice.socket
 
 import android.app.Service
 import android.content.Context
@@ -63,6 +63,7 @@ class SocketEvenService : Service() {
         registerSocketConnectionEvent()
         registerSocketMessageEvent()
         registerSocketChannelEvent()
+        normalLog(Thread.currentThread().name)
         return binder
     }
 
@@ -103,7 +104,8 @@ class SocketEvenService : Service() {
                     jsonData.getString("type"),
                     jsonData.getString("content"),
                     jsonData.getString("senderEmail"),
-                    jsonData.getLong("createdDate")
+                    jsonData.getLong("createdDate"),
+                    MessageEntity.Status.DONE
                 )
                 updateChannelStatusWhenMessageCome(newMessageEntity)
                 messageLocalDbApi.addNewMessages(listOf(newMessageEntity.to()))

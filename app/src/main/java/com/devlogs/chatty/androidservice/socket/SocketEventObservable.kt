@@ -1,4 +1,4 @@
-package com.devlogs.chatty.androidservice
+package com.devlogs.chatty.androidservice.socket
 
 import com.devlogs.chatty.common.base.Observable
 
@@ -17,5 +17,4 @@ class SocketEventObservable : Observable<SocketListener> {
     internal fun getListeners () : HashSet<SocketListener> {
         return listeners
     }
-
 }

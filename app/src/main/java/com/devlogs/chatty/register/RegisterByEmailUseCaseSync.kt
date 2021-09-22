@@ -4,7 +4,6 @@ import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.domain.datasource.authserver.AuthServerApi
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
 import com.devlogs.chatty.register.RegisterByEmailUseCaseSync.Result.*
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 

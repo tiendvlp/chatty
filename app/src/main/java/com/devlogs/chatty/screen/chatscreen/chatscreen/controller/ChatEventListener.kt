@@ -1,7 +1,7 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.controller
 
-import com.devlogs.chatty.androidservice.SocketEventObservable
-import com.devlogs.chatty.androidservice.SocketMessageListener
+import com.devlogs.chatty.androidservice.socket.SocketEventObservable
+import com.devlogs.chatty.androidservice.socket.SocketMessageListener
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.to
@@ -9,7 +9,8 @@ import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenAction
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import javax.inject.Inject
 
-class ChatEventListener @Inject constructor(private var socketEventObservable: SocketEventObservable, private val stateManager: PresentationStateManager) : SocketMessageListener {
+class ChatEventListener @Inject constructor(private var socketEventObservable: SocketEventObservable, private val stateManager: PresentationStateManager) :
+    SocketMessageListener {
     private var isStarted = false
     fun onStart() {
         if (isStarted) return

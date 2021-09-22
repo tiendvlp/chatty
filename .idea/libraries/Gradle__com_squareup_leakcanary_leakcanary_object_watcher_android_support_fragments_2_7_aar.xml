@@ -4,9 +4,13 @@
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c69e6e3fd287c94fdfdd4c364213d256/jetified-leakcanary-object-watcher-android-support-fragments-2.7/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c69e6e3fd287c94fdfdd4c364213d256/jetified-leakcanary-object-watcher-android-support-fragments-2.7/res" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c69e6e3fd287c94fdfdd4c364213d256/jetified-leakcanary-object-watcher-android-support-fragments-2.7/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/f3dde5760aa2fed16f477a36f7f92572/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/f3dde5760aa2fed16f477a36f7f92572/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/AndroidManifest.xml" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-3/f3dde5760aa2fed16f477a36f7f92572/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/8c89a8f153a4be6d4a293eafd3007256/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/8c89a8f153a4be6d4a293eafd3007256/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/8c89a8f153a4be6d4a293eafd3007256/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/res" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/70326e77f3e2bbd3d0ad5db15f0f8f9d/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/70326e77f3e2bbd3d0ad5db15f0f8f9d/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/70326e77f3e2bbd3d0ad5db15f0f8f9d/transformed/jetified-leakcanary-object-watcher-android-support-fragments-2.7/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup.leakcanary/leakcanary-object-watcher-android-support-fragments/2.7/4b7f0c8b2d2694265a56c0ab8e1daedbb421f860/leakcanary-object-watcher-android-support-fragments-2.7-javadoc.jar!/" />

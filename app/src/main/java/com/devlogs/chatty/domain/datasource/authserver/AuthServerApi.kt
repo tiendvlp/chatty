@@ -1,7 +1,6 @@
 package com.devlogs.chatty.domain.datasource.authserver
 
 import com.devlogs.chatty.domain.error.CommonErrorEntity
-import com.devlogs.chatty.domain.error.ErrorEntity
 
 interface AuthServerApi {
 

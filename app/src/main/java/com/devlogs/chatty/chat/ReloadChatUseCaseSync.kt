@@ -6,6 +6,7 @@ import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.datasource.local.process.ConfigurationLocalDbApi
 import com.devlogs.chatty.datasource.local.process.MessageLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.MessageRealmObject
+import com.devlogs.chatty.datasource.local.relam_object.to
 import com.devlogs.chatty.domain.datasource.mainserver.MessageMainServerApi
 import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
@@ -34,7 +35,7 @@ class ReloadChatUseCaseSync @Inject constructor (private val messageMainServerAp
             val result = ArrayList<MessageEntity>()
             val messageDto = messageMainServerApi.getChannelMessagesOverPeriodOfTime(channelId, lastUpdate, System.currentTimeMillis())
             result.addAll(messageDto.map {
-                MessageEntity(it.id, it.channelId, it.type, it.content, it.senderEmail, it.createdDate)
+                MessageEntity(it.id, it.channelId, it.type, it.content, it.senderEmail, it.createdDate, MessageEntity.Status.DONE)
             })
             saveMessageToDb(channelId, result)
             this@ReloadChatUseCaseSync.normalLog("Reload channel success: " + result.size)
@@ -52,7 +53,7 @@ class ReloadChatUseCaseSync @Inject constructor (private val messageMainServerAp
          launch(NonCancellable) {
             val messageRos = ArrayList<MessageRealmObject> ()
             messages.forEach {
-                messageRos.add(MessageRealmObject(it.id, it.channelId,it.type, it.content, it.senderEmail, it.createdDate))
+                messageRos.add(it.to())
             }
             messageLocalDbApi.addNewMessages(messageRos)
             val lastUpdate = messageLocalDbApi.getLatestUpdateTime(channelId)

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.devlogs.chatty.common.application.ApplicationEventObservable
 import com.devlogs.chatty.common.helper.normalLog
+import com.devlogs.chatty.datasource.common.helper.GraphqlSimpleError
 import com.devlogs.chatty.screen.chatscreen.ChatActivity
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.ChatMvcView
@@ -48,13 +49,14 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     protected lateinit var applicationEventObservable: ApplicationEventObservable
     @Inject
     protected lateinit var loadChatController: LoadChatController
-    private lateinit var mvcView: ChatMvcView
+    private lateinit var mvcView : ChatMvcView
 
     var channelID : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.channelID = arguments?.get(CHANNEL_ID_PARAM) as String
+
         presentationStateManager.init(savedInstanceState, LoadingState)
     }
 

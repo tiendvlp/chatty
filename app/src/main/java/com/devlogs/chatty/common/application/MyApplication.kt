@@ -5,10 +5,9 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.devlogs.chatty.androidservice.SocketConnectionListener
-import com.devlogs.chatty.androidservice.SocketEvenService
-import com.devlogs.chatty.androidservice.SocketEventObservable
-import com.devlogs.chatty.androidservice.bindSocketEventService
+import com.devlogs.chatty.androidservice.socket.SocketConnectionListener
+import com.devlogs.chatty.androidservice.socket.SocketEventObservable
+import com.devlogs.chatty.androidservice.socket.bindSocketEventService
 import com.devlogs.chatty.chat.spawnChat
 import com.devlogs.chatty.domain.datasource.local.TokenOfflineApi
 import com.devlogs.chatty.realtime.MessageRealtime

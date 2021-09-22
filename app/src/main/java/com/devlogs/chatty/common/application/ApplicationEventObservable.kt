@@ -5,6 +5,10 @@ import com.devlogs.chatty.common.base.BaseObservable
 
 class ApplicationEventObservable : BaseObservable<ApplicationListener>() {
 
+    fun getListeners (): Set<ApplicationListener> {
+        return super.getListener()
+    }
+
     @MainThread
     internal fun invokeConnectedEvent () {
         getListener().forEach {listener ->

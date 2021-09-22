@@ -1,6 +1,5 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.devlogs.chatty.R
 import com.devlogs.chatty.screen.common.mvcview.BaseMvcView

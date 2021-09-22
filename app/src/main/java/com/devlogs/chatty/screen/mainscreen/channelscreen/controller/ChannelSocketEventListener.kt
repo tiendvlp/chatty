@@ -1,12 +1,10 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.controller
 
-import com.devlogs.chatty.androidservice.SocketChannelListener
-import com.devlogs.chatty.androidservice.SocketEventObservable
-import com.devlogs.chatty.androidservice.SocketMessageListener
+import com.devlogs.chatty.androidservice.socket.SocketChannelListener
+import com.devlogs.chatty.androidservice.socket.SocketEventObservable
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
-import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.to
 import com.devlogs.chatty.screen.mainscreen.channelscreen.state.ChannelScreenPresentationAction

@@ -2,6 +2,8 @@
 rootProject.ext.appModule.plugins.each {
     apply plugin: it
 }
+
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -27,6 +29,7 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+
     kotlinOptions {
         jvmTarget = '1.8'
     }
@@ -35,6 +38,7 @@ android {
         // instruct the compiler to generate Kotlin models
         generateKotlinModels.set(true)
     }
+
 }
 
 
@@ -50,5 +54,9 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
+    implementation 'io.ktor:ktor-client-android:1.5.0'
+    implementation 'io.ktor:ktor-client-serialization:1.5.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1'
+    implementation 'io.ktor:ktor-client-logging-jvm:1.5.0'
 }
 

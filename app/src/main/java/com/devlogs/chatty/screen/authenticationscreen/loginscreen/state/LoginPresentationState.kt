@@ -25,13 +25,13 @@ sealed class LoginPresentationState : PresentationState {
         override fun consumeAction(previousState: PresentationState, action: PresentationAction): CauseAndEffect {
             when (action) {
                 is LoginFailedAction ->  return CauseAndEffect(action, NotLoggedInState)
-                is LoginSuccessAction ->  return CauseAndEffect(action, LoginSuccessState)
+                is LoginSuccessAction ->  return CauseAndEffect(action, LoginSuccessState(action.id))
             }
             return super.consumeAction(previousState, action)
         }
     }
 
-    object LoginSuccessState : LoginPresentationState () {
+    data class LoginSuccessState (val id: String) : LoginPresentationState (){
         override fun consumeAction(previousState: PresentationState, action: PresentationAction): CauseAndEffect {
             return super.consumeAction(previousState, action)
         }

@@ -18,6 +18,8 @@ open class MessageRealmObject : RealmObject {
     var senderEmail: String?=null
     @Required
     var createdDate: Long?=null
+    @Required
+    var status: String? = null
 
     constructor(
         id: String,
@@ -25,9 +27,11 @@ open class MessageRealmObject : RealmObject {
         type: String,
         content: String,
         senderEmail: String,
-        createdDate: Long
+        createdDate: Long,
+        status: String
     ) {
-
+        assert(status.equals("DONE") || status.equals("FAILED") || status.equals("SENDING"))
+        this.status = status
         this.id = id
         this.channelId = channelId
         this.type = type
@@ -41,5 +45,17 @@ open class MessageRealmObject : RealmObject {
 }
 
 fun MessageEntity.to() : MessageRealmObject {
-    return MessageRealmObject(id, channelId, type, content, senderEmail, createdDate)
+    val statusDb = when (status) {
+        MessageEntity.Status.DONE -> {
+            "DONE";
+        }
+        MessageEntity.Status.FAILED -> {
+            "FAILED"
+        }
+        MessageEntity.Status.SENDING -> {
+            "SENDING"
+        }
+    }
+
+    return MessageRealmObject(id, channelId, type, content, senderEmail, createdDate, statusDb)
 }

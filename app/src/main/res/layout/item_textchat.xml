@@ -6,7 +6,11 @@
     android:gravity="bottom"
     android:orientation="horizontal"
     android:scaleX="1">
-
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:src="@color/main_color"
+        />
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgAvatar"
         android:layout_width="32dp"

@@ -1,4 +1,4 @@
-package com.devlogs.chatty.androidservice
+package com.devlogs.chatty.androidservice.socket
 
 import com.devlogs.chatty.domain.entity.channel.ChannelEntity
 import com.devlogs.chatty.domain.entity.message.MessageEntity

@@ -12,23 +12,40 @@ import javax.inject.Inject
 
 class MessageLocalDbApi {
 
-    private val realmConfiguration: RealmConfiguration
+    private val realmConfiguration : RealmConfiguration
 
     @Inject
     constructor(realmConfiguration: RealmConfiguration) {
-        this.realmConfiguration = realmConfiguration
+        this.realmConfiguration = realmConfiguration;
     }
 
-    suspend fun addNewMessage (messageRO: MessageRealmObject) = withContext(BackgroundDispatcher) {
+    suspend fun addOrUpdate (messageRO: MessageRealmObject) = withContext(BackgroundDispatcher) {
         val realmInstance = Realm.getInstance(realmConfiguration)
         realmInstance.executeTransaction {
             realmInstance.copyToRealmOrUpdate(messageRO)
         }
     }
 
+    fun delete (id: String) : MessageRealmObject? {
+        val realmInstance = Realm.getInstance(realmConfiguration)
+        var isSuccess = false;
+        var instanceToDelete : MessageRealmObject? = null
+        realmInstance.executeTransaction() {
+             instanceToDelete = realmInstance.where(MessageRealmObject::class.java).equalTo("id", id).findFirst()
+            if (instanceToDelete != null) {
+                instanceToDelete!!.deleteFromRealm()
+                isSuccess = true
+            } else {
+                isSuccess = false
+            }
+
+        }
+        if (isSuccess) return instanceToDelete
+        return null
+    }
+
     suspend fun getChannelMessageInPeriodOfTime (channelId: String, from: Long, to: Long) : List<MessageRealmObject> = withContext(BackgroundDispatcher) {
         val realmInstance = Realm.getInstance(realmConfiguration)
-
         val result = realmInstance
             .where(MessageRealmObject::class.java)
             .equalTo("channelId", channelId)
@@ -42,7 +59,6 @@ class MessageLocalDbApi {
 
     suspend fun getPreviousMessage (channelId: String, since: Long, count: Int) : List<MessageRealmObject> = withContext(BackgroundDispatcher) {
         val realmInstance = Realm.getInstance(realmConfiguration)
-
         val result = realmInstance
             .where(MessageRealmObject::class.java)
             .equalTo("channelId", channelId)
@@ -70,4 +86,8 @@ class MessageLocalDbApi {
         }
     }
 
+    fun getMessage(id: String): MessageRealmObject? {
+        val realmInstance = Realm.getInstance(realmConfiguration)
+        return realmInstance.where(MessageRealmObject::class.java).equalTo("id", id).findFirst()
+    }
 }

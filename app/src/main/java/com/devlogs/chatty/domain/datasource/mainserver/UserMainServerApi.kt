@@ -1,6 +1,5 @@
 package com.devlogs.chatty.domain.datasource.mainserver
 
-import com.devlogs.chatty.domain.datasource.mainserver.model.UserAvatarMainServerModel
 import com.devlogs.chatty.domain.datasource.mainserver.model.UserMainServerModel
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity

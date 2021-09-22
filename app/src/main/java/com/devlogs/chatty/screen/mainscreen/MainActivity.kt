@@ -3,13 +3,21 @@ package com.devlogs.chatty.screen.mainscreen
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.FrameLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.devlogs.chatty.R
+import com.devlogs.chatty.common.application.SharedMemory
+import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.screen.common.BackPressDispatcher
 import com.devlogs.chatty.screen.common.BackPressListener
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.ktx.messaging
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,6 +42,7 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.area_main)
+
         mNavigator.init(savedInstanceState)
         rdgrMain = findViewById(R.id.rdgrMain)
         rbtnAccountScreen = findViewById(R.id.rbtnAccountScreen)

@@ -17,8 +17,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class LaunchActivity : AppCompatActivity() {
 
-    val refreshtk = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Im1pbmd0aW5nMTVAbWludGluLmNvbSIsImlkIjoiNWY3NWNkMzUzYTQwNGQzMzY4YTlkOTQxIiwiaWF0IjoxNjEwMzQ2NTUyLCJleHAiOjE2MTA5NTEzNTJ9.Bwwf0fGX2-Vs5dEXjyd5p7kNFKeojMR1pCw6-BEvPAc"
-
     @Inject
     lateinit var loginUseCase : LoginWithEmailUseCaseSync
     @Inject
@@ -36,17 +34,6 @@ class LaunchActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_launch)
 
-        coroutineScope.launch(Dispatchers.IO) {
-//            loginUseCase.execute("mingting15@mintin.com", "tiendvlp")
-//            userMainServerApiImp.getUser("mingting15@mintin.com")
-//            (getUserChannelUSeCaseOverPeriodOfTime.execute(10, 10) as GetUserChannelsOverPeriodOfTimeUseCaseSync.Result.Success)
-//                .channels.forEach {
-//                    normalLog("RESULT: " + it.admin)
-//                    normalLog("RESULT: " + it.admin)
-//                }
-//            messageApiImp.getChannelMessage("5fb8bdf0614d57292085e59d", 10)
-//            messageApiImp.sendTextMessage("Hi hi tui ne", "5fb8bdf0614d57292085e59d")
 
-        }
     }
 }
