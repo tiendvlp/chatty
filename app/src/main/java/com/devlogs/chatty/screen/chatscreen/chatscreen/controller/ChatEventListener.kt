@@ -6,6 +6,7 @@ import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.to
 import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenAction
+import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenState
 import com.devlogs.chatty.screen.common.presentationstate.PresentationStateManager
 import javax.inject.Inject
 
@@ -26,6 +27,8 @@ class ChatEventListener @Inject constructor(private var socketEventObservable: S
 
     override fun onNewMessage(newMessage: MessageEntity) {
         normalLog("NewMessage: " + newMessage.content)
-        stateManager.consumeAction(ChatScreenAction.NewChatAction(newMessage.to()))
+        if (stateManager.currentState is ChatScreenState.DisplayState) {
+            stateManager.consumeAction(ChatScreenAction.NewChatAction(newMessage.to()))
+        }
     }
 }

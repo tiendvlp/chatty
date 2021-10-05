@@ -21,7 +21,7 @@ class ChannelLocalDbApi {
     constructor(realmConfiguration: RealmConfiguration) {
         currentRealmConfiguration = realmConfiguration
 
-       }
+    }
 
     suspend fun addChannel (channelRO: ChannelRealmObject) = withContext(BackgroundDispatcher) {
         overrideChannel(listOf(channelRO))
@@ -38,7 +38,6 @@ class ChannelLocalDbApi {
         }
     }
     suspend fun getAllChannel () : List<ChannelRealmObject> = withContext(BackgroundDispatcher) {
-
 
         val realmInstance = Realm.getInstance(currentRealmConfiguration)
         val count = realmInstance.where(ChannelRealmObject::class.java)

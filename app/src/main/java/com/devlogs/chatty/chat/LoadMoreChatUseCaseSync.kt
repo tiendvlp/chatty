@@ -62,7 +62,7 @@ class LoadMoreChatUseCaseSync@Inject constructor (private val messageMainServerA
     private suspend fun loadMoreMessageFromServer (channelId: String, since: Long, count: Int) : List<MessageEntity> {
         val messageMainServerModels = messageMainServerApi.getPreviousChannelMessages(channelId, since, count)
         val results =  messageMainServerModels.map {
-            MessageEntity(it.id, it.channelId, it.type, it.content, it.senderEmail, it.createdDate, Status.DONE)
+            MessageEntity(it._id, it.channelId, it.type, it.content, it.senderEmail, it.createdDate, Status.DONE)
         }
         if (results.isNotEmpty()) {
             saveToLocal (results)

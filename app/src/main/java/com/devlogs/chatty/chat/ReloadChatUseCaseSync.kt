@@ -12,7 +12,6 @@ import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity
 import kotlinx.coroutines.NonCancellable
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
@@ -35,7 +34,7 @@ class ReloadChatUseCaseSync @Inject constructor (private val messageMainServerAp
             val result = ArrayList<MessageEntity>()
             val messageDto = messageMainServerApi.getChannelMessagesOverPeriodOfTime(channelId, lastUpdate, System.currentTimeMillis())
             result.addAll(messageDto.map {
-                MessageEntity(it.id, it.channelId, it.type, it.content, it.senderEmail, it.createdDate, MessageEntity.Status.DONE)
+                MessageEntity(it._id, it.channelId, it.type, it.content, it.senderEmail, it.createdDate, MessageEntity.Status.DONE)
             })
             saveMessageToDb(channelId, result)
             this@ReloadChatUseCaseSync.normalLog("Reload channel success: " + result.size)

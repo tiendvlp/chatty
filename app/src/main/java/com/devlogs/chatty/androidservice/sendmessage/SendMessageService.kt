@@ -7,18 +7,18 @@ import android.content.ServiceConnection
 import android.os.Binder
 import android.os.IBinder
 import com.devlogs.chatty.common.application.ApplicationEventObservable
-import com.devlogs.chatty.common.application.ApplicationListener
 import com.devlogs.chatty.common.application.MessageListener
 import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.common.background_dispatcher.BackgroundDispatcher
-import com.devlogs.chatty.textchat.CachingTextChatUseCaseSync
-import com.devlogs.chatty.textchat.SendTextChatFromCacheUseCaseSync
+import com.devlogs.chatty.datasource.local.process.MessageLocalDbApi
+import com.devlogs.chatty.domain.entity.message.MessageEntity
+import com.devlogs.chatty.textchat.GetAllSendingMessageUseCaseSync
 import com.devlogs.chatty.textchat.SendTextMessageUseCaseSync
-import dagger.hilt.EntryPoint
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.util.*
 import javax.inject.Inject
 
@@ -40,78 +40,76 @@ class SendMessageService : Service() {
         }
     }
 
-    private lateinit var binder: LocalBinder
     private val coroutine = CoroutineScope(Dispatchers.Main.immediate)
-    private val cachingQueue: Queue<MessageQueueModel> = LinkedList()
     private val sendingQueue: Queue<MessageSendingQueueModel> = LinkedList()
 
     @Inject
     protected lateinit var applicationEventObservable: ApplicationEventObservable
 
     @Inject
-    protected lateinit var cachingTextMessageUseCase: CachingTextChatUseCaseSync
+    protected lateinit var messageLocalDbApi: MessageLocalDbApi
 
     @Inject
-    protected lateinit var sendTextMessageUseCase: SendTextChatFromCacheUseCaseSync
+    protected lateinit var sendTextMessageUseCase: SendTextMessageUseCaseSync
+    @Inject
+    protected lateinit var getAllSendingMessageUseCaseSync: GetAllSendingMessageUseCaseSync
 
     override fun onBind(intent: Intent?): IBinder? {
-        return binder
-    }
-
-    fun sendTextMessage(channelId: String, content: String) {
-        cachingQueue.add(MessageQueueModel(channelId, content))
-        startCachingTextMessageProcess()
-    }
-
-    private var isCachingTextMessageProcessing = false
-    private fun startCachingTextMessageProcess() {
-        if (isCachingTextMessageProcessing) return
-
-        coroutine.launch(BackgroundDispatcher) {
-            isCachingTextMessageProcessing = true
-            var textMessage: MessageQueueModel? = null
-            while (textMessage != null) {
-                textMessage = cachingQueue.peek()
-                val result = cachingTextMessageUseCase.execute(
-                    textMessage.channelId,
-                    textMessage.content,
-                    SharedMemory.email!!
-                )
-                applicationEventObservable.getListeners().forEach {
-                    if (it is MessageListener) {
-                        if (result is CachingTextChatUseCaseSync.Result.Success) {
-                            // current message state: sending
-                            it.onNewMessage(result.messageEntity)
-                            sendingQueue.add(MessageSendingQueueModel(result.messageEntity.id))
-                            startSendTextMessageProcess()
-                        }
-                    }
-                }
-            }
+        coroutine.launch {
+            restoreSendingQueue()
+            startSendTextMessageProcess()
         }
-        isCachingTextMessageProcessing = false
+        return LocalBinder()
     }
 
+    private suspend fun restoreSendingQueue () {
+        (getAllSendingMessageUseCaseSync.executes() as GetAllSendingMessageUseCaseSync.Result.Success).sendMessages.forEach {
+            sendingQueue.add(MessageSendingQueueModel(it.id, it.senderEmail, it.content, it.channelId))
+        }
+    }
+
+    fun sendTextMessage(channelId: String, content: String, identify: String?) {
+        sendingQueue.add(MessageSendingQueueModel(identify, SharedMemory.email!!, content, channelId))
+        coroutine.launch {
+            startSendTextMessageProcess()
+        }
+    }
 
     private var isSendTextMessageProcessing = false
-    private fun startSendTextMessageProcess() {
-        if (isSendTextMessageProcessing) return
+    private suspend fun startSendTextMessageProcess() = withContext(BackgroundDispatcher) {
+        if (isSendTextMessageProcessing) return@withContext
+        isSendTextMessageProcessing = true
 
-        coroutine.launch(BackgroundDispatcher) {
-            isSendTextMessageProcessing = true
-            var textMessage: MessageSendingQueueModel? = null
-            while (textMessage != null) {
-                textMessage = sendingQueue.peek()
-                val result = sendTextMessageUseCase.execute(textMessage.id)
-                applicationEventObservable.getListeners().forEach {
-                    if (it is MessageListener) {
-                        if (result is SendTextChatFromCacheUseCaseSync.Result.Success) {
-                            it.onNewMessage(result.message)
+        var textMessage: MessageSendingQueueModel? = sendingQueue.poll()
+        while (textMessage != null) {
+            val listener: SendTextMessageUseCaseSync.Listener = object : SendTextMessageUseCaseSync.Listener {
+                override fun onSendMessageSuccess(message: MessageEntity) {
+                    applicationEventObservable.getListeners().forEach {
+                        if (it is MessageListener) {
+                            it.onMessageStatusChanged(message)
                         }
                     }
                 }
+
+                override fun onSendToServerFailed(message: MessageEntity) {
+                    applicationEventObservable.getListeners().forEach {
+                        if (it is MessageListener) {
+                            it.onMessageStatusChanged(message)
+                        }
+                    }
+                }
+
             }
-            isSendTextMessageProcessing = false
+            sendTextMessageUseCase.execute(
+                textMessage.id,
+                textMessage.senderEmail,
+                textMessage.content,
+                textMessage.channelId,
+                listener
+            )
+            textMessage = sendingQueue.poll()
         }
+
+        isSendTextMessageProcessing = false
     }
 }

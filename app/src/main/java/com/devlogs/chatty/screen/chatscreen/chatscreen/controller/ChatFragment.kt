@@ -1,15 +1,21 @@
 package com.devlogs.chatty.screen.chatscreen.chatscreen.controller
 
+import android.content.ComponentName
+import android.content.ServiceConnection
 import android.os.Bundle
+import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.devlogs.chatty.androidservice.sendmessage.SendMessageService
 import com.devlogs.chatty.common.application.ApplicationEventObservable
+import com.devlogs.chatty.common.application.MessageListener
 import com.devlogs.chatty.common.helper.normalLog
-import com.devlogs.chatty.datasource.common.helper.GraphqlSimpleError
+import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.screen.chatscreen.ChatActivity
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
+import com.devlogs.chatty.screen.chatscreen.chatscreen.model.to
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.ChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.getChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.state.ChatScreenAction.*
@@ -27,7 +33,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedListener {
+class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedListener, MessageListener, ServiceConnection {
     companion object {
         private val CHANNEL_ID_PARAM = "CHANNEL_ID"
         fun getInstance (channelId: String) : ChatFragment {
@@ -49,14 +55,15 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     protected lateinit var applicationEventObservable: ApplicationEventObservable
     @Inject
     protected lateinit var loadChatController: LoadChatController
+
     private lateinit var mvcView : ChatMvcView
+    private var sendMessageService: SendMessageService? = null
 
     var channelID : String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         this.channelID = arguments?.get(CHANNEL_ID_PARAM) as String
-
         presentationStateManager.init(savedInstanceState, LoadingState)
     }
 
@@ -85,6 +92,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
         super.onStart()
         mvcView.register(this)
         chatEventListener.onStart()
+        SendMessageService.bind(requireContext(), this)
         presentationStateManager.register(this, true)
     }
 
@@ -153,11 +161,27 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
         }
     }
 
-    override fun onBtnSendClicked(message: String) {
 
+    override fun onBtnSendClicked(message: String) {
+        sendMessageService?.sendTextMessage(message, channelID, null)
     }
 
     override fun onLoadMore() {
         loadChatController.loadMoreChat(channelID, (presentationStateManager.currentState as ChatScreenState).latestTime)
+    }
+
+    override fun onNewMessage(newMessage: MessageEntity) {
+        if (newMessage.channelId.equals(channelID)) {
+            normalLog("New chat: " + newMessage.content)
+            presentationStateManager.consumeAction(NewChatAction(newMessage.to()))
+        }
+    }
+
+    override fun onServiceConnected(name: ComponentName?, binder: IBinder?) {
+        sendMessageService = (binder as SendMessageService.LocalBinder).service
+    }
+
+    override fun onServiceDisconnected(name: ComponentName?) {
+        sendMessageService = null
     }
 }

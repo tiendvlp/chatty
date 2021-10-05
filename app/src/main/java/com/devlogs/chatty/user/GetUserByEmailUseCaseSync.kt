@@ -40,10 +40,11 @@ class GetUserByEmailUseCaseSync {
             }
             if (result == null) {
                 result = Mapper().toUserEntity(mUserMainServerApi.getUser(userEmail))
+                launch {
+                    userLocalDbApi.addUser(Mapper().toUserRO(result))
+                }
             }
-            launch {
-                userLocalDbApi.addUser(Mapper().toUserRO(result))
-            }
+
             Success(result)
         } catch (e: GeneralErrorEntity) {
             GeneralError

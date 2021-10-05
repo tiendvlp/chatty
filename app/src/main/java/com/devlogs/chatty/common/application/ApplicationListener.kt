@@ -18,7 +18,8 @@ interface ChannelListener : ApplicationListener {
 }
 
 interface MessageListener: ApplicationListener {
-    fun onNewMessage (newMessage: MessageEntity)
+    fun onNewMessage (newMessage: MessageEntity) {}
+    fun onMessageStatusChanged (changedMessage: MessageEntity) {}
 }
 
 

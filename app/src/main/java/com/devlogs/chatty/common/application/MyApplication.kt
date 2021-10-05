@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.ServiceConnection
 import android.os.IBinder
+import com.devlogs.chatty.androidservice.sendmessage.SendMessageService
 import com.devlogs.chatty.androidservice.socket.SocketConnectionListener
 import com.devlogs.chatty.androidservice.socket.SocketEventObservable
 import com.devlogs.chatty.androidservice.socket.bindSocketEventService
@@ -45,6 +46,16 @@ class MyApplication : Application(), SocketConnectionListener, ServiceConnection
         appContext = applicationContext
         gson = GsonBuilder().create()
         Realm.init(this)
+        SendMessageService.bind(this, object: ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+
+            }
+
+        })
         socketEventObservable.register(this)
         applicationContext.bindSocketEventService(this)
         spawnChat()

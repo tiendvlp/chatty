@@ -6,43 +6,31 @@ import com.devlogs.chatty.datasource.local.process.MessageLocalDbApi
 import com.devlogs.chatty.datasource.local.relam_object.MessageRealmObject
 import com.devlogs.chatty.domain.datasource.mainserver.MessageMainServerApi
 import com.devlogs.chatty.domain.datasource.mainserver.model.MessageMainServerModel
+import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.domain.error.AuthenticationErrorEntity.InvalidRefreshTokenErrorEntity
 import com.devlogs.chatty.domain.error.CommonErrorEntity.*
-import com.devlogs.chatty.textchat.SendTextMessageUseCaseSync.Result.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.RuntimeException
 import java.util.*
 import javax.inject.Inject
 
 
 
 class SendTextMessageUseCaseSync {
-         data class Model (
-            val channelId: String,val message: String,val spawnedId: String, val createdDate: Long
-        )
-
-        interface Listener {
-            fun onSending (message: Model)
-            fun onSendFailed (result: FailedResult)
-            fun onSendSuccess (result: DoneResult)
+        enum class FAILED_STATUS {
+            GENERAL_ERROR, NETWORK_ERROR, AUTH_ERROR
         }
 
-        sealed class Result (message: Model) {
-            sealed class FailedResult (message: Model) : Result (message) {
-                data class NetworkError (val message: Model) : FailedResult(message)
-                data class GeneralError (val message: Model) : FailedResult(message)
-                data class InvalidRefreshToken (val message: Model) : FailedResult(message)
-            }
-
-            sealed class DoneResult (message: Model, realId: String) : Result (message) {
-                data class Success  (val message: Model, val realId: String) : DoneResult (message, realId)
-            }
+        interface Listener {
+            fun onSending () {}
+            fun onCachedToLocalDb () {}
+            fun onSendMessageSuccess (message: MessageEntity) {}
+            fun onSendToServerFailed (message: MessageEntity) {}
         }
 
         private val messageMainServerApi : MessageMainServerApi
         private val messageLocalDbApi: MessageLocalDbApi
-        private var spawnedLocalId = UUID.randomUUID().toString()
-        var listener: Listener? = null
 
         @Inject
         constructor(messageMainServerApi : MessageMainServerApi, messageLocalDbApi: MessageLocalDbApi) {
@@ -50,45 +38,50 @@ class SendTextMessageUseCaseSync {
             this.messageLocalDbApi = messageLocalDbApi
         }
 
-        fun getMessageId () : String {
-            return spawnedLocalId
-        }
 
-        suspend fun execute (senderEmail: String, message: String, channelId: String) = withContext(BackgroundDispatcher) {
-            spawnedLocalId = UUID.randomUUID().toString()
+        suspend fun execute (id: String? = null, senderEmail: String, message: String, channelId: String, callBack: Listener? = null) = withContext(BackgroundDispatcher) {
+            var messageId = UUID.randomUUID().toString().substring(0,8)
             val createdDate = System.currentTimeMillis()
-            val messageModel = Model(channelId, message, spawnedLocalId, createdDate)
             try {
+                callBack?.onSending()
+                if (id == null) {
+                    messageLocalDbApi.addOrUpdate(MessageRealmObject(
+                        id = messageId,
+                        channelId = channelId, type = "TEXT",
+                        content = message,
+                        senderEmail = senderEmail,
+                        createdDate = createdDate,
+                        "FAILED"
+                    ))
+                    callBack?.onCachedToLocalDb()
+                } else {
+                   if (messageLocalDbApi.getMessage(id) == null) {
+                       throw RuntimeException("Invalid local message id: $id")
+                   }
+                   messageId = id;
+                }
 
-                listener?.onSending(messageModel)
-                messageLocalDbApi.addOrUpdate(MessageRealmObject(
-                    id = spawnedLocalId,
-                    channelId = channelId, type = "TEXT",
-                    content = message,
-                    senderEmail = senderEmail,
-                    createdDate = createdDate,
-                    "FAILED"
-                ))
                 val result = messageMainServerApi.sendTextMessage(message, channelId)
-                replaceMessageInDb(result)
-                listener?.onSendSuccess(DoneResult.Success(messageModel, result.id))
+                val sentMessage = MessageEntity(result._id, channelId, result.type, result.content, result.senderEmail, result.createdDate, MessageEntity.Status.DONE)
+                replaceMessageInDb(messageId, result);
+                callBack?.onSendMessageSuccess(sentMessage);
             } catch (e: NetworkErrorEntity) {
                 errorLog("Authentication error happen: " + e.message)
-                listener?.onSendFailed(FailedResult.NetworkError(messageModel))
+                callBack?.onSendToServerFailed(MessageEntity(messageId, channelId, "TEXT", message, senderEmail, createdDate, MessageEntity.Status.FAILED))
             } catch (e: GeneralErrorEntity) {
                 errorLog("GeneralErrorEntity error happen: " + e.message)
-                listener?.onSendFailed(FailedResult.GeneralError(messageModel))
+                callBack?.onSendToServerFailed(MessageEntity(messageId, channelId, "TEXT", message, senderEmail, createdDate, MessageEntity.Status.FAILED))
             } catch (e: InvalidRefreshTokenErrorEntity) {
                 errorLog("InvalidRefreshTokenErrorEntity error happen: " + e.message)
-                listener?.onSendFailed(FailedResult.InvalidRefreshToken(messageModel))
+                callBack?.onSendToServerFailed(MessageEntity(messageId, channelId, "TEXT", message, senderEmail, createdDate, MessageEntity.Status.FAILED))
             }
     }
 
-    private suspend fun replaceMessageInDb (messageFromServer:MessageMainServerModel) = withContext(BackgroundDispatcher){
+    private suspend fun replaceMessageInDb (id: String, messageFromServer:MessageMainServerModel) = withContext(BackgroundDispatcher){
         launch {
-            messageLocalDbApi.delete(messageFromServer.id)
+            messageLocalDbApi.delete(id)
             messageLocalDbApi.addOrUpdate(MessageRealmObject(
-                id = messageFromServer.id,
+                id = messageFromServer._id,
                 channelId = messageFromServer.channelId, type = messageFromServer.type,
                 content = messageFromServer.content,
                 senderEmail = messageFromServer.senderEmail,

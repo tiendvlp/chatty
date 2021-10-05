@@ -11,5 +11,5 @@ interface MessageMainServerRestClientConfig {
 
     @POST("$SEND_TEXT_MESSAGE_POST_REQ_WITHOUT_PARAMS/{channelid}")
     suspend fun sendTextMessage (@Path("channelid") channelId: String, @Body body: SendTextMessageReqBody) : Response<MessageMainServerModel>
-    data class SendTextMessageReqBody (val body: String)
+    data class SendTextMessageReqBody(val body: String, val identify: String?)
 }

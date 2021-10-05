@@ -10,7 +10,7 @@ interface MessageMainServerApi {
     * @throws CommonErrorEntity.GeneralErrorEntity
     * @throws CommonErrorEntity.NetworkErrorEntity
     **/
-    suspend fun sendTextMessage (messageBody: String, channelId: String) : MessageMainServerModel
+    suspend fun sendTextMessage (messageBody: String, channelId: String, identify: String? = null) : MessageMainServerModel
     /**
      * @throws AuthenticationErrorEntity
      * @throws CommonErrorEntity.GeneralErrorEntity

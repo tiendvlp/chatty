@@ -28,9 +28,9 @@ class MessageMainServerApiImp : MessageMainServerApi {
         mRetrofit = retrofit
     }
 
-    override suspend fun sendTextMessage(messageBody: String, channelId: String) : MessageMainServerModel {
+    override suspend fun sendTextMessage(messageBody: String, channelId: String,identify: String?) : MessageMainServerModel {
         try {
-            val reqBody = SendTextMessageReqBody(messageBody)
+            val reqBody = SendTextMessageReqBody(messageBody, identify)
             val client = mRetrofit.create(MessageMainServerRestClientConfig::class.java)
             val response = client.sendTextMessage(channelId, reqBody)
 

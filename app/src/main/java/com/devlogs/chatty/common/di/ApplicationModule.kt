@@ -85,8 +85,8 @@ class ApplicationModule {
         return RealmConfiguration.Builder()
             .name("CHATTY_LOCAL_DB")
             .schemaVersion(1)
-            .allowQueriesOnUiThread(false)
-            .allowWritesOnUiThread(false)
+            .allowQueriesOnUiThread(true)
+            .allowWritesOnUiThread(true)
             .build()
     }
 

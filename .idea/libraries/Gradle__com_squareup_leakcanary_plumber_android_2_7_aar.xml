@@ -4,9 +4,9 @@
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c6a44661512045911ff94b7b2e5c62ba/jetified-plumber-android-2.7/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c6a44661512045911ff94b7b2e5c62ba/jetified-plumber-android-2.7/res" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c6a44661512045911ff94b7b2e5c62ba/jetified-plumber-android-2.7/AndroidManifest.xml" />
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/3386a07bd79dd09e4cfb3afc2be12344/transformed/jetified-plumber-android-2.7/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/3386a07bd79dd09e4cfb3afc2be12344/transformed/jetified-plumber-android-2.7/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/3386a07bd79dd09e4cfb3afc2be12344/transformed/jetified-plumber-android-2.7/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/e2dd26e391284766cc09f130536d003d/transformed/jetified-plumber-android-2.7/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/e2dd26e391284766cc09f130536d003d/transformed/jetified-plumber-android-2.7/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/e2dd26e391284766cc09f130536d003d/transformed/jetified-plumber-android-2.7/res" />
     </CLASSES>
     <JAVADOC>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.squareup.leakcanary/plumber-android/2.7/8263537f0697a5a0252474c42ee3f3ba7f143a28/plumber-android-2.7-javadoc.jar!/" />
