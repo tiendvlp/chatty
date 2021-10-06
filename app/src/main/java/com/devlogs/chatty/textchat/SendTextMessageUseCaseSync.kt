@@ -40,29 +40,34 @@ class SendTextMessageUseCaseSync {
 
 
         suspend fun execute (id: String? = null, senderEmail: String, message: String, channelId: String, callBack: Listener? = null) = withContext(BackgroundDispatcher) {
-            var messageId = UUID.randomUUID().toString().substring(0,8)
+            var messageId = id
+            if (messageId == null) {
+                messageId = UUID.randomUUID().toString().substring(0,8)
+            }
             val createdDate = System.currentTimeMillis()
             try {
                 callBack?.onSending()
-                if (id == null) {
-                    messageLocalDbApi.addOrUpdate(MessageRealmObject(
+                messageLocalDbApi.addOrUpdate(
+                    MessageRealmObject(
                         id = messageId,
                         channelId = channelId, type = "TEXT",
                         content = message,
                         senderEmail = senderEmail,
                         createdDate = createdDate,
                         "FAILED"
-                    ))
-                    callBack?.onCachedToLocalDb()
-                } else {
-                   if (messageLocalDbApi.getMessage(id) == null) {
-                       throw RuntimeException("Invalid local message id: $id")
-                   }
-                   messageId = id;
-                }
+                    )
+                )
 
                 val result = messageMainServerApi.sendTextMessage(message, channelId)
-                val sentMessage = MessageEntity(result._id, channelId, result.type, result.content, result.senderEmail, result.createdDate, MessageEntity.Status.DONE)
+                val sentMessage = MessageEntity(
+                    result._id,
+                    channelId,
+                    result.type,
+                    result.content,
+                    result.senderEmail,
+                    result.createdDate,
+                    MessageEntity.Status.DONE
+                )
                 replaceMessageInDb(messageId, result);
                 callBack?.onSendMessageSuccess(sentMessage);
             } catch (e: NetworkErrorEntity) {
@@ -78,6 +83,7 @@ class SendTextMessageUseCaseSync {
     }
 
     private suspend fun replaceMessageInDb (id: String, messageFromServer:MessageMainServerModel) = withContext(BackgroundDispatcher){
+
         launch {
             messageLocalDbApi.delete(id)
             messageLocalDbApi.addOrUpdate(MessageRealmObject(

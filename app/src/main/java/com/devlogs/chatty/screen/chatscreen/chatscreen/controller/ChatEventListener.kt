@@ -2,6 +2,7 @@ package com.devlogs.chatty.screen.chatscreen.chatscreen.controller
 
 import com.devlogs.chatty.androidservice.socket.SocketEventObservable
 import com.devlogs.chatty.androidservice.socket.SocketMessageListener
+import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.to
@@ -27,6 +28,9 @@ class ChatEventListener @Inject constructor(private var socketEventObservable: S
 
     override fun onNewMessage(newMessage: MessageEntity) {
         normalLog("NewMessage: " + newMessage.content)
+        if (newMessage.senderEmail.equals(SharedMemory.email)) {
+            return;
+        }
         if (stateManager.currentState is ChatScreenState.DisplayState) {
             stateManager.consumeAction(ChatScreenAction.NewChatAction(newMessage.to()))
         }

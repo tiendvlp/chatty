@@ -1,6 +1,7 @@
 package com.devlogs.chatty.chat
 
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
+import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatState
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatType
 import kotlin.collections.ArrayList
 import kotlin.random.Random
@@ -30,7 +31,7 @@ fun spawnChat () {
         startTime += delta
         val rand = Random.nextInt(-1,2)
         val sender = if (rand == 0) "tiendvlp@gmail.com" else "thuylinh@gmail.com"
-        spawnMessage.add(ChatPresentableModel("$i", ChatType.TEXT, sender, randomMessage(i),  startTime))
+        spawnMessage.add(ChatPresentableModel("$i", ChatType.TEXT, sender, randomMessage(i),  startTime, ChatState.SENT))
     }
 }
 

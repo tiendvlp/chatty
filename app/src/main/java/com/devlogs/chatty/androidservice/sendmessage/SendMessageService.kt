@@ -15,10 +15,7 @@ import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.textchat.GetAllSendingMessageUseCaseSync
 import com.devlogs.chatty.textchat.SendTextMessageUseCaseSync
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import java.util.*
 import javax.inject.Inject
 
@@ -76,7 +73,7 @@ class SendMessageService : Service() {
     }
 
     private var isSendTextMessageProcessing = false
-    private suspend fun startSendTextMessageProcess() = withContext(BackgroundDispatcher) {
+    private suspend fun startSendTextMessageProcess() = withContext(Dispatchers.Main.immediate) {
         if (isSendTextMessageProcessing) return@withContext
         isSendTextMessageProcessing = true
 
@@ -84,21 +81,24 @@ class SendMessageService : Service() {
         while (textMessage != null) {
             val listener: SendTextMessageUseCaseSync.Listener = object : SendTextMessageUseCaseSync.Listener {
                 override fun onSendMessageSuccess(message: MessageEntity) {
-                    applicationEventObservable.getListeners().forEach {
-                        if (it is MessageListener) {
-                            it.onMessageStatusChanged(message)
-                        }
+                        applicationEventObservable.getListeners().forEach {
+                            if (it is MessageListener) {
+                                coroutine.launch (Dispatchers.Main.immediate) {
+                                    it.onMessageStatusChanged(message, textMessage!!.id)
+                                }
+                            }
                     }
                 }
 
                 override fun onSendToServerFailed(message: MessageEntity) {
                     applicationEventObservable.getListeners().forEach {
                         if (it is MessageListener) {
-                            it.onMessageStatusChanged(message)
+                            coroutine.launch (Dispatchers.Main.immediate) {
+                                it.onMessageStatusChanged(message, textMessage!!.id)
+                            }
                         }
                     }
                 }
-
             }
             sendTextMessageUseCase.execute(
                 textMessage.id,

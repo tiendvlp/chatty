@@ -11,8 +11,10 @@ import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.recyclerview.widget.RecyclerView
 import com.devlogs.chatty.R
+import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.screen.chatscreen.chatscreen.controller.chat_adapter.ChatAdapterSharedBox
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
+import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatState
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 
@@ -28,6 +30,7 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
     private val dynamicBackground: LinearLayout
     private val resource: TreeSet<ChatPresentableModel>
     private val txtSender: TextView
+    private val imgState: CircleImageView
     private val wrapperLayout: LinearLayout
     private val sharedBox: ChatAdapterSharedBox
     val lp = LinearLayout.LayoutParams(
@@ -43,6 +46,7 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
     ) : super(layoutInflater.inflate(R.layout.item_textchat,container, false)) {
         this.resource = resource
         this.sharedBox = sharedBox
+        this.imgState = itemView.findViewById(R.id.imgState)
         txtMessage = itemView.findViewById(R.id.txtChatMessage)
         wrapperLayout = itemView.findViewById(R.id.wrapperLayout)
         imgAvatar = itemView.findViewById(R.id.imgAvatar)
@@ -103,6 +107,23 @@ class TextChatViewHolder : RecyclerView.ViewHolder {
             txtMessage.setTextColor(itemView.context.getColor(R.color.white))
             txtMessage.scaleX = 1f
         }
+
+        // update state
+
+        if (data.state == ChatState.SENDING) {
+            imgState.setImageResource(R.drawable.message_sending_state)
+        }
+        if (data.state == ChatState.SENT) {
+            imgState.setImageResource(R.drawable.message_sent_state)
+        }
+        if (data.state == ChatState.FAILED) {
+            imgState.setImageResource(R.drawable.message_error_state)
+        }
+
+        if (data.senderEmail.equals(SharedMemory.email)) {
+            imgState.scaleX = -1f
+        }
+
         txtSender.text = data.senderEmail.split("@")[0]
         txtMessage.text = data.content
     }

@@ -57,6 +57,10 @@ class ChatMvcViewImp : ChatMvcView, BaseMvcView<ChatMvcView.Listener>,
         chatRcvAdapter.addNewMessages(data)
     }
 
+    override fun updateMessage(message: ChatPresentableModel, identify: String?) {
+        chatRcvAdapter.updateMessageState(message, identify)
+    }
+
     private fun addEvents () {
         chatRcvAdapter.onLoadMore = {
             getListener().forEach { listener ->

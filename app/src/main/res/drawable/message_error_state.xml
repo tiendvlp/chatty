@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android"
+
+    >
+    <item android:width="20dp" android:height="20dp" android:gravity="center">
+        <shape android:shape="oval">
+            <solid android:color="@color/red_1"></solid>
+        </shape>
+    </item>
+
+    <item android:width="15dp" android:height="10dp" android:gravity="center">
+        <bitmap android:src="@drawable/icon_exclamation_mark"></bitmap>
+    </item>
+</layer-list>

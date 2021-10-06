@@ -6,12 +6,18 @@ enum class ChatType {
     URL, TEXT, VIDEO, IMAGE
 }
 
+enum class ChatState {
+    SENDING, FAILED, SENT
+}
+
+
 data class ChatPresentableModel(
-    val id: String,
-    val type: ChatType,
-    val senderEmail: String,
-    val content: String,
-    val createdDate: Long
+    var id: String,
+    var type: ChatType,
+    var senderEmail: String,
+    var content: String,
+    var createdDate: Long,
+    var state:ChatState
 ) : Comparable<ChatPresentableModel> {
     override fun compareTo(other: ChatPresentableModel): Int {
         if (other.id.equals(id)) {
@@ -31,7 +37,13 @@ fun MessageEntity.to () : ChatPresentableModel {
         chatType = ChatType.TEXT
     }
 
+    var chatState = when (status) {
+        MessageEntity.Status.FAILED -> ChatState.FAILED
+        MessageEntity.Status.SENDING -> ChatState.SENDING
+        MessageEntity.Status.DONE -> ChatState.SENT
+    }
+
     return ChatPresentableModel(
-        id, chatType!!, senderEmail, content, createdDate
+        id, chatType!!, senderEmail, content, createdDate, chatState
     )
 }

@@ -15,6 +15,15 @@ class GetAllSendingMessageUseCaseSync @Inject constructor(private val messageLoc
     suspend fun executes () : Result {
         val queryResult = messageLocalDbApi.getMessageByState(MessageEntity.Status.SENDING)
 
+
+
+
+
+
+
+
+
+
         val result = queryResult.map ({messageRealmObject -> MessageEntity(messageRealmObject.id!!, messageRealmObject.channelId!!, messageRealmObject.type!!, messageRealmObject.content!!,messageRealmObject.senderEmail!!, messageRealmObject.createdDate!!, MessageEntity.Status.SENDING) })
 
         return Result.Success(result)

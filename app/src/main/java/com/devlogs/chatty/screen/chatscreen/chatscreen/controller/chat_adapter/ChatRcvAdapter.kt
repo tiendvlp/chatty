@@ -139,4 +139,25 @@ class ChatRcvAdapter : Adapter<RecyclerView.ViewHolder> {
         return TEXT_CHAT
     }
 
+    fun updateMessageState(message: ChatPresentableModel, identify: String?) {
+        var id = identify;
+        if (id == null) {
+            id = message.id;
+        }
+
+        val index = source.indexOfFirst { it.id.equals(id) }
+
+        val target = source.elementAt(index)
+
+        target.content = message.content
+        target.id = message.id
+        target.createdDate = message.createdDate
+        target.senderEmail = message.senderEmail
+        target.type = message.type
+        target.state = message.state
+
+        notifyItemChanged((index) + 1)
+
+    }
+
 }

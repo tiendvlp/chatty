@@ -11,10 +11,13 @@ import androidx.fragment.app.Fragment
 import com.devlogs.chatty.androidservice.sendmessage.SendMessageService
 import com.devlogs.chatty.common.application.ApplicationEventObservable
 import com.devlogs.chatty.common.application.MessageListener
+import com.devlogs.chatty.common.application.SharedMemory
 import com.devlogs.chatty.common.helper.normalLog
 import com.devlogs.chatty.domain.entity.message.MessageEntity
 import com.devlogs.chatty.screen.chatscreen.ChatActivity
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatPresentableModel
+import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatState
+import com.devlogs.chatty.screen.chatscreen.chatscreen.model.ChatType
 import com.devlogs.chatty.screen.chatscreen.chatscreen.model.to
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.ChatMvcView
 import com.devlogs.chatty.screen.chatscreen.chatscreen.mvc_view.getChatMvcView
@@ -92,6 +95,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
         super.onStart()
         mvcView.register(this)
         chatEventListener.onStart()
+        applicationEventObservable.register(this)
         SendMessageService.bind(requireContext(), this)
         presentationStateManager.register(this, true)
     }
@@ -99,6 +103,7 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     override fun onStop() {
         mvcView.register(this)
         chatEventListener.onStop()
+        applicationEventObservable.unRegister(this)
         presentationStateManager.register(this)
         super.onStop()
     }
@@ -162,8 +167,17 @@ class ChatFragment : Fragment(), ChatMvcView.Listener, PresentationStateChangedL
     }
 
 
+    override fun onMessageStatusChanged(changedMessage: MessageEntity, identify: String?) {
+        normalLog("OnMessage status changed: ${changedMessage.content} status: ${changedMessage.status.name}")
+        mvcView.updateMessage(changedMessage.to(), identify)
+    }
+
     override fun onBtnSendClicked(message: String) {
-        sendMessageService?.sendTextMessage(message, channelID, null)
+        val id = UUID.randomUUID().toString().substring(0,8)
+        val data = TreeSet<ChatPresentableModel>()
+        data.add(ChatPresentableModel(id, ChatType.TEXT, SharedMemory.email!!, message, System.currentTimeMillis(), ChatState.SENDING))
+        mvcView.newChat(data)
+        sendMessageService?.sendTextMessage(channelID,message, id)
     }
 
     override fun onLoadMore() {

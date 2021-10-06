@@ -19,7 +19,7 @@ interface ChannelListener : ApplicationListener {
 
 interface MessageListener: ApplicationListener {
     fun onNewMessage (newMessage: MessageEntity) {}
-    fun onMessageStatusChanged (changedMessage: MessageEntity) {}
+    fun onMessageStatusChanged (changedMessage: MessageEntity, identify: String?) {}
 }
 
 

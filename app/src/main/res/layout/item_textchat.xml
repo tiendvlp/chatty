@@ -7,9 +7,11 @@
     android:orientation="horizontal"
     android:scaleX="1">
     <de.hdodenhof.circleimageview.CircleImageView
-        android:layout_width="20dp"
-        android:layout_height="20dp"
-        android:src="@color/main_color"
+        android:id="@+id/imgState"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:src="@drawable/message_sending_state"
+        android:layout_margin="2dp"
         />
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/imgAvatar"
