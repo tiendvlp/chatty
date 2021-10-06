@@ -1,8 +1,10 @@
 package com.devlogs.chatty.screen.mainscreen.channelscreen.controller
 
+import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +17,7 @@ import com.devlogs.chatty.resource.GetUserAvatarUrlUseCaseSync
 import com.devlogs.chatty.resource.UrlType.LOCAL
 import com.devlogs.chatty.screen.common.viewholder.ItemLoadingViewHolder
 import com.devlogs.chatty.screen.mainscreen.channelscreen.model.ChannelPresentationModel
+import com.devlogs.chatty.screen.search_screen.SearchActivity
 import de.hdodenhof.circleimageview.CircleImageView
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +25,10 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.*
 import javax.inject.Inject
+import androidx.core.app.ActivityOptionsCompat
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
+
 
 class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
 
@@ -78,7 +85,23 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
     }
 
     class SearchViewHolder : ViewHolder {
-        constructor(view: View) : super(view)
+
+        private val btnSearch: Button
+        constructor(view: View) : super(view) {
+            btnSearch = view.findViewById(R.id.btnSearch)
+        }
+
+        fun bind () {
+            btnSearch.setOnClickListener {
+                val options: ActivityOptionsCompat =
+                    ActivityOptionsCompat.makeSceneTransitionAnimation(
+                        itemView.context as Activity,
+                        btnSearch as View,
+                        "searchBox"
+                    )
+                SearchActivity.start(itemView.context, options)
+            }
+        }
     }
 
     private val SEARCH_TYPE = 0
@@ -145,7 +168,9 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ViewHolder> {
             holder.bind(channel)
             return
         }
-
+        if (holder is SearchViewHolder) {
+            holder.bind()
+        }
         if (holder is ItemLoadingViewHolder) {
             holder.bind(isLoadMoreEnable)
         }

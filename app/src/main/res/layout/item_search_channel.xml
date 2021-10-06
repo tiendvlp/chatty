@@ -8,6 +8,7 @@
         android:backgroundTint="@color/dark1"
         android:textAlignment="textStart"
         android:textColor="@color/dark2"
+        android:transitionName="searchBox"
         android:paddingLeft="20dp"
         style="?android:attr/borderlessButtonStyle"
         android:text="Search"

@@ -15,11 +15,14 @@
         <entry key="app/src/main/res/drawable/rbtnuser_background.xml" value="0.2861111111111111" />
         <entry key="app/src/main/res/drawable/redcircle.xml" value="0.2861111111111111" />
         <entry key="app/src/main/res/drawable/yellocircle.xml" value="0.2861111111111111" />
+        <entry key="app/src/main/res/layout/item_search_channel.xml" value="0.12952898550724637" />
         <entry key="app/src/main/res/layout/item_textchat.xml" value="0.5168250524595512" />
+        <entry key="app/src/main/res/layout/layout_channel.xml" value="0.21331521739130435" />
+        <entry key="app/src/main/res/layout/layout_search.xml" value="0.25" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

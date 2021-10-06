@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/global_margin_horizontal"
+    android:paddingTop="@dimen/global_margin_horizontal"
+    android:paddingRight="@dimen/global_margin_horizontal"
+    >
+    <LinearLayout
+        android:transitionName="searchBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        >
+        <EditText
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/edtSearch"
+            android:layout_width="wrap_content"
+            android:imeOptions="actionSearch"
+            android:layout_height="28dp"
+            android:layout_weight="1"
+            android:background="@drawable/circularviewbg_a"
+            android:backgroundTint="@color/dark1"
+            android:textAlignment="textStart"
+            android:textColor="@color/dark2"
+            android:paddingLeft="20dp"
+            style="?android:attr/borderlessButtonStyle"
+            android:hint="Search"
+            android:textSize="12sp" />
+        <com.devlogs.chatty.screen.common.customview.Button
+            android:id="@+id/btnCancel"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:padding="0dp"
+            android:text="cancel"
+            android:textSize="11sp"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/grey_500"
+            android:background="@null"
+            />
+    </LinearLayout>
+</LinearLayout>
